@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="dim4dp">4dp</dimen>
+    <dimen name="dim8dp">8dp</dimen>
+    <dimen name="dim16dp">16dp</dimen>
+    <dimen name="dim32dp">32dp</dimen>
+    <dimen name="dim48dp">48dp</dimen>
+    <dimen name="dim64dp">64dp</dimen>
+    <dimen name="posts_avatar_size">48dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="checkbox_padding_start">8dp</dimen>
+    <dimen name="icon_button_padding">12dp</dimen>
+    <dimen name="icon_button_min_size">48dp</dimen>
+</resources>

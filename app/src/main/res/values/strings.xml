@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">NeWork</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="coala_text">Коала — это небольшой зверек. Длина взрослого самца около 80 см, а весит он приблизительно 15 кг. Самки немного меньше. Шерстка коал обычно серого цвета, с вкраплениями белого и иногда черного тона. Уши достаточно крупные, а глаза, наоборот, небольшие. Нос выпуклый, черного цвета. Конечности коалы полностью приспособлены для лазания по деревьям. На передних лапах у них пять пальцев — два находятся немного в стороне (как большие пальцы у людей).</string>
+    <string name="event_text">Крупнейшая в стране конференция по тестированию ПО от JUG Ru Group. Подходит не только для QA-инженеров, но и для пишущих тесты разработчиков, тимлидов и директоров по качеству. Мероприятие больше ориентировано на технологии, чем на процессы и методологии. Программный комитет состоит из экспертов в области тестирования, которые тщательно проверяют каждый доклад. Среди тем — нагрузочное тестирование, тестирование мобильных приложений, безопасность, автоматизация тестирования и много другое.</string>
+    <string name="default_name">John Doe</string>
+    <string name="default_date">21 февраля 2023</string>
+    <string name="Date">Дата:</string>
+    <string name="Location">Место:</string>
+    <string name="default_date_of_event">16 апреля 2023</string>
+    <string name="default_city">г. Москва</string>
+    <string name="format">Формат:</string>
+    <string name="default_format">Онлайн</string>
+    <string name="def_likes">33</string>
+    <string name="google_com">google.com</string>
+    <string name="mob_developer">Мобильный разработчик</string>
+    <string name="google_inc">Google Inc.</string>
+    <string name="web_site">Сайт:</string>
+    <string name="start_job">Начало работы:</string>
+    <string name="end_job">Конец работы</string>
+    <string name="position">Должность:</string>
+    <string name="job">Место работы:</string>
+    <string name="remove">Удалить</string>
+    <string name="description_select_photo">Выбрать фото</string>
+    <string name="description_take_photo">Сделать снимок</string>
+    <string name="Posts">Посты</string>
+    <string name="add_post">Добавить запись</string>
+    <string name="menu_edit">Редактировать</string>
+    <string name="menu_remove">Удалить</string>
+</resources>

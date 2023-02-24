@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/profileBtn"
+        android:icon="@drawable/ic_baseline_account_box_24"
+        android:title="Профиль"
+        app:showAsAction="always"
+        />
+    <group android:id="@+id/authorized">
+        <item android:id="@+id/logout" android:title="Logout"/>
+    </group>
+    <group android:id="@+id/unAuthorized">
+        <item android:id="@+id/signIn" android:title="Sign In"/>
+        <item android:id="@+id/signUp" android:title="Sign Up"/>
+
+    </group>
+</menu>
