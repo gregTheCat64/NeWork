@@ -7,22 +7,57 @@
     android:orientation="vertical"
     tools:context=".ui.EventsFragment">
 
-    <FrameLayout
-        android:padding="@dimen/dim16dp"
+
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-
-        <com.google.android.material.button.MaterialButton
+        <Button
+            android:id="@+id/postListBtn"
+            style="@style/Widget.AppCompat.TextButton.UnChecked"
+            android:layout_weight="1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            app:icon="@drawable/ic_baseline_add_24"
-            android:text="@string/add_post"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:text="посты"
             />
 
-    </FrameLayout>
+        <Button
+            android:id="@+id/eventsListBtn"
+            style="@style/Widget.AppCompat.TextButton.Checked"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="cобытия"
+            />
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="@dimen/dim16dp"
+        android:layout_marginEnd="@dimen/dim16dp"
+        android:background="@color/divider_color"
+        app:layout_constraintBottom_toTopOf="@id/buttonPanel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/newEventBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/dim8dp"
+            app:icon="@drawable/ic_baseline_add_24"
+            android:minHeight="@dimen/dim16dp"
+            android:text="@string/add_post"
+            style="@style/Widget.Material3.Button.OutlinedButton.Icon"
+            />
+
+
 
 
     <androidx.recyclerview.widget.RecyclerView

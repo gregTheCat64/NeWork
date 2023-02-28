@@ -28,4 +28,14 @@
     <string name="add_post">Добавить запись</string>
     <string name="menu_edit">Редактировать</string>
     <string name="menu_remove">Удалить</string>
+    <string name="liked">лайкнут</string>
+    <string name="channel_remote_name">Server notifications</string>
+    <string name="channel_remote_description">Notifications from remote server</string>
+    <string name="notification_user_liked">User %1$s liked %2$s\'s post</string>
+    <string name="google_play_unavailable">Службы гугл недоступны на устройстве</string>
+    <string name="Profile">Профиль</string>
+    <string name="save">Сохранить</string>
+    <string name="empty_posts">Здесь пока нет постов. Создайте свой и он появится здесь:)</string>
+    <string name="error_loading">Ошибка загрузки</string>
+    <string name="retry_loading">Повторить</string>
 </resources>

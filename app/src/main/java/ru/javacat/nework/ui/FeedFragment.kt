@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import ru.javacat.nework.R
@@ -46,12 +47,26 @@ class FeedFragment : Fragment() {
 
         })
         binding.postsList.adapter = adapter
-        viewModel.data.observe(viewLifecycleOwner) {posts ->
-            adapter.submitList(posts)
+        viewModel.data.observe(viewLifecycleOwner) { state ->
+            adapter.submitList(state.posts)
+            with(binding){
+                progress.isVisible = state.loading
+                retryButton.isVisible = state.error
+                retryTitle.isVisible = state.error
+                emptyText.isVisible = state.empty
+            }
+        }
+
+        binding.retryButton.setOnClickListener {
+            viewModel.loadPosts()
         }
 
         binding.addPostBtn.setOnClickListener {
             findNavController().navigate(R.id.action_navigation_posts_to_newPostFragment)
+        }
+
+        binding.eventsListBtn.setOnClickListener{
+            findNavController().navigate(R.id.action_navigation_posts_to_navigation_events)
         }
 
         return binding.root

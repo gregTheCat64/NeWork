@@ -69,7 +69,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/jobEditText" />
 
-        <com.google.android.material.button.MaterialButton
+        <Button
             android:id="@+id/materialButton"
             style="@style/Widget.AppTheme.IconButton"
             android:layout_width="wrap_content"

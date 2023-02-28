@@ -9,17 +9,92 @@
 
 
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/addPostBtn"
-            android:padding="@dimen/dim8dp"
+        <Button
+            android:id="@+id/postListBtn"
+            style="@style/Widget.AppCompat.TextButton.Checked"
+            android:layout_weight="1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            app:icon="@drawable/ic_baseline_add_24"
-            android:text="@string/add_post"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:text="посты"
             />
+
+
+
+        <Button
+            android:id="@+id/eventsListBtn"
+            style="@style/Widget.AppCompat.TextButton.UnChecked"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="cобытия"
+            />
+
+    </LinearLayout>
+
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="@dimen/dim16dp"
+        android:layout_marginEnd="@dimen/dim16dp"
+        android:background="@color/divider_color"
+        app:layout_constraintBottom_toTopOf="@id/buttonPanel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/addPostBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/dim8dp"
+        app:icon="@drawable/ic_baseline_add_24"
+        android:minHeight="@dimen/dim16dp"
+        android:text="@string/add_post"
+        style="@style/Widget.Material3.Button.OutlinedButton.Icon"
+        />
+
+    <TextView
+        android:id="@+id/retryTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/dim16dp"
+        android:text="@string/error_loading"
+        android:visibility="gone"
+        android:layout_gravity="center" />
+
+    <Button
+        android:id="@+id/retryButton"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/retry_loading"
+        />
+
+
+
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_gravity="center"
+        />
+
+    <TextView
+        android:id="@+id/emptyText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/empty_posts"
+        android:visibility="gone"
+        android:padding="@dimen/dim64dp" />
 
 
     <androidx.recyclerview.widget.RecyclerView
@@ -28,6 +103,7 @@
         android:layout_height="wrap_content"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/card_post" />
+
 
 
 

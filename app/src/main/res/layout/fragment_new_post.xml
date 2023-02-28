@@ -16,12 +16,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
             android:layout_height="@dimen/dim48dp"
             android:background="@color/color_primary" />
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/cancel_button"
             style="@style/Widget.AppTheme.WhiteIconButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

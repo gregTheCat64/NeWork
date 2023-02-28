@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/profileBtn"
         android:icon="@drawable/ic_baseline_account_box_24"
-        android:title="Профиль"
+        android:title="@string/Profile"
         app:showAsAction="always"
         />
     <group android:id="@+id/authorized">

@@ -1,10 +1,9 @@
 package ru.javacat.nework.ui
 
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import ru.javacat.nework.R
@@ -29,6 +28,25 @@ class NewPostFragment : Fragment() {
     ): View {
         val binding = FragmentNewPostBinding.inflate(inflater, container, false)
 
+        // *** Так можно добавить меню на appBar
+//        requireActivity().addMenuProvider(object : MenuProvider{
+//            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+//                menuInflater.inflate(R.menu.create_post_menu, menu)
+//            }
+//
+//            override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
+//                when (menuItem.itemId){
+//                    R.id.saveBtn ->{
+//                        viewModel.changeContent(binding.edit.text.toString())
+//                        viewModel.save()
+//                        AndroidUtils.hideKeyboard(requireView())
+//                        findNavController().navigateUp()
+//                        true
+//                    }
+//                        else -> false
+//                }
+//        }, viewLifecycleOwner)
+
         arguments?.textArg
             ?.let(binding.edit::setText)
 
@@ -36,10 +54,18 @@ class NewPostFragment : Fragment() {
             viewModel.changeContent(binding.edit.text.toString())
             viewModel.save()
             AndroidUtils.hideKeyboard(requireView())
+        }
+        viewModel.postCreated.observe(viewLifecycleOwner) {
+            viewModel.loadPosts()
             findNavController().navigateUp()
         }
 
+        binding.cancelButton.setOnClickListener {
+            AndroidUtils.hideKeyboard(requireView())
+            findNavController().navigateUp()
+        }
+
+
         return binding.root
     }
-
 }
