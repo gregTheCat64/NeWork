@@ -1,15 +1,22 @@
 package ru.javacat.nework.viewmodels
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.net.Uri
+import androidx.lifecycle.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import ru.javacat.nework.db.AppDb
+import ru.javacat.nework.dto.MediaUpload
 import ru.javacat.nework.dto.Post
 import ru.javacat.nework.model.FeedModel
+import ru.javacat.nework.model.FeedModelState
+import ru.javacat.nework.model.PhotoModel
 import ru.javacat.nework.repository.PostRepository
 import ru.javacat.nework.repository.PostRepositoryImpl
 import ru.javacat.nework.util.SingleLiveEvent
+import java.io.File
 import java.io.IOException
 import kotlin.concurrent.thread
 
@@ -21,55 +28,86 @@ private val empty = Post(
     likes = 0,
     published = "",
 
-)
+    )
+
+private val noPhoto = PhotoModel()
+
 class PostViewModel(application: Application) : AndroidViewModel(application) {
     // упрощённый вариант
-    private val repository: PostRepository = PostRepositoryImpl()
-    private val _data = MutableLiveData(FeedModel())
-    val data: LiveData<FeedModel>
-        get() = _data
+    private val repository: PostRepository = PostRepositoryImpl(
+        AppDb.getInstance(application).postDao()
+    )
+    //private val _data = MutableLiveData(FeedModel())
+    val data: LiveData<FeedModel> = repository.data
+        .map(::FeedModel)
+        .asLiveData(Dispatchers.Default)
+
+    private val _state = MutableLiveData(FeedModelState(idle = true))
+    val state: LiveData<FeedModelState> = _state
+
+    val newerCount: LiveData<Int> = data.switchMap {
+        repository.getNewerCount(it.posts.firstOrNull()?.id ?: 0L)
+            .catch { e -> e.printStackTrace() }
+            .asLiveData(Dispatchers.Default)
+    }
+
+
     private val edited = MutableLiveData(empty)
     private val _postCreated = SingleLiveEvent<Unit>()
     val postCreated: LiveData<Unit>
         get() = _postCreated
+
+    private val _photo = MutableLiveData(noPhoto)
+    val photo: LiveData<PhotoModel>
+    get() = _photo
 
     init {
         loadPosts()
     }
 
     fun loadPosts() {
-        thread {
-            // Начинаем загрузку
-            _data.postValue(FeedModel(loading = true))
+        viewModelScope.launch {
             try {
-                // Данные успешно получены
-                val posts = repository.getAll()
-                FeedModel(posts = posts, empty = posts.isEmpty())
-            } catch (e: IOException) {
-                // Получена ошибка
-                FeedModel(error = true)
-            }.also(_data::postValue)
+                _state.value = FeedModelState(loading = true)
+                repository.getAll()
+                _state.value = FeedModelState(idle = true)
+            } catch (e: Exception) {
+                _state.value = FeedModelState(error = true)
+            }
         }
-//        _data.value = FeedModel(loading = true)
-//        repository.getAllAsync(object : PostRepository.GetAllCallback {
-//            override fun onSuccess(posts: List<Post>) {
-//                _data.postValue(FeedModel(posts = posts, empty = posts.isEmpty()))
-//            }
-//
-//            override fun onError(e: Exception) {
-//                _data.postValue(FeedModel(error = true))
-//            }
-//        })
+    }
+
+    fun refresh() {
+        viewModelScope.launch {
+            _state.value = FeedModelState(refreshing = true)
+            try {
+                repository.getAll()
+                _state.value = FeedModelState(idle = true)
+            } catch (e: Exception) {
+                _state.value = FeedModelState(error = true)
+            }
+        }
     }
 
     fun save() {
         edited.value?.let {
-            thread {
-                repository.save(it)
-                _postCreated.postValue(Unit)
+            _postCreated.value = Unit
+            viewModelScope.launch {
+               try {
+                   when(_photo.value) {
+                       noPhoto -> repository.save(it)
+                       else -> _photo.value?.file?.let { file ->
+                           repository.saveWithAttachment(it, MediaUpload(file))
+                       }
+                   }
+                   _state.value = FeedModelState()
+               } catch (e: Exception) {
+                   _state.value = FeedModelState(error = true)
+               }
             }
         }
         edited.value = empty
+        _photo.value = noPhoto
     }
 
     fun edit(post: Post) {
@@ -85,23 +123,16 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun likeById(id: Long) {
-        thread { repository.likeById(id) }
+        viewModelScope.launch { repository.likeById(id) }
     }
 
     fun removeById(id: Long) {
-        thread {
-            // Оптимистичная модель
-            val old = _data.value?.posts.orEmpty()
-            _data.postValue(
-                _data.value?.copy(posts = _data.value?.posts.orEmpty()
-                    .filter { it.id != id }
-                )
-            )
-            try {
-                repository.removeById(id)
-            } catch (e: IOException) {
-                _data.postValue(_data.value?.copy(posts = old))
-            }
+        viewModelScope.launch {
+            repository.removeById(id)
         }
+    }
+
+    fun changePhoto(uri: Uri?, file: File?) {
+        _photo.value = PhotoModel(uri, file)
     }
 }

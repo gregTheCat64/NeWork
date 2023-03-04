@@ -48,43 +48,37 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/addPostBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/dim8dp"
+            app:icon="@drawable/ic_baseline_add_24"
+            android:minHeight="@dimen/dim16dp"
+            android:text="@string/add_post"
+            style="@style/Widget.Material3.Button.OutlinedButton.Icon"
+            />
+
+
+
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/addPostBtn"
+        android:id="@+id/newPostsBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="@dimen/dim8dp"
-        app:icon="@drawable/ic_baseline_add_24"
-        android:minHeight="@dimen/dim16dp"
-        android:text="@string/add_post"
-        style="@style/Widget.Material3.Button.OutlinedButton.Icon"
-        />
-
-    <TextView
-        android:id="@+id/retryTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/dim16dp"
-        android:text="@string/error_loading"
-        android:visibility="gone"
-        android:layout_gravity="center" />
-
-    <Button
-        android:id="@+id/retryButton"
+        android:text="Новые записи"
         android:layout_gravity="center"
         android:visibility="gone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/retry_loading"
         />
-
 
 
     <ProgressBar
         android:id="@+id/progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
+        android:visibility="visible"
         android:layout_gravity="center"
         />
 
@@ -97,12 +91,18 @@
         android:padding="@dimen/dim64dp" />
 
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/postsList"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeToRefresh"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/card_post" />
+        android:layout_height="wrap_content">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/postsList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/card_post" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
 
 
 

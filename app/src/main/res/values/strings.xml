@@ -35,7 +35,8 @@
     <string name="google_play_unavailable">Службы гугл недоступны на устройстве</string>
     <string name="Profile">Профиль</string>
     <string name="save">Сохранить</string>
-    <string name="empty_posts">Здесь пока нет постов. Создайте свой и он появится здесь:)</string>
+    <string name="empty_posts">Здесь пока нет постов. Создайте новый :)</string>
     <string name="error_loading">Ошибка загрузки</string>
     <string name="retry_loading">Повторить</string>
+    <string name="chooser_share_post">Поделиться записью</string>
 </resources>

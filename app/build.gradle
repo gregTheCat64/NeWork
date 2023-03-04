@@ -31,8 +31,9 @@ android {
         }
         debug {
             manifestPlaceholders.usesCleartextTraffic = true
-            buildConfigField "String", "BASE_URL", '"http://10.0.2.2:9999/api/slow/"'
-            //buildConfigField "String", "BASE_URL", '"https://netomedia.ru/api/slow/"'
+            buildConfigField "String", "BASE_URL", '"http://10.0.2.2:9999"'
+            //buildConfigField "String", "BASE_URL", '"http://192.168.0.103:9999/api/"'
+            //buildConfigField "String", "BASE_URL", '"https://netomedia.ru/api/"'
         }
     }
     compileOptions {
@@ -55,6 +56,8 @@ dependencies {
     def okhttp_version = "4.10.0"
     def retrofit_version = "2.9.0"
     def glide_version = "4.14.2"
+    def imagepicker_version = "2.1"
+    def play_services_base_version = "18.2.0"
 
 
     implementation 'androidx.core:core-ktx:1.9.0'
@@ -69,6 +72,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
 
     implementation "androidx.room:room-runtime:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
 
     implementation "androidx.recyclerview:recyclerview:$recyclerview_version"
 
@@ -80,10 +84,17 @@ dependencies {
     kapt "androidx.room:room-compiler:$room_version"
 
     implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
+    implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_version"
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
 
     implementation "com.github.bumptech.glide:glide:$glide_version"
+
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+
+    implementation "com.github.dhaval2404:imagepicker:$imagepicker_version"
+    implementation "com.google.android.gms:play-services-base:$play_services_base_version"
+
 
     testImplementation "android.arch.core:core-testing:$arch_version"
     testImplementation 'junit:junit:4.13.2'

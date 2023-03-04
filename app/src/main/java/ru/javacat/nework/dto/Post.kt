@@ -9,11 +9,12 @@ data class Post (
     val likedByMe: Boolean,
     val likes: Int = 0,
     var attachment: Attachment? = null,
+    var savedOnServer:Boolean = true
+
         )
 
 data class Attachment(
     val url: String,
-    //val description: String?,
     val type: AttachmentType = AttachmentType.IMAGE
 )
 

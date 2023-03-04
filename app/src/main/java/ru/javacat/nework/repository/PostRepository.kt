@@ -1,18 +1,17 @@
 package ru.javacat.nework.repository
 
-import androidx.lifecycle.LiveData
+
+import kotlinx.coroutines.flow.Flow
+import ru.javacat.nework.dto.MediaUpload
 import ru.javacat.nework.dto.Post
 
+
 interface PostRepository {
-    fun getAll(): List<Post>
-    fun likeById(id: Long)
-    fun save(post: Post)
-    fun removeById(id: Long)
-
-    fun getAllAsync(callback: GetAllCallback)
-
-    interface GetAllCallback {
-        fun onSuccess(posts: List<Post>) {}
-        fun onError(e: Exception) {}
+    val data: Flow<List<Post>>
+    suspend fun getAll()
+    fun getNewerCount(id: Long): Flow<Int>
+    suspend fun likeById(id: Long)
+    suspend fun save(post: Post)
+    suspend fun saveWithAttachment(post: Post, upload: MediaUpload)
+    suspend fun removeById(id: Long)
     }
-}

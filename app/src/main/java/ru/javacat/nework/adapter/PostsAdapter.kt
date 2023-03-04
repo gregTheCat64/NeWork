@@ -5,13 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import ru.javacat.nework.BuildConfig
-import ru.javacat.nework.BuildConfig.BASE_URL
 import ru.javacat.nework.R
 import ru.javacat.nework.databinding.CardPostBinding
 import ru.javacat.nework.dto.Post
@@ -22,9 +20,9 @@ interface OnInteractionListener {
     fun onEdit(post: Post) {}
     fun onRemove(post: Post) {}
     fun onShare(post: Post) {}
+    fun onResave(post: Post) {}
 }
 
-const val BASE_URL = "http://10.0.2.2:9999"
 
 class PostsAdapter(
     private val onInteractionListener: OnInteractionListener
@@ -53,9 +51,14 @@ class PostViewHolder(
                 binding.attachImage.visibility = View.VISIBLE
                 getAttachment(post, binding)
             } else binding.attachImage.visibility = View.GONE
+            if (post.savedOnServer){
+                binding.onServer.setImageResource(R.drawable.ic_baseline_cloud_done_24)
+            } else {
+                binding.onServer.setImageResource(R.drawable.ic_baseline_cloud_sync_24)
+            }
+
 
             binding.apply {
-                //avatar.loadCircleCrop("${ru.javacat.nework.adapter.BASE_URL}/avatars/${post.authorAvatar}")
                 name.text = post.author
                 published.text = post.published
                 content.text = post.content
@@ -63,6 +66,11 @@ class PostViewHolder(
                 likeBtn.isChecked = post.likedByMe
                 likeBtn.text = "${post.likes}"
 
+//                onServer.setOnClickListener {
+//                    if (!post.savedOnServer){
+//                        onInteractionListener.onResave(post)
+//                    }
+//                }
 
                 menu.setOnClickListener {
                     PopupMenu(it.context, it).apply {
@@ -97,7 +105,7 @@ class PostViewHolder(
 
 fun getAvatars(post: Post, binding: CardPostBinding){
     Glide.with(binding.avatar)
-        .load("${ru.javacat.nework.adapter.BASE_URL}/avatars/${post.authorAvatar}")
+        .load("${BuildConfig.BASE_URL}/avatars/${post.authorAvatar}")
         .placeholder(R.drawable.ic_baseline_account_circle_24)
         .error(R.drawable.ic_baseline_account_circle_24)
         .circleCrop()
@@ -107,12 +115,11 @@ fun getAvatars(post: Post, binding: CardPostBinding){
 
 fun getAttachment(post: Post, binding: CardPostBinding){
     Glide.with(binding.attachImage)
-        .load("${ru.javacat.nework.adapter.BASE_URL}/images/${post.attachment?.url}")
+        .load("${BuildConfig.BASE_URL}/media/${post.attachment?.url}")
         .error(R.drawable.ic_baseline_close_24)
         .timeout(10_000)
         .into(binding.attachImage)
 }
-
 
 
 class PostDiffCallback : DiffUtil.ItemCallback<Post>() {
