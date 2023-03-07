@@ -2,6 +2,7 @@ package ru.javacat.nework.dto
 
 data class Post (
     val id: Long,
+    val authorId: Long,
     val author: String,
     val authorAvatar: String = "",
     val content: String,
@@ -9,7 +10,8 @@ data class Post (
     val likedByMe: Boolean,
     val likes: Int = 0,
     var attachment: Attachment? = null,
-    var savedOnServer:Boolean = true
+    var savedOnServer:Boolean = true,
+    val ownedByMe: Boolean = false
 
         )
 

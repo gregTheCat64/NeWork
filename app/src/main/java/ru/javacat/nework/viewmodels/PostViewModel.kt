@@ -5,8 +5,10 @@ import android.net.Uri
 import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import ru.javacat.nework.auth.AppAuth
 import ru.javacat.nework.db.AppDb
 import ru.javacat.nework.dto.MediaUpload
 import ru.javacat.nework.dto.Post
@@ -22,6 +24,7 @@ import kotlin.concurrent.thread
 
 private val empty = Post(
     id = 0,
+    authorId = 0L,
     content = "",
     author = "Greg the Cat",
     likedByMe = false,
@@ -37,10 +40,19 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: PostRepository = PostRepositoryImpl(
         AppDb.getInstance(application).postDao()
     )
-    //private val _data = MutableLiveData(FeedModel())
-    val data: LiveData<FeedModel> = repository.data
-        .map(::FeedModel)
-        .asLiveData(Dispatchers.Default)
+
+    val data: LiveData<FeedModel> = AppAuth.getInstance()
+        .authStateFlow
+        .flatMapLatest { (myId, _) ->
+            repository.data
+                .map { posts ->
+                    FeedModel(
+                        posts.map {
+                            it.copy(ownedByMe = it.authorId == myId)
+                        }, posts.isEmpty()
+                    )
+                }
+        }.asLiveData(Dispatchers.Default)
 
     private val _state = MutableLiveData(FeedModelState(idle = true))
     val state: LiveData<FeedModelState> = _state
@@ -59,7 +71,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _photo = MutableLiveData(noPhoto)
     val photo: LiveData<PhotoModel>
-    get() = _photo
+        get() = _photo
 
     init {
         loadPosts()
@@ -93,17 +105,17 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         edited.value?.let {
             _postCreated.value = Unit
             viewModelScope.launch {
-               try {
-                   when(_photo.value) {
-                       noPhoto -> repository.save(it)
-                       else -> _photo.value?.file?.let { file ->
-                           repository.saveWithAttachment(it, MediaUpload(file))
-                       }
-                   }
-                   _state.value = FeedModelState()
-               } catch (e: Exception) {
-                   _state.value = FeedModelState(error = true)
-               }
+                try {
+                    when (_photo.value) {
+                        noPhoto -> repository.save(it)
+                        else -> _photo.value?.file?.let { file ->
+                            repository.saveWithAttachment(it, MediaUpload(file))
+                        }
+                    }
+                    _state.value = FeedModelState()
+                } catch (e: Exception) {
+                    _state.value = FeedModelState(error = true)
+                }
             }
         }
         edited.value = empty

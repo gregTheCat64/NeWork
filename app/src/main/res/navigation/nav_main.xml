@@ -19,6 +19,12 @@
         <action
             android:id="@+id/action_navigation_posts_to_navigation_events"
             app:destination="@id/navigation_events" />
+        <action
+            android:id="@+id/action_navigation_posts_to_registrationFragment"
+            app:destination="@id/registrationFragment" />
+        <action
+            android:id="@+id/action_navigation_posts_to_signInFragment"
+            app:destination="@id/signInFragment" />
     </fragment>
     <fragment
         android:id="@+id/navigation_events"
@@ -59,4 +65,14 @@
         android:name="ru.javacat.nework.ui.NewJobFragment"
         android:label="fragment_new_job"
         tools:layout="@layout/fragment_new_job" />
+    <fragment
+        android:id="@+id/registrationFragment"
+        android:name="ru.javacat.nework.ui.RegistrationFragment"
+        android:label="fragment_registration"
+        tools:layout="@layout/fragment_registration" />
+    <fragment
+        android:id="@+id/signInFragment"
+        android:name="ru.javacat.nework.ui.SignInFragment"
+        android:label="fragment_sign_in"
+        tools:layout="@layout/fragment_sign_in" />
 </navigation>

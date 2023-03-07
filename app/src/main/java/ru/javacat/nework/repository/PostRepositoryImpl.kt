@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.*
 import okhttp3.*
 import okhttp3.RequestBody.Companion.asRequestBody
 import ru.javacat.nework.api.PostsApi
+import ru.javacat.nework.auth.AppAuth
 import ru.javacat.nework.dao.PostDao
 import ru.javacat.nework.dto.*
 import ru.javacat.nework.entity.PostEntity
@@ -15,27 +16,6 @@ import ru.javacat.nework.entity.toEntity
 import ru.javacat.nework.error.*
 import java.io.IOException
 
-//class PostRepositoryImpl (
-//    private val dao: PostDao,
-//) : PostRepository {
-//    override fun getAll() = Transformations.map(dao.getAll()) { list ->
-//        list.map {
-//            it.toDto()
-//        }
-//    }
-//
-//    override fun likeById(id: Long) {
-//        dao.likeById(id)
-//    }
-//
-//    override fun save(post: Post) {
-//        dao.save(PostEntity.fromDto(post))
-//    }
-//
-//    override fun removeById(id: Long) {
-//        dao.removeById(id)
-//    }
-//}
 
 class PostRepositoryImpl(private val postDao: PostDao) : PostRepository {
     override val data = postDao.getAll()
@@ -137,7 +117,7 @@ class PostRepositoryImpl(private val postDao: PostDao) : PostRepository {
     override suspend fun likeById(id: Long) {
         //врем.решение
         val posts = PostsApi.retrofitService.getAll().body()
-        var currentPost:Post = Post(0,"","","","",false,0)
+        var currentPost:Post = Post(0,0,"","","","",false,0 )
         if (!posts.isNullOrEmpty()){
             for (p in posts){
                 if (p.id == id) {currentPost = p}
@@ -148,6 +128,48 @@ class PostRepositoryImpl(private val postDao: PostDao) : PostRepository {
             } else {
                PostsApi.retrofitService.dislikeById(id)
             }
+        }
+    }
+
+    override suspend fun updateUser(login: String, pass: String) {
+        try {
+            val response = PostsApi.retrofitService.updateUser(login, pass)
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+            val body = response.body()?: throw ApiError(response.code(), response.message())
+            val id = body.id
+            val token = body.token
+            if (token != null) {
+                AppAuth.getInstance().setAuth(id,token)
+            }
+
+        } catch (e: IOException) {
+            throw NetworkError
+        }catch (e: Exception) {
+            println(e)
+            throw UnknownError
+        }
+    }
+
+    override suspend fun registerUser(login: String, pass: String, name: String) {
+        try {
+            val response = PostsApi.retrofitService.registerUser(login, pass, name)
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+            val body = response.body()?: throw ApiError(response.code(), response.message())
+            val id = body.id
+            val token = body.token
+            if (token != null){
+                AppAuth.getInstance().setAuth(id,token)
+            }
+        } catch (e: IOException) {
+            throw NetworkError
+        }catch (e: Exception) {
+            println(e)
+            throw UnknownError
+
         }
     }
 }

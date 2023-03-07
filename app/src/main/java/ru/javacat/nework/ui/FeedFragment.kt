@@ -1,11 +1,14 @@
 package ru.javacat.nework.ui
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -13,6 +16,7 @@ import com.google.android.material.snackbar.Snackbar
 import ru.javacat.nework.R
 import ru.javacat.nework.adapter.OnInteractionListener
 import ru.javacat.nework.adapter.PostsAdapter
+import ru.javacat.nework.auth.AppAuth
 import ru.javacat.nework.databinding.FragmentFeedBinding
 import ru.javacat.nework.dto.Post
 import ru.javacat.nework.ui.NewPostFragment.Companion.textArg
@@ -34,7 +38,10 @@ class FeedFragment : Fragment() {
 
         val adapter = PostsAdapter(object : OnInteractionListener{
             override fun onLike(post: Post) {
-                viewModel.likeById(post.id)
+                if (AppAuth.getInstance().authStateFlow.value.id != 0L){
+                    viewModel.likeById(post.id)
+                } else showSignInDialog()
+
             }
 
             override fun onEdit(post: Post) {
@@ -67,12 +74,14 @@ class FeedFragment : Fragment() {
         })
 
         binding.postsList.adapter = adapter
+
         viewModel.data.observe(viewLifecycleOwner) { feedModel ->
             adapter.submitList(feedModel.posts)
             with(binding){
                 emptyText.isVisible = feedModel.empty
             }
         }
+
         viewModel.state.observe(viewLifecycleOwner) { state ->
             with(binding){
                 progress.isVisible = state.loading
@@ -108,7 +117,10 @@ class FeedFragment : Fragment() {
         }
 
         binding.addPostBtn.setOnClickListener {
-            findNavController().navigate(R.id.action_navigation_posts_to_newPostFragment)
+            if (AppAuth.getInstance().authStateFlow.value.token != null){
+                findNavController().navigate(R.id.action_navigation_posts_to_newPostFragment)
+            } else showSignInDialog()
+
         }
 
         binding.eventsListBtn.setOnClickListener{
@@ -116,5 +128,27 @@ class FeedFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    private fun showSignInDialog() {
+        val listener = DialogInterface.OnClickListener { _, which ->
+            when (which) {
+                DialogInterface.BUTTON_POSITIVE -> findNavController().navigate(R.id.action_navigation_posts_to_signInFragment)
+                DialogInterface.BUTTON_NEGATIVE -> Toast.makeText(
+                    context,
+                    "Не забудьте авторизоваться",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+        val dialog = AlertDialog.Builder(context)
+            .setCancelable(false)
+            .setTitle("Вы не авторизованы!")
+            .setMessage("Пожалуйста, авторизуйтесь")
+            .setPositiveButton("Хорошо", listener)
+            .setNegativeButton("Позже", listener)
+            .create()
+
+        dialog.show()
     }
 }

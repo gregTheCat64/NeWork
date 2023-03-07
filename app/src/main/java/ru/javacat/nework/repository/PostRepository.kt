@@ -14,4 +14,6 @@ interface PostRepository {
     suspend fun save(post: Post)
     suspend fun saveWithAttachment(post: Post, upload: MediaUpload)
     suspend fun removeById(id: Long)
+    suspend fun updateUser(login: String, pass: String)
+    suspend fun registerUser(login: String, pass: String, name: String)
     }
