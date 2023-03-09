@@ -2,6 +2,7 @@ package ru.javacat.nework.ui
 
 import android.app.AlertDialog
 import android.content.DialogInterface
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
@@ -19,15 +20,31 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.messaging.FirebaseMessaging
+import dagger.hilt.android.AndroidEntryPoint
 import ru.javacat.nework.R
 import ru.javacat.nework.auth.AppAuth
 import ru.javacat.nework.databinding.ActivityAppBinding
+import ru.javacat.nework.ui.NewPostFragment.Companion.textArg
 import ru.javacat.nework.viewmodels.AuthViewModel
+import ru.javacat.nework.viewmodels.PostViewModel
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class AppActivity : AppCompatActivity() {
 
-    //lateinit var appAuth: AppAuth
-    //private lateinit var navView: BottomNavigationView
+    @Inject
+    lateinit var appAuth: AppAuth
+
+    @Inject
+    lateinit var firebaseMessaging: FirebaseMessaging
+
+    @Inject
+    lateinit var googleApiAvailability: GoogleApiAvailability
+
+    val viewModel: AuthViewModel by viewModels()
+
+    private val postViewModel: PostViewModel by viewModels()
+
 
        override fun onCreate(savedInstanceState: Bundle?) {
            super.onCreate(savedInstanceState)
@@ -47,10 +64,28 @@ class AppActivity : AppCompatActivity() {
 //        navView.setupWithNavController(navController)
 //           navView.isVisible = true
 
+           intent?.let {
+               if (it.action != Intent.ACTION_SEND) {
+                   return@let
+               }
+
+               val text = it.getStringExtra(Intent.EXTRA_TEXT)
+               if (text?.isNotBlank() != true) {
+                   return@let
+               }
+
+               intent.removeExtra(Intent.EXTRA_TEXT)
+               findNavController(R.id.nav_host_fragment)
+                   .navigate(
+                       R.id.action_navigation_posts_to_newPostFragment,
+                       Bundle().apply {
+                           textArg = text
+                       }
+                   )
+           }
 
            checkGoogleApiAvailability()
 
-           val viewModel by viewModels<AuthViewModel>()
 
            var currentMenuProvider: MenuProvider? = null
            viewModel.data.observe(this) {
@@ -93,7 +128,7 @@ class AppActivity : AppCompatActivity() {
     private fun showSignOutDialog(){
         val listener = DialogInterface.OnClickListener{ _, which->
             when(which) {
-                DialogInterface.BUTTON_POSITIVE -> AppAuth.getInstance().removeAuth()
+                DialogInterface.BUTTON_POSITIVE -> appAuth.removeAuth()
                 DialogInterface.BUTTON_NEGATIVE -> Toast.makeText(this, "ну и ладненько...", Toast.LENGTH_SHORT).show()
             }
         }
@@ -110,7 +145,7 @@ class AppActivity : AppCompatActivity() {
 
 
     private fun checkGoogleApiAvailability() {
-        with(GoogleApiAvailability.getInstance()) {
+        with(googleApiAvailability) {
             val code = isGooglePlayServicesAvailable(this@AppActivity)
             if (code == ConnectionResult.SUCCESS) {
                 return@with
@@ -123,7 +158,7 @@ class AppActivity : AppCompatActivity() {
                 .show()
         }
 
-        FirebaseMessaging.getInstance().token.addOnSuccessListener {
+        firebaseMessaging.token.addOnSuccessListener {
             println(it)
         }
     }

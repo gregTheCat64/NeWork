@@ -10,9 +10,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import ru.javacat.nework.R
 import ru.javacat.nework.adapter.OnInteractionListener
 import ru.javacat.nework.adapter.PostsAdapter
@@ -21,13 +23,14 @@ import ru.javacat.nework.databinding.FragmentFeedBinding
 import ru.javacat.nework.dto.Post
 import ru.javacat.nework.ui.NewPostFragment.Companion.textArg
 import ru.javacat.nework.viewmodels.PostViewModel
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class FeedFragment : Fragment() {
+    private val viewModel: PostViewModel by activityViewModels()
 
-    private val viewModel: PostViewModel by viewModels(
-        ownerProducer = ::requireParentFragment
-    )
+    @Inject
+    lateinit var appAuth: AppAuth
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,7 +41,7 @@ class FeedFragment : Fragment() {
 
         val adapter = PostsAdapter(object : OnInteractionListener{
             override fun onLike(post: Post) {
-                if (AppAuth.getInstance().authStateFlow.value.id != 0L){
+                if (appAuth.authStateFlow.value.id != 0L){
                     viewModel.likeById(post.id)
                 } else showSignInDialog()
 
@@ -117,7 +120,7 @@ class FeedFragment : Fragment() {
         }
 
         binding.addPostBtn.setOnClickListener {
-            if (AppAuth.getInstance().authStateFlow.value.token != null){
+            if (appAuth.authStateFlow.value.token != null){
                 findNavController().navigate(R.id.action_navigation_posts_to_newPostFragment)
             } else showSignInDialog()
 
