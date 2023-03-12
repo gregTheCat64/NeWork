@@ -1,14 +1,8 @@
 package ru.javacat.nework.api
 
 import okhttp3.MultipartBody
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
-import ru.javacat.nework.BuildConfig
-import ru.javacat.nework.auth.AppAuth
 import ru.javacat.nework.auth.AuthState
 import ru.javacat.nework.dto.Media
 import ru.javacat.nework.dto.Post
@@ -54,10 +48,17 @@ interface PostsApiService {
     suspend fun upload(@Part media: MultipartBody.Part): Response<Media>
 
     @FormUrlEncoded
-    @POST ("users/authentication")
-    suspend fun updateUser(@Field("login") login: String, @Field("pass") pass:String): Response<AuthState>
+    @POST("users/authentication")
+    suspend fun updateUser(
+        @Field("login") login: String,
+        @Field("password") pass: String
+    ): Response<AuthState>
 
     @FormUrlEncoded
     @POST("users/registration")
-    suspend fun registerUser(@Field("login") login: String, @Field("pass") pass: String, @Field("name") name: String): Response<AuthState>
+    suspend fun registerUser(
+        @Field("login") login: String,
+        @Field("password") pass: String,
+        @Field("name") name: String
+    ): Response<AuthState>
 }

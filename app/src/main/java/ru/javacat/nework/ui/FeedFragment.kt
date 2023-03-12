@@ -23,6 +23,7 @@ import ru.javacat.nework.adapter.PostsAdapter
 import ru.javacat.nework.auth.AppAuth
 import ru.javacat.nework.databinding.FragmentFeedBinding
 import ru.javacat.nework.dto.Post
+import ru.javacat.nework.mediaplayer.MediaLifecycleObserver
 import ru.javacat.nework.ui.NewPostFragment.Companion.textArg
 import ru.javacat.nework.viewmodels.PostViewModel
 import javax.inject.Inject
@@ -30,6 +31,8 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class FeedFragment : Fragment() {
     private val viewModel: PostViewModel by activityViewModels()
+
+    private val mediaObserver = MediaLifecycleObserver()
 
     @Inject
     lateinit var appAuth: AppAuth
@@ -40,6 +43,8 @@ class FeedFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentFeedBinding.inflate(inflater, container,false)
+
+        lifecycle.addObserver(mediaObserver)
 
         val adapter = PostsAdapter(object : OnInteractionListener{
             override fun onLike(post: Post) {
@@ -75,6 +80,14 @@ class FeedFragment : Fragment() {
             override fun onResave(post: Post) {
                 viewModel.edit(post)
                 viewModel.save()
+            }
+
+            override fun onPlayAudio(post: Post) {
+                mediaObserver.apply {
+                    mediaPlayer?.setDataSource(
+                        post.attachment?.url
+                    )
+                }.play()
             }
         })
 

@@ -58,7 +58,7 @@ class PostRemoteMediator(
             appDb.withTransaction {
                 when (loadType) {
                     LoadType.REFRESH -> {
-                        if (postDao.isEmpty()) {
+                        if (body.isNotEmpty()){
                             postRemoteKeyDao.insert(
                                 listOf(
                                     PostRemoteKeyEntity(
@@ -71,12 +71,7 @@ class PostRemoteMediator(
                                     )
                                 )
                             )
-                        } else postRemoteKeyDao.insert(
-                            PostRemoteKeyEntity(
-                                PostRemoteKeyEntity.KeyType.AFTER,
-                                body.first().id
-                            )
-                        )
+                        }
                     }
 
                     LoadType.APPEND -> {
@@ -92,9 +87,9 @@ class PostRemoteMediator(
                     else -> Unit
                 }
                 //val nextKey = if (body.isEmpty()) null else body.last().id
-                body.map {
-                    it.savedOnServer = true
-                }
+//                body.map {
+//                    it.savedOnServer = true
+//                }
                 postDao.insert(body.map(PostEntity::fromDto))
             }
 

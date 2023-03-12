@@ -46,9 +46,9 @@ class PostRepositoryImpl @Inject constructor(
         try {
             val response = apiService.getAll()
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            for (i in body) {
-                i.savedOnServer = true
-            }
+//            for (i in body) {
+//                i.savedOnServer = true
+//            }
             postDao.insert(body.toEntity())
         } catch (e: IOException) {
             throw NetworkError
@@ -75,7 +75,7 @@ class PostRepositoryImpl @Inject constructor(
         .flowOn(Dispatchers.Default)
 
     override suspend fun save(post: Post, upload: MediaUpload?) {
-        post.savedOnServer = false
+        //post.savedOnServer = false
         try {
             val postWithAttachment = upload?.let {
                 upload(it)
@@ -84,8 +84,8 @@ class PostRepositoryImpl @Inject constructor(
             }
             if (postWithAttachment!=null) {postDao.insert(PostEntity.fromDto(postWithAttachment))}
             val response = apiService.save(postWithAttachment?: post)
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
-            body.savedOnServer = true
+            //val body = response.body() ?: throw ApiError(response.code(), response.message())
+            //body.savedOnServer = true
             //postDao.insert(PostEntity.fromDto(body))
         } catch (e: IOException) {
             throw NetworkError
@@ -128,7 +128,7 @@ class PostRepositoryImpl @Inject constructor(
     override suspend fun likeById(id: Long) {
         //врем.решение
         val posts = apiService.getAll().body()
-        var currentPost: Post = Post(0, 0, "", "", "", "", false, 0)
+        var currentPost: Post = Post(0, 0, "", "", "","",  false, 0)
         if (!posts.isNullOrEmpty()) {
             for (p in posts) {
                 if (p.id == id) {

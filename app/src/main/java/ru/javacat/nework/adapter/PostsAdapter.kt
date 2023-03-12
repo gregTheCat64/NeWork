@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide
 import ru.javacat.nework.BuildConfig
 import ru.javacat.nework.R
 import ru.javacat.nework.databinding.CardPostBinding
+import ru.javacat.nework.dto.AttachmentType
 import ru.javacat.nework.dto.Post
 
 
@@ -23,6 +24,7 @@ interface OnInteractionListener {
     fun onRemove(post: Post) {}
     fun onShare(post: Post) {}
     fun onResave(post: Post) {}
+    fun onPlayAudio(post: Post) {}
 }
 
 
@@ -49,15 +51,19 @@ class PostViewHolder(
 
         fun bind(post: Post) {
             getAvatars(post,binding)
-            if (post.attachment != null){
-                binding.attachImage.visibility = View.VISIBLE
-                getAttachment(post, binding)
-            } else binding.attachImage.visibility = View.GONE
-            if (post.savedOnServer){
-                binding.onServer.setImageResource(R.drawable.ic_baseline_cloud_done_24)
-            } else {
-                binding.onServer.setImageResource(R.drawable.ic_baseline_cloud_sync_24)
-            }
+                if (post.attachment != null) {
+                        when (post.attachment!!.type) {
+                            AttachmentType.IMAGE -> {
+                                binding.attachImage.visibility = View.VISIBLE
+                                getAttachment(post, binding)
+                            }
+                            AttachmentType.VIDEO -> TODO()
+                            AttachmentType.AUDIO -> {
+                                binding.playBtn.visibility = View.VISIBLE
+                            }
+                        }
+                    } else binding.attachImage.visibility = View.GONE
+
 
 
             binding.apply {
@@ -67,6 +73,12 @@ class PostViewHolder(
                 // в адаптере
                 likeBtn.isChecked = post.likedByMe
                 likeBtn.text = "${post.likes}"
+                if (post.attachment?.type == AttachmentType.AUDIO ) {
+                    playBtn.isVisible = true
+                }
+                playBtn.setOnClickListener {
+                    onInteractionListener.onPlayAudio(post)
+                }
 
 //                onServer.setOnClickListener {
 //                    if (!post.savedOnServer){
@@ -108,7 +120,7 @@ class PostViewHolder(
 
 fun getAvatars(post: Post, binding: CardPostBinding){
     Glide.with(binding.avatar)
-        .load("${BuildConfig.BASE_URL}/avatars/${post.authorAvatar}")
+        .load("${post.authorAvatar}")
         .placeholder(R.drawable.ic_baseline_account_circle_24)
         .error(R.drawable.ic_baseline_account_circle_24)
         .circleCrop()
@@ -118,7 +130,7 @@ fun getAvatars(post: Post, binding: CardPostBinding){
 
 fun getAttachment(post: Post, binding: CardPostBinding){
     Glide.with(binding.attachImage)
-        .load("${BuildConfig.BASE_URL}/media/${post.attachment?.url}")
+        .load("${post.attachment?.url}")
         .error(R.drawable.ic_baseline_close_24)
         .timeout(10_000)
         .into(binding.attachImage)

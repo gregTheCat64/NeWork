@@ -3,9 +3,8 @@ package ru.javacat.nework.entity
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import ru.javacat.nework.dto.Attachment
-import ru.javacat.nework.dto.AttachmentType
-import ru.javacat.nework.dto.Post
+import ru.javacat.nework.dto.*
+import java.util.Date
 
 @Entity
 data class PostEntity (
@@ -13,18 +12,22 @@ data class PostEntity (
         val id: Long,
         val authorId: Long,
         val author: String,
-        val authorAvatar: String,
+        val authorAvatar: String?,
         val content: String,
         val published: String,
         val likedByMe: Boolean,
         val likes: Int = 0,
-        var savedOnServer:Boolean = false,
+
         @Embedded
         val attachment: AttachmentEmbeddable?,
 
+        val ownedByMe: Boolean = false,
+//        val mentionedMe: Boolean = false,
+//        val users: List<User>? = null,
+//        val coords: Coordinates? = null,
+
 ) {
-        fun toDto() = Post(id, authorId, author, authorAvatar, content, published, likedByMe, likes,
-                savedOnServer =  savedOnServer,
+        fun toDto() = Post(id, authorId, author, authorAvatar, content, published,  likedByMe, likes,
                 attachment = attachment?.toDto()
         )
 
@@ -39,7 +42,6 @@ data class PostEntity (
                                 dto.published,
                                 dto.likedByMe,
                                 dto.likes,
-                                dto.savedOnServer,
                                 AttachmentEmbeddable.fromDto(dto.attachment)
                         )
 
