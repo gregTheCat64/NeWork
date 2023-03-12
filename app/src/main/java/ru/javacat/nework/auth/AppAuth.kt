@@ -44,10 +44,17 @@ class AppAuth @Inject constructor(
         } else {
             _authStateFlow = MutableStateFlow(AuthState(id, token))
         }
-        sendPushToken()
+        //sendPushToken()
     }
 
     val authStateFlow: StateFlow<AuthState> = _authStateFlow.asStateFlow()
+
+
+    @InstallIn(SingletonComponent::class)
+    @EntryPoint
+    interface AppAuthEntryPoint {
+        fun getApiService(): PostsApiService
+    }
 
     @Synchronized
     fun setAuth(id: Long, token: String) {
@@ -68,12 +75,6 @@ class AppAuth @Inject constructor(
             commit()
         }
         sendPushToken()
-    }
-
-    @InstallIn(SingletonComponent::class)
-    @EntryPoint
-    interface AppAuthEntryPoint {
-        fun getApiService(): PostsApiService
     }
 
     fun sendPushToken(token: String? = null) {

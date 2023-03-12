@@ -1,6 +1,7 @@
 package ru.javacat.nework.dao
 
 
+import androidx.paging.PagingSource
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 import ru.javacat.nework.dto.AttachmentType
@@ -10,6 +11,12 @@ import ru.javacat.nework.entity.PostEntity
 interface PostDao {
     @Query("SELECT * FROM PostEntity ORDER BY id DESC")
     fun getAll(): Flow<List<PostEntity>>
+
+    @Query("SELECT * FROM PostEntity ORDER BY id DESC")
+    fun getPagingSource(): PagingSource<Int, PostEntity>
+
+    @Query("SELECT COUNT(*) == 0 FROM PostEntity")
+    suspend fun isEmpty(): Boolean
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(post: PostEntity)
@@ -33,6 +40,9 @@ interface PostDao {
 
     @Query("DELETE FROM PostEntity WHERE id = :id")
     suspend fun removeById(id: Long)
+
+    @Query("DELETE FROM PostEntity")
+    suspend fun clear()
 }
 
 class Converters {

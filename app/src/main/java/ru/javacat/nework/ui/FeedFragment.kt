@@ -11,10 +11,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import ru.javacat.nework.R
 import ru.javacat.nework.adapter.OnInteractionListener
 import ru.javacat.nework.adapter.PostsAdapter
@@ -78,12 +80,25 @@ class FeedFragment : Fragment() {
 
         binding.postsList.adapter = adapter
 
-        viewModel.data.observe(viewLifecycleOwner) { feedModel ->
-            adapter.submitList(feedModel.posts)
-            with(binding){
-                emptyText.isVisible = feedModel.empty
+        lifecycleScope.launchWhenCreated {
+            viewModel.data.collectLatest {
+                adapter.submitData(it)
             }
         }
+
+        lifecycleScope.launchWhenCreated {
+            adapter.loadStateFlow.collectLatest {
+                binding.swipeToRefresh.isRefreshing = it.refresh is LoadState.Loading
+                        || it.append is LoadState.Loading
+                        || it.prepend is LoadState.Loading
+            }
+        }
+//        viewModel.data.observe(viewLifecycleOwner) { feedModel ->
+//            adapter.submitList(feedModel.posts)
+//            with(binding){
+//                emptyText.isVisible = feedModel.empty
+//            }
+//        }
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             with(binding){
@@ -99,24 +114,25 @@ class FeedFragment : Fragment() {
             }
         }
 
-        viewModel.newerCount.observe(viewLifecycleOwner) { state ->
-            println("НОВЫХ ПОСТОВ: $state штук!!!")
-            val btnText = "Новые записи"
-            if(state>0){
-                binding.newPostsBtn.isVisible = true
-                binding.newPostsBtn.text = btnText
-            }
-        }
+//        viewModel.newerCount.observe(viewLifecycleOwner) { state ->
+//            println("НОВЫХ ПОСТОВ: $state штук!!!")
+//            val btnText = "Новые записи"
+//            if(state>0){
+//                binding.newPostsBtn.isVisible = true
+//                binding.newPostsBtn.text = btnText
+//            }
+//        }
 
-        binding.newPostsBtn.setOnClickListener {
-            viewModel.refresh()
-            binding.newPostsBtn.isVisible = false
-            binding.postsList.smoothScrollToPosition(0)
-        }
+//        binding.newPostsBtn.setOnClickListener {
+//            viewModel.refresh()
+//            binding.newPostsBtn.isVisible = false
+//            binding.postsList.smoothScrollToPosition(0)
+//        }
+
 
 
         binding.swipeToRefresh.setOnRefreshListener {
-            viewModel.refresh()
+            adapter.refresh()
         }
 
         binding.addPostBtn.setOnClickListener {

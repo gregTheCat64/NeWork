@@ -22,8 +22,17 @@ interface PostsApiService {
     @GET("posts")
     suspend fun getAll(): Response<List<Post>>
 
+    @GET("posts/latest")
+    suspend fun getLatest(@Query("count") count: Int): Response<List<Post>>
+
     @GET("posts/{id}/newer")
     suspend fun getNewer(@Path("id") id: Long): Response<List<Post>>
+
+    @GET("posts/{id}/before")
+    suspend fun getBefore(@Path("id") id: Long, @Query("count") count: Int): Response<List<Post>>
+
+    @GET("posts/{id}/after")
+    suspend fun getAfter(@Path("id") id: Long, @Query("count") count: Int): Response<List<Post>>
 
     @GET("posts/{id}")
     suspend fun getById(@Path("id") id: Long): Response<Post>
@@ -46,9 +55,9 @@ interface PostsApiService {
 
     @FormUrlEncoded
     @POST ("users/authentication")
-    suspend fun updateUser(@Field("login") login: String, @Field("password") pass:String): Response<AuthState>
+    suspend fun updateUser(@Field("login") login: String, @Field("pass") pass:String): Response<AuthState>
 
     @FormUrlEncoded
     @POST("users/registration")
-    suspend fun registerUser(@Field("login") login: String, @Field("password") pass: String, @Field("name") name: String): Response<AuthState>
+    suspend fun registerUser(@Field("login") login: String, @Field("pass") pass: String, @Field("name") name: String): Response<AuthState>
 }

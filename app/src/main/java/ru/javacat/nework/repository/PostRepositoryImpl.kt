@@ -1,6 +1,7 @@
 package ru.javacat.nework.repository
 
 
+import androidx.paging.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -9,10 +10,10 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import ru.javacat.nework.api.PostsApiService
 import ru.javacat.nework.auth.AppAuth
 import ru.javacat.nework.dao.PostDao
+import ru.javacat.nework.dao.PostRemoteKeyDao
 import ru.javacat.nework.db.AppDb
 import ru.javacat.nework.dto.*
 import ru.javacat.nework.entity.PostEntity
-import ru.javacat.nework.entity.toDto
 import ru.javacat.nework.entity.toEntity
 import ru.javacat.nework.error.*
 import java.io.IOException
@@ -22,13 +23,23 @@ import javax.inject.Inject
 class PostRepositoryImpl @Inject constructor(
     private val postDao: PostDao,
     private val apiService: PostsApiService,
+    postRemoteKeyDao: PostRemoteKeyDao,
     private val appAuth: AppAuth,
     appDb: AppDb
 
-    ) : PostRepository {
-    override val data = postDao.getAll()
-        .map (List<PostEntity>::toDto)
-        .flowOn(Dispatchers.Default)
+) : PostRepository {
+    @OptIn(ExperimentalPagingApi::class)
+    override val data: Flow<PagingData<Post>> = Pager(
+        config = PagingConfig(pageSize = 5),
+        pagingSourceFactory = { postDao.getPagingSource() },
+        remoteMediator = PostRemoteMediator(
+            apiService,
+            postDao,
+            postRemoteKeyDao,
+            appDb
+        )
+    ).flow
+        .map { it.map(PostEntity::toDto) }
 
 
     override suspend fun getAll() {
@@ -63,13 +74,19 @@ class PostRepositoryImpl @Inject constructor(
         .catch { e -> throw AppError.from(e) }
         .flowOn(Dispatchers.Default)
 
-    override suspend fun save(post: Post) {
+    override suspend fun save(post: Post, upload: MediaUpload?) {
         post.savedOnServer = false
         try {
-            val response = apiService.save(post)
+            val postWithAttachment = upload?.let {
+                upload(it)
+            }?.let {
+                post.copy(attachment = Attachment(it.id, AttachmentType.IMAGE))
+            }
+            if (postWithAttachment!=null) {postDao.insert(PostEntity.fromDto(postWithAttachment))}
+            val response = apiService.save(postWithAttachment?: post)
             val body = response.body() ?: throw ApiError(response.code(), response.message())
             body.savedOnServer = true
-            postDao.insert(PostEntity.fromDto(body))
+            //postDao.insert(PostEntity.fromDto(body))
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
@@ -77,22 +94,8 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun saveWithAttachment(post: Post, upload: MediaUpload) {
-        try {
-            val media = uploadFile(upload)
-            // TODO: add support for other types
-            val postWithAttachment = post.copy(attachment = Attachment(media.id, AttachmentType.IMAGE))
-            save(postWithAttachment)
-        } catch (e: AppError) {
-            throw e
-        } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
-        }
-    }
 
-    private suspend fun uploadFile(upload: MediaUpload): Media {
+    override suspend fun upload(upload: MediaUpload): Media {
         try {
             val media = MultipartBody.Part.createFormData(
                 "file", upload.file.name, upload.file.asRequestBody()
@@ -114,7 +117,7 @@ class PostRepositoryImpl @Inject constructor(
     override suspend fun removeById(id: Long) {
         try {
             postDao.removeById(id)
-           apiService.removeById(id)
+            apiService.removeById(id)
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
@@ -125,16 +128,18 @@ class PostRepositoryImpl @Inject constructor(
     override suspend fun likeById(id: Long) {
         //врем.решение
         val posts = apiService.getAll().body()
-        var currentPost:Post = Post(0,0,"","","","",false,0 )
-        if (!posts.isNullOrEmpty()){
-            for (p in posts){
-                if (p.id == id) {currentPost = p}
+        var currentPost: Post = Post(0, 0, "", "", "", "", false, 0)
+        if (!posts.isNullOrEmpty()) {
+            for (p in posts) {
+                if (p.id == id) {
+                    currentPost = p
+                }
             }
             postDao.likeById(id)
-            if (!currentPost.likedByMe){
+            if (!currentPost.likedByMe) {
                 apiService.likeById(id)
             } else {
-               apiService.dislikeById(id)
+                apiService.dislikeById(id)
             }
         }
     }
@@ -145,16 +150,16 @@ class PostRepositoryImpl @Inject constructor(
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
-            val body = response.body()?: throw ApiError(response.code(), response.message())
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
             val id = body.id
             val token = body.token
             if (token != null) {
-                appAuth.setAuth(id,token)
+                appAuth.setAuth(id, token)
             }
 
         } catch (e: IOException) {
             throw NetworkError
-        }catch (e: Exception) {
+        } catch (e: Exception) {
             println(e)
             throw UnknownError
         }
@@ -166,15 +171,15 @@ class PostRepositoryImpl @Inject constructor(
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
-            val body = response.body()?: throw ApiError(response.code(), response.message())
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
             val id = body.id
             val token = body.token
-            if (token != null){
-               appAuth.setAuth(id,token)
+            if (token != null) {
+                appAuth.setAuth(id, token)
             }
         } catch (e: IOException) {
             throw NetworkError
-        }catch (e: Exception) {
+        } catch (e: Exception) {
             println(e)
             throw UnknownError
 

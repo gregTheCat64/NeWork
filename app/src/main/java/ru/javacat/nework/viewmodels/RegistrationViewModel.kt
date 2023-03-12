@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import ru.javacat.nework.api.PostsApiService
 import ru.javacat.nework.auth.AppAuth
 import ru.javacat.nework.dao.PostDao
+import ru.javacat.nework.dao.PostRemoteKeyDao
 import ru.javacat.nework.db.AppDb
 import ru.javacat.nework.repository.PostRepository
 import ru.javacat.nework.repository.PostRepositoryImpl
@@ -20,11 +21,12 @@ import javax.inject.Inject
 class RegistrationViewModel @Inject constructor(
     postDao: PostDao,
     apiService: PostsApiService,
+    postRemoteKeyDao: PostRemoteKeyDao,
     appAuth: AppAuth,
     appDb: AppDb
 ) : ViewModel() {
     private val repository: PostRepository =
-        PostRepositoryImpl(postDao, apiService, appAuth, appDb)
+        PostRepositoryImpl(postDao, apiService,postRemoteKeyDao, appAuth, appDb)
 
     private val _tokenReceived = SingleLiveEvent<Int>()
     val tokenReceived: LiveData<Int>
