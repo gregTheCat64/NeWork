@@ -20,15 +20,15 @@ data class PostEntity (
 
         @Embedded
         val attachment: AttachmentEmbeddable?,
-
-        val ownedByMe: Boolean = false,
 //        val mentionedMe: Boolean = false,
 //        val users: List<User>? = null,
-//        val coords: Coordinates? = null,
+ //       val coords: Coordinates? = Coordinates(null, null),
+        val ownedByMe: Boolean = false,
 
 ) {
         fun toDto() = Post(id, authorId, author, authorAvatar, content, published,  likedByMe, likes,
-                attachment = attachment?.toDto()
+                attachment = attachment?.toDto(),
+                //coords = coords
         )
 
         companion object {
@@ -42,7 +42,9 @@ data class PostEntity (
                                 dto.published,
                                 dto.likedByMe,
                                 dto.likes,
-                                AttachmentEmbeddable.fromDto(dto.attachment)
+                                AttachmentEmbeddable.fromDto(dto.attachment),
+                                //dto.coords,
+                                dto.ownedByMe
                         )
 
         }

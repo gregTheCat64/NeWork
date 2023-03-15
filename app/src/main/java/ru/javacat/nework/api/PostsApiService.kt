@@ -61,4 +61,13 @@ interface PostsApiService {
         @Field("password") pass: String,
         @Field("name") name: String
     ): Response<AuthState>
+
+    @Multipart
+    @POST("users/registration")
+    suspend fun registerWithPhoto(
+        @Part("login") login: String,
+        @Part("password") pass: String,
+        @Part("name") name: String,
+        @Part media: MultipartBody.Part,
+    ): Response<AuthState>
 }

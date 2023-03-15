@@ -86,7 +86,8 @@ class NewPostFragment : Fragment() {
         binding.pickPhoto.setOnClickListener {
             ImagePicker.Builder(this)
                 .galleryOnly()
-                .maxResultSize(2048,2048)
+                .crop()
+                .compress(2000)
                 .createIntent {
                     pickPhotoLauncher.launch(it)
                 }
@@ -105,8 +106,6 @@ class NewPostFragment : Fragment() {
         binding.clearPicBtn.setOnClickListener {
             viewModel.changePhoto(null, null)
         }
-
-
 
         binding.saveBtn.setOnClickListener {
             viewModel.changeContent(binding.edit.text.toString())

@@ -15,7 +15,7 @@ data class Post (
     val ownedByMe: Boolean = false,
 //    val mentionedMe: Boolean = false,
 //    val users: List<User>? = null,
-//    val coords: Coordinates? = null
+ //   val coords: Coordinates? = Coordinates(null, null)
         )
 
 data class User(

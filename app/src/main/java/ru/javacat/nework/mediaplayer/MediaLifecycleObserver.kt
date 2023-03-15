@@ -14,6 +14,11 @@ class MediaLifecycleObserver: LifecycleEventObserver {
             it.start()
         }
         mediaPlayer?.prepareAsync()
+        mediaPlayer?.setOnCompletionListener {
+            it.stop()
+            it.reset()
+            //it.release()
+        }
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {

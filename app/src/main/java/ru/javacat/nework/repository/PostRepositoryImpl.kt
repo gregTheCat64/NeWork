@@ -9,6 +9,7 @@ import okhttp3.*
 import okhttp3.RequestBody.Companion.asRequestBody
 import ru.javacat.nework.api.PostsApiService
 import ru.javacat.nework.auth.AppAuth
+import ru.javacat.nework.auth.AuthState
 import ru.javacat.nework.dao.PostDao
 import ru.javacat.nework.dao.PostRemoteKeyDao
 import ru.javacat.nework.db.AppDb
@@ -75,7 +76,6 @@ class PostRepositoryImpl @Inject constructor(
         .flowOn(Dispatchers.Default)
 
     override suspend fun save(post: Post, upload: MediaUpload?) {
-        //post.savedOnServer = false
         try {
             val postWithAttachment = upload?.let {
                 upload(it)
@@ -83,14 +83,41 @@ class PostRepositoryImpl @Inject constructor(
                 post.copy(attachment = Attachment(it.id, AttachmentType.IMAGE))
             }
             if (postWithAttachment!=null) {postDao.insert(PostEntity.fromDto(postWithAttachment))}
-            val response = apiService.save(postWithAttachment?: post)
-            //val body = response.body() ?: throw ApiError(response.code(), response.message())
-            //body.savedOnServer = true
-            //postDao.insert(PostEntity.fromDto(body))
+            apiService.save(postWithAttachment?: post)
+
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
             throw UnknownError
+        }
+    }
+
+    override suspend fun registerUser(login: String, pass: String, name: String, upload: MediaUpload?) {
+        try {
+            val response = if (upload != null){
+                val avatar = MultipartBody.Part.createFormData(
+                    "file", upload.file.name, upload.file.asRequestBody()
+                )
+                apiService.registerWithPhoto(login, pass, name, avatar)
+            } else {
+                apiService.registerUser(login, pass, name)
+            }
+
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
+            val id = body.id
+            val token = body.token
+            if (token != null) {
+                appAuth.setAuth(id, token)
+            }
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            println(e)
+            throw UnknownError
+
         }
     }
 
@@ -165,24 +192,5 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun registerUser(login: String, pass: String, name: String) {
-        try {
-            val response = apiService.registerUser(login, pass, name)
-            if (!response.isSuccessful) {
-                throw ApiError(response.code(), response.message())
-            }
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
-            val id = body.id
-            val token = body.token
-            if (token != null) {
-                appAuth.setAuth(id, token)
-            }
-        } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            println(e)
-            throw UnknownError
 
-        }
-    }
 }

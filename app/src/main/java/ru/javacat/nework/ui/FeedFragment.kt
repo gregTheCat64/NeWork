@@ -51,7 +51,6 @@ class FeedFragment : Fragment() {
                 if (appAuth.authStateFlow.value.id != 0L){
                     viewModel.likeById(post.id)
                 } else showSignInDialog()
-
             }
 
             override fun onEdit(post: Post) {
@@ -84,10 +83,15 @@ class FeedFragment : Fragment() {
 
             override fun onPlayAudio(post: Post) {
                 mediaObserver.apply {
+                    mediaPlayer?.reset()
                     mediaPlayer?.setDataSource(
                         post.attachment?.url
                     )
                 }.play()
+            }
+
+            override fun onPlayVideo(post: Post) {
+                super.onPlayVideo(post)
             }
         })
 

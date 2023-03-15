@@ -1,9 +1,11 @@
 package ru.javacat.nework.adapter
 
 
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.MediaController
 import android.widget.PopupMenu
 import androidx.core.view.isVisible
 import androidx.paging.PagingDataAdapter
@@ -25,6 +27,7 @@ interface OnInteractionListener {
     fun onShare(post: Post) {}
     fun onResave(post: Post) {}
     fun onPlayAudio(post: Post) {}
+    fun onPlayVideo(post: Post) {}
 }
 
 
@@ -57,9 +60,11 @@ class PostViewHolder(
                                 binding.attachImage.visibility = View.VISIBLE
                                 getAttachment(post, binding)
                             }
-                            AttachmentType.VIDEO -> TODO()
+                            AttachmentType.VIDEO -> {
+
+                            }
                             AttachmentType.AUDIO -> {
-                                binding.playBtn.visibility = View.VISIBLE
+
                             }
                         }
                     } else binding.attachImage.visibility = View.GONE
@@ -73,11 +78,27 @@ class PostViewHolder(
                 // в адаптере
                 likeBtn.isChecked = post.likedByMe
                 likeBtn.text = "${post.likes}"
-                if (post.attachment?.type == AttachmentType.AUDIO ) {
-                    playBtn.isVisible = true
-                }
-                playBtn.setOnClickListener {
+                attachAudio.isVisible = post.attachment?.type == AttachmentType.AUDIO
+                videoGroup.isVisible = post.attachment?.type == AttachmentType.VIDEO
+
+                attachAudio.setOnClickListener {
                     onInteractionListener.onPlayAudio(post)
+                }
+                videoPlayBtn.setOnClickListener {
+                    videoPlayBtn.isVisible = false
+                    attachVideo.apply {
+                        setMediaController(MediaController(context))
+                        setVideoURI(
+                            Uri.parse(post.attachment?.url)
+                        )
+                        setOnPreparedListener {
+                            start()
+                        }
+                        setOnCompletionListener {
+                            stopPlayback()
+                            videoPlayBtn.isVisible = true
+                        }
+                    }
                 }
 
 //                onServer.setOnClickListener {
@@ -134,6 +155,10 @@ fun getAttachment(post: Post, binding: CardPostBinding){
         .error(R.drawable.ic_baseline_close_24)
         .timeout(10_000)
         .into(binding.attachImage)
+}
+
+fun playVideo(post: Post, url: String){
+
 }
 
 

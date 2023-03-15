@@ -17,5 +17,5 @@ interface PostRepository {
     suspend fun removeById(id: Long)
     suspend fun upload(upload: MediaUpload): Media
     suspend fun updateUser(login: String, pass: String)
-    suspend fun registerUser(login: String, pass: String, name: String)
+    suspend fun registerUser(login: String, pass: String, name: String, upload: MediaUpload?)
     }
