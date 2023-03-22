@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="@dimen/dim32dp"
-    tools:context=".ui.RegistrationFragment">
+    tools:context=".ui.screens.RegistrationFragment">
 
 
 
@@ -84,8 +84,6 @@
             android:hint="Повторите пароль"
             android:minHeight="48dp" />
     </com.google.android.material.textfield.TextInputLayout>
-
-
 
 
 

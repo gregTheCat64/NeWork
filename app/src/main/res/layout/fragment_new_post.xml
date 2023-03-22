@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
 
-    tools:context=".ui.NewPostFragment">
+    tools:context=".ui.screens.NewPostFragment">
 
     <FrameLayout
         android:id="@+id/toolBarFrame"

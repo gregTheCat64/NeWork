@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:padding="@dimen/dim16dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.WallFragment">
+    tools:context=".ui.screens.WallFragment">
 
     <ImageView
         android:id="@+id/avatar"
