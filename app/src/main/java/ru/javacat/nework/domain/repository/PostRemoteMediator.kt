@@ -1,7 +1,5 @@
 package ru.javacat.nework.domain.repository
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.paging.*
 import androidx.room.withTransaction
 import ru.javacat.nework.data.dao.PostDao
@@ -10,7 +8,7 @@ import ru.javacat.nework.data.api.PostsApi
 import ru.javacat.nework.data.AppDb
 import ru.javacat.nework.data.entity.PostEntity
 import ru.javacat.nework.data.entity.PostRemoteKeyEntity
-import ru.javacat.nework.data.toModel
+import ru.javacat.nework.data.mappers.toEntity
 import ru.javacat.nework.error.ApiError
 import java.io.IOException
 
@@ -22,7 +20,6 @@ class PostRemoteMediator(
     private val postRemoteKeyDao: PostRemoteKeyDao,
     private val appDb: AppDb
 ) : RemoteMediator<Int, PostEntity>() {
-    @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun load(
         loadType: LoadType,
         state: PagingState<Int, PostEntity>
@@ -30,10 +27,11 @@ class PostRemoteMediator(
         try {
             val response = when (loadType) {
                 LoadType.REFRESH -> {
-                    val id = postRemoteKeyDao.max()
-                    if (id != null) {
-                        apiService.getAfter(id, state.config.pageSize)
-                    } else
+//                    val id = postRemoteKeyDao.max()
+//                    if (id != null) {
+//                        apiService.getAfter(id, state.config.pageSize)
+//
+//                    } else
                         apiService.getLatest(state.config.initialLoadSize)
                 }
                 LoadType.PREPEND -> {
@@ -56,11 +54,12 @@ class PostRemoteMediator(
                 response.code(),
                 response.message()
             )
+            //println("RESPONSE_BODY: ${body}")
 
             appDb.withTransaction {
                 when (loadType) {
                     LoadType.REFRESH -> {
-                        if (body.isNotEmpty()) {
+                            postRemoteKeyDao.clear()
                             postRemoteKeyDao.insert(
                                 listOf(
                                     PostRemoteKeyEntity(
@@ -73,7 +72,7 @@ class PostRemoteMediator(
                                     )
                                 )
                             )
-                        }
+
                     }
 
                     LoadType.APPEND -> {
@@ -92,7 +91,15 @@ class PostRemoteMediator(
 //                body.map {
 //                    it.savedOnServer = true
 //                }
-                postDao.insert(body.map { it.toModel() }.map(PostEntity::fromDto))
+                //val result = body.map { it.toModel() }.map(PostWithLikeOwnersAndMentions::fromDto)
+                //val result = body.map { it.toModel() }.map(PostEntity::fromDto)
+                //println("POST_MEDIATOR: $body")
+
+                 val result = body.map { it.toEntity() }
+                println("MEDIATOR: $result")
+                postDao.insert(
+                    body.map { it.toEntity() }
+                )
             }
 
             return MediatorResult.Success(body.isEmpty())

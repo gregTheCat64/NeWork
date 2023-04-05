@@ -5,7 +5,9 @@ import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.MediaPlayer
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -13,8 +15,10 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
@@ -26,7 +30,7 @@ import ru.javacat.nework.R
 import ru.javacat.nework.ui.adapter.OnInteractionListener
 import ru.javacat.nework.ui.adapter.PostsAdapter
 import ru.javacat.nework.data.auth.AppAuth
-import ru.javacat.nework.databinding.FragmentFeedBinding
+import ru.javacat.nework.databinding.FragmentPostsBinding
 import ru.javacat.nework.domain.model.PostModel
 import ru.javacat.nework.mediaplayer.MediaLifecycleObserver
 import ru.javacat.nework.ui.screens.NewPostFragment.Companion.textArg
@@ -37,10 +41,11 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class FeedFragment : Fragment() {
+class PostsFragment : Fragment() {
     private val viewModel: PostViewModel by activityViewModels()
 
     private val mediaObserver = MediaLifecycleObserver()
+
 
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -51,7 +56,6 @@ class FeedFragment : Fragment() {
             }
         }
 
-
     @Inject
     lateinit var appAuth: AppAuth
 
@@ -60,38 +64,51 @@ class FeedFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = FragmentFeedBinding.inflate(inflater, container, false)
-        
-        //Доступ к локации:
-        when {
-            // 1. Проверяем есть ли уже права
-            ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED -> {
-                Toast.makeText(requireContext(), "Йес!", Toast.LENGTH_SHORT).show()
-                val fusedLocationProviderClient = LocationServices
-                    .getFusedLocationProviderClient(requireActivity())
+        val binding = FragmentPostsBinding.inflate(inflater, container, false)
 
-                fusedLocationProviderClient.lastLocation.addOnSuccessListener {
-                    println(it)
-                    val df = DecimalFormat("#,######")
-                    df.roundingMode = RoundingMode.CEILING
+
+        //Доступ к локации:
+        lifecycle.coroutineScope.launchWhenCreated {
+            when {
+                // 1. Проверяем есть ли уже права
+                ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED -> {
+                    Toast.makeText(requireContext(), "Йес!", Toast.LENGTH_SHORT).show()
+                    val fusedLocationProviderClient = LocationServices
+                        .getFusedLocationProviderClient(requireActivity())
+
+                    fusedLocationProviderClient.lastLocation.addOnSuccessListener {
+                        println("МЕСТО: $it")
+                        val df = DecimalFormat("#,######")
+                        df.roundingMode = RoundingMode.CEILING
 //                    val latitude = String.format("%.7g%n", it.latitude).toDouble()
 //                    val longitude = String.format("%.7g%n", it.longitude).toDouble()
+                        if (it != null) {
+                            Log.i("MY_LOCATION", it.toString())
+                            viewModel.setCoordinates(
+                                df.format(it.latitude).toDouble(),
+                                df.format(it.longitude).toDouble()
+                            )
+                        }
 
-                    viewModel.setCoordinates(df.format(it.latitude).toDouble(), df.format(it.longitude).toDouble())
+                    }
+                }
+                // 2. Должны показать обоснование необходимости прав
+                shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) -> {
+                    // TODO: show rationale dialog
+                    //requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                    Toast.makeText(requireContext(), "НАМ НУЖНЫ ЕБАНЫ ПРАВА", Toast.LENGTH_SHORT)
+                        .show()
+                }
+                // 3. Запрашиваем права
+                else -> {
+                    requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                 }
             }
-            // 2. Должны показать обоснование необходимости прав
-            shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) -> {
-                // TODO: show rationale dialog
-            }
-            // 3. Запрашиваем права
-            else -> {
-                requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-            }
         }
+
 
         lifecycle.addObserver(mediaObserver)
 
@@ -131,12 +148,26 @@ class FeedFragment : Fragment() {
             }
 
             override fun onPlayAudio(post: PostModel) {
+                post.playBtnPressed = !post.playBtnPressed
                 mediaObserver.apply {
-                    mediaPlayer?.reset()
-                    mediaPlayer?.setDataSource(
-                        post.attachment?.url
-                    )
-                }.play()
+                    if (!mediaPlayer!!.isPlaying) {
+                        mediaPlayer?.reset()
+                        mediaPlayer?.setDataSource(post.attachment?.url)
+                        this.play()
+                    } else {
+                        mediaPlayer!!.pause()
+                    }
+                }
+
+
+//                val audioPlayer = MediaPlayer.create(context, post.attachment?.url.toString().toUri())
+//                audioPlayer.setOnPreparedListener{
+//                    it.start()
+//                }
+//                audioPlayer.setOnCompletionListener {
+//                    post.playBtnPressed = false
+//                    it.stop()
+//                }
             }
 
         })

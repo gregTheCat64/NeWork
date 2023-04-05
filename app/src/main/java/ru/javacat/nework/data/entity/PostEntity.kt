@@ -1,15 +1,16 @@
 package ru.javacat.nework.data.entity
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import ru.javacat.nework.data.dto.response.UserPreview
 import ru.javacat.nework.domain.model.AttachmentModel
 import ru.javacat.nework.domain.model.AttachmentType
 import ru.javacat.nework.domain.model.CoordinatesModel
 import ru.javacat.nework.domain.model.PostModel
+import ru.javacat.nework.util.asString
 import ru.javacat.nework.util.toLocalDateTime
+
 
 @Entity
 data class PostEntity(
@@ -20,27 +21,27 @@ data class PostEntity(
     val authorAvatar: String?,
     val authorJob: String?,
     val content: String,
-    val published: String,
+    val published: String?,
     @Embedded
     val coords: CoordinatesEmbeddable?,
     val link: String?,
-    //val likeOwnerIds: List<Int>,
-    //val mentionIds: List<Int>,
+    val likeOwnerIds: List<Long>?,
+    val mentionIds: List<Long>,
     val mentionMe: Boolean,
-    val likedByMe: Boolean,
+    var likedByMe: Boolean,
     @Embedded
     val attachment: AttachmentEmbeddable?,
     val ownedByMe: Boolean,
-    //val users: Map<Int, UserPreview>,
+    val users: Map<Long, UserPreview>,
     ) {
 
 
     fun toDto() = PostModel(
-        id, authorId, author, authorAvatar, authorJob, content, published.toString(),
+        id, authorId, author, authorAvatar, authorJob, content, published?.toLocalDateTime(),
         coords = coords?.toDto(),
-        link, null, null, mentionMe, likedByMe,
+        link, likeOwnerIds, mentionIds, mentionMe, likedByMe,
         attachment = attachment?.toDto(),
-        ownedByMe, null
+        ownedByMe, false, users
     )
 
     companion object {
@@ -52,12 +53,16 @@ data class PostEntity(
                 dto.authorAvatar,
                 dto.authorJob,
                 dto.content,
-                dto.published.toString(),
+                dto.published?.toString(),
                 CoordinatesEmbeddable.fromDto(dto.coords),
-                dto.link, dto.mentionMe,
+                dto.link,
+                dto.likeOwnerIds,
+                dto.mentionIds,
+                dto.mentionMe,
                 dto.likedByMe,
                 AttachmentEmbeddable.fromDto(dto.attachment),
-                dto.ownedByMe
+                dto.ownedByMe,
+                dto.users
             )
     }
 }
@@ -91,3 +96,5 @@ data class CoordinatesEmbeddable(
 
 fun List<PostEntity>.toDto(): List<PostModel> = map(PostEntity::toDto)
 fun List<PostModel>.toEntity(): List<PostEntity> = map(PostEntity.Companion::fromDto)
+
+

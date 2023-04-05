@@ -12,9 +12,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.javacat.nework.data.auth.AppAuth
 import ru.javacat.nework.data.dto.MediaUpload
-import ru.javacat.nework.data.dto.response.Coordinates
-import ru.javacat.nework.data.toModel
-import ru.javacat.nework.data.toPostRequest
+import ru.javacat.nework.data.mappers.toPostRequest
 import ru.javacat.nework.domain.model.CoordinatesModel
 import ru.javacat.nework.domain.model.FeedModelState
 import ru.javacat.nework.domain.model.PhotoModel
@@ -26,8 +24,8 @@ import javax.inject.Inject
 
 private val empty = PostModel(
    0,0L,"",null,null,"",null,
-    null,null,null,null,false,false,null,
-    false, null
+    null,null,null, emptyList(),false,false,null,
+    false, false, emptyMap()
     )
 
 private val noPhoto = PhotoModel()
@@ -72,6 +70,7 @@ class PostViewModel @Inject constructor(
         get() = _photo
 
     init {
+
         loadPosts()
     }
 

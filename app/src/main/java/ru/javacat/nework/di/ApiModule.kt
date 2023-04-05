@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -18,11 +19,54 @@ import javax.inject.Singleton
 @Module
 class ApiModule {
 
+    companion object {
+        private const val BASE_URL = "${BuildConfig.BASE_URL}/api/"
+    }
+
     @Provides
     @Singleton
-    fun provideApiService(auth: AppAuth): PostsApi {
-        return retrofit(okhttp(loggingInterceptor(), authInterceptor(auth)))
-            .create(PostsApi::class.java)
+    fun provideLogging():  HttpLoggingInterceptor = HttpLoggingInterceptor().apply{
+    if (BuildConfig.DEBUG) {
+        level = HttpLoggingInterceptor.Level.BODY
     }
+        }
+
+    @Provides
+    @Singleton
+    fun provideOkHttp(
+        logging: HttpLoggingInterceptor,
+        appAuth: AppAuth
+    ): OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor(logging)
+        .addInterceptor{chain->
+    appAuth.authStateFlow.value.token?.let { token ->
+        val newRequest = chain.request().newBuilder()
+            .addHeader("Authorization", token)
+            .build()
+        return@addInterceptor chain.proceed(newRequest)
+    }
+    chain.proceed(chain.request())
+        }
+        .build()
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(client: OkHttpClient): Retrofit = Retrofit.Builder()
+        .addConverterFactory(GsonConverterFactory.create())
+        .baseUrl(BASE_URL)
+        .client(client)
+        .build()
+
+    @Provides
+    @Singleton
+    fun provideApiService(
+        retrofit: Retrofit
+    ) : PostsApi = retrofit.create()
+
+    @Provides
+    @Singleton
+    fun provideEventsApiService(
+        retrofit: Retrofit
+    ) : EventsApi = retrofit.create()
 
 }

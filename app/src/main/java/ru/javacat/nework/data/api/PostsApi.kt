@@ -14,21 +14,6 @@ import ru.javacat.nework.data.dto.request.PostRequest
 import ru.javacat.nework.data.dto.response.PostResponse
 
 
-private const val BASE_URL = "${BuildConfig.BASE_URL}/api/"
-
-fun okhttp(vararg interceptors: Interceptor): OkHttpClient = OkHttpClient.Builder()
-    .apply {
-        interceptors.forEach {
-            this.addInterceptor(it)
-        }
-    }
-    .build()
-
-fun retrofit(client: OkHttpClient): Retrofit = Retrofit.Builder()
-    .addConverterFactory(GsonConverterFactory.create())
-    .baseUrl(BASE_URL)
-    .client(client)
-    .build()
 
 
 interface PostsApi {
@@ -90,6 +75,4 @@ interface PostsApi {
         @Part("name") name: String,
         @Part media: MultipartBody.Part,
     ): Response<Token>
-
-
 }

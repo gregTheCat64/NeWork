@@ -7,9 +7,9 @@
 
     <fragment
         android:id="@+id/navigation_posts"
-        android:name="ru.javacat.nework.ui.screens.FeedFragment"
+        android:name="ru.javacat.nework.ui.screens.PostsFragment"
         android:label="Посты"
-        tools:layout="@layout/fragment_feed" >
+        tools:layout="@layout/fragment_posts" >
         <action
             android:id="@+id/action_navigation_posts_to_wallFragment"
             app:destination="@id/wallFragment" />
@@ -40,6 +40,12 @@
         <action
             android:id="@+id/action_navigation_events_to_navigation_posts"
             app:destination="@id/navigation_posts" />
+        <action
+            android:id="@+id/action_navigation_events_to_signInFragment"
+            app:destination="@id/signInFragment" />
+        <action
+            android:id="@+id/action_navigation_events_to_registrationFragment"
+            app:destination="@id/registrationFragment" />
     </fragment>
     <fragment
         android:id="@+id/wallFragment"

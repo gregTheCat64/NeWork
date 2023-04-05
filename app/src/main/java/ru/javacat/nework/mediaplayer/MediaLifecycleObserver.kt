@@ -10,26 +10,47 @@ class MediaLifecycleObserver: LifecycleEventObserver {
     var mediaPlayer: MediaPlayer? = MediaPlayer()
 
     fun play() {
-        mediaPlayer?.setOnPreparedListener{
-            it.start()
+        if (mediaPlayer!!.isPlaying){
+            mediaPlayer!!.pause()
+            //mediaPlayer!!.release()
+        } else {
+            mediaPlayer?.setOnPreparedListener{
+                it.start()
+            }
+            mediaPlayer?.prepareAsync()
+            mediaPlayer?.setOnCompletionListener {
+                it.stop()
+                it.reset()
+
+            }
         }
-        mediaPlayer?.prepareAsync()
-        mediaPlayer?.setOnCompletionListener {
-            it.stop()
-            it.reset()
-            //it.release()
-        }
+
+    }
+
+    fun stop(){
+        mediaPlayer?.stop()
+        mediaPlayer?.reset()
+        mediaPlayer?.release()
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+        if (mediaPlayer!= null){
         when (event){
-            Lifecycle.Event.ON_PAUSE -> mediaPlayer?.pause()
-            Lifecycle.Event.ON_STOP -> {
-                mediaPlayer?.release()
-                mediaPlayer = null
+                Lifecycle.Event.ON_PAUSE -> {
+                    if(mediaPlayer!!.isPlaying) mediaPlayer?.pause()
+                }
+                Lifecycle.Event.ON_STOP -> {
+                    if(mediaPlayer!!.isPlaying){
+                        mediaPlayer?.stop()
+                        mediaPlayer?.reset()
+                        mediaPlayer?.release()
+                        mediaPlayer = null
+                    }
+
             }
             Lifecycle.Event.ON_DESTROY -> source.lifecycle.removeObserver(this)
-            else -> Unit
+            else -> {}
+        }
         }
     }
 }

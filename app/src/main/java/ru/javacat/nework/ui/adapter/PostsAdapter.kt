@@ -11,14 +11,13 @@ import androidx.core.view.isVisible
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import ru.javacat.nework.R
 import ru.javacat.nework.databinding.CardPostBinding
 import ru.javacat.nework.domain.model.AttachmentType
 import ru.javacat.nework.domain.model.PostModel
-
-import java.text.SimpleDateFormat
-import java.util.Date
+import ru.javacat.nework.util.asString
+import ru.javacat.nework.util.load
+import ru.javacat.nework.util.loadCircleCrop
 
 
 interface OnInteractionListener {
@@ -33,8 +32,8 @@ interface OnInteractionListener {
 
 
 class PostsAdapter(
-    private val onInteractionListener: OnInteractionListener
-): PagingDataAdapter<PostModel, PostViewHolder>(PostDiffCallback()) {
+    private val onInteractionListener: OnInteractionListener,
+) : PagingDataAdapter<PostModel, PostViewHolder>(PostDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val binding = CardPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return PostViewHolder(binding, onInteractionListener)
@@ -51,61 +50,76 @@ class PostViewHolder(
     private val binding: CardPostBinding,
     private val onInteractionListener: OnInteractionListener
 ) : RecyclerView.ViewHolder(binding.root) {
-
-
-        fun bind(post: PostModel) {
-            getAvatars(post,binding)
-                if (post.attachment != null) {
-                        when (post.attachment!!.type) {
-                            AttachmentType.IMAGE -> {
-                                binding.attachImage.visibility = View.VISIBLE
-                                getAttachment(post, binding)
-                            }
-                            AttachmentType.VIDEO -> {
-
-                            }
-                            AttachmentType.AUDIO -> {
-
-                            }
-                        }
-                    } else binding.attachImage.visibility = View.GONE
-
-
-
-            binding.apply {
-                name.text = post.author
-                published.text = post.published.toString()
-                content.text = post.content
-                // в адаптере
-                likeBtn.isChecked = post.likedByMe
-                likeBtn.text = "${post.likeOwnerIds?.size}"
-                if (post.coords != null) {
-                    locationTextView.text = "${post.coords?.toString()}"
+    fun bind(post: PostModel) {
+        if (post.attachment != null) {
+            binding.attachLayout.root.visibility = View.VISIBLE
+            when (post.attachment.type) {
+                AttachmentType.IMAGE -> {
+                    binding.attachLayout.attachImage.load(post.attachment.url)
                 }
-
-                attachAudio.isVisible = post.attachment?.type == AttachmentType.AUDIO
-                videoGroup.isVisible = post.attachment?.type == AttachmentType.VIDEO
-
-                attachAudio.setOnClickListener {
-                    onInteractionListener.onPlayAudio(post)
+                AttachmentType.VIDEO -> {
                 }
-                videoPlayBtn.setOnClickListener {
-                    videoPlayBtn.isVisible = false
+                AttachmentType.AUDIO -> {
+                }
+            }
+        } else binding.attachLayout.root.visibility = View.GONE
 
-                    attachVideo.apply {
-                        setMediaController(MediaController(context))
-                        setVideoURI(
-                            Uri.parse(post.attachment?.url)
-                        )
-                        setOnPreparedListener {
-                            start()
-                        }
-                        setOnCompletionListener {
-                            stopPlayback()
-                            videoPlayBtn.isVisible = true
-                        }
+        binding.apply {
+            avatar.loadCircleCrop(post.authorAvatar.toString())
+            name.text = post.author
+            published.text = post.published?.asString()
+            content.text = post.content
+            linkText.text = post.link
+
+            //likes:
+            likeBtn.isChecked = post.likedByMe //???
+            likeBtn.text = "${post.likeOwnerIds?.size ?: ""}"
+
+            if (post.coords != null) {
+                locationTextView.text = "${post.coords?.toString()}"
+            } else {
+                locationTextView.text = ""
+            }
+            infoLayout.isVisible = true
+
+            //mentions:
+            if (post.mentionIds.isNotEmpty()) {
+                mentionIds.text = post.mentionIds.map {
+                    post.users[it]?.name
+                }.joinToString (", ")
+            } else mentionIds.text = ""
+
+
+
+            //image
+            attachLayout.attachImage.isVisible = post.attachment?.type == AttachmentType.IMAGE
+
+            // audio:
+            attachLayout.attachAudio.isVisible = post.attachment?.type == AttachmentType.AUDIO
+            attachLayout.attachAudio.isChecked = post.playBtnPressed
+            attachLayout.attachAudio.setOnClickListener {
+                onInteractionListener.onPlayAudio(post)
+            }
+
+            //video
+            attachLayout.videoGroup.isVisible = post.attachment?.type == AttachmentType.VIDEO
+            attachLayout.videoPlayBtn.setOnClickListener {
+                attachLayout.videoPlayBtn.isVisible = false
+
+                attachLayout.attachVideo.apply {
+                    setMediaController(MediaController(context))
+                    setVideoURI(
+                        Uri.parse(post.attachment?.url)
+                    )
+                    setOnPreparedListener {
+                        start()
+                    }
+                    setOnCompletionListener {
+                        stopPlayback()
+                        attachLayout.videoPlayBtn.isVisible = true
                     }
                 }
+            }
 
 //                onServer.setOnClickListener {
 //                    if (!post.savedOnServer){
@@ -113,64 +127,42 @@ class PostViewHolder(
 //                    }
 //                }
 
-                menu.isVisible = post.ownedByMe
-                menu.setOnClickListener {
-                    PopupMenu(it.context, it).apply {
-                        inflate(R.menu.options_post)
-                        setOnMenuItemClickListener { item ->
-                            when (item.itemId) {
-                                R.id.remove -> {
-                                    onInteractionListener.onRemove(post)
-                                    true
-                                }
-                                R.id.edit -> {
-                                    onInteractionListener.onEdit(post)
-                                    true
-                                }
-
-                                else -> false
+            menu.isVisible = post.ownedByMe
+            menu.setOnClickListener {
+                PopupMenu(it.context, it).apply {
+                    inflate(R.menu.options_post)
+                    setOnMenuItemClickListener { item ->
+                        when (item.itemId) {
+                            R.id.remove -> {
+                                onInteractionListener.onRemove(post)
+                                true
                             }
+                            R.id.edit -> {
+                                onInteractionListener.onEdit(post)
+                                true
+                            }
+
+                            else -> false
                         }
-                    }.show()
-                }
+                    }
+                }.show()
+            }
 
-                likeBtn.setOnClickListener {
-                    onInteractionListener.onLike(post)
-                }
+            likeBtn.setOnClickListener {
+                onInteractionListener.onLike(post)
+            }
 
-                shareBtn.setOnClickListener {
-                    onInteractionListener.onShare(post)
-                }
+            shareBtn.setOnClickListener {
+                onInteractionListener.onShare(post)
             }
         }
     }
-
-fun getAvatars(post: PostModel, binding: CardPostBinding){
-    Glide.with(binding.avatar)
-        .load("${post.authorAvatar}")
-        .placeholder(R.drawable.ic_baseline_account_circle_24)
-        .error(R.drawable.ic_baseline_account_circle_24)
-        .circleCrop()
-        .timeout(10_000)
-        .into(binding.avatar)
 }
 
-fun getAttachment(post: PostModel, binding: CardPostBinding){
-    Glide.with(binding.attachImage)
-        .load("${post.attachment?.url}")
-        .error(R.drawable.ic_baseline_close_24)
-        .timeout(10_000)
-        .into(binding.attachImage)
-}
 
-fun playVideo(post: PostModel, url: String){
+fun playVideo(post: PostModel, url: String) {
 
 }
-
-//fun getDate(date: String): Date? {
-//    val format = SimpleDateFormat("dd-MM-yyyy'T'HH:mm:ss'Z'")
-//    return format.parse(date)
-//}
 
 
 class PostDiffCallback : DiffUtil.ItemCallback<PostModel>() {

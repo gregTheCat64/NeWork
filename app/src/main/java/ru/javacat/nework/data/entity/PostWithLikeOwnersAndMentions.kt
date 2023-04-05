@@ -48,5 +48,16 @@ class PostWithLikeOwnersAndMentions(
         entity = MentionEntity::class,
         entityColumn = "postId")
     val mention: List<MentionEntity>
-)
+){
+//    fun toModel() = PostModel(
+//        postEntity.id,postEntity.authorId,postEntity.author,postEntity.authorAvatar,postEntity.authorJob,
+//        postEntity.content,postEntity.published?.toLocalDateTime(),postEntity.coords?.toDto(),postEntity.link,
+//        likeOwners.map { it.likeOwnerId }, mention.map { it.mentionId },postEntity.mentionMe,
+//        postEntity.likedByMe,postEntity.attachment?.toDto(),false,postEntity.ownedByMe
+//
+//    )
+}
+
+//fun List<PostResponse>.toMultiInsertDto() =
+
 

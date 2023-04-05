@@ -7,7 +7,7 @@
     <string name="default_name">John Doe</string>
     <string name="default_date">21 февраля 2023</string>
     <string name="Date">Дата:</string>
-    <string name="Location">Место:</string>
+    <string name="Location">Местоположение:</string>
     <string name="default_date_of_event">16 апреля 2023</string>
     <string name="default_city">г. Москва</string>
     <string name="format">Формат:</string>

@@ -79,7 +79,7 @@ class AppActivity : AppCompatActivity() {
                    )
            }
 
-           //checkGoogleApiAvailability()
+           checkGoogleApiAvailability()
 
 
            var currentMenuProvider: MenuProvider? = null
@@ -97,12 +97,20 @@ class AppActivity : AppCompatActivity() {
                    override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
                        when (menuItem.itemId) {
                            R.id.signIn -> {
-                               findNavController(R.id.nav_host_fragment).navigate(R.id.action_navigation_posts_to_signInFragment)
+                               try {
+                                   findNavController(R.id.nav_host_fragment).navigate(R.id.action_navigation_posts_to_signInFragment)
+                               } catch (e: Exception) {
+                                   findNavController(R.id.nav_host_fragment).navigate(R.id.action_navigation_events_to_signInFragment)
+                               }
                                //AppAuth.getInstance().setAuth(5, "x-token")
                                true
                            }
                            R.id.signUp -> {
-                               findNavController(R.id.nav_host_fragment).navigate(R.id.action_navigation_posts_to_registrationFragment)
+                               try {
+                                   findNavController(R.id.nav_host_fragment).navigate(R.id.action_navigation_posts_to_registrationFragment)
+                               } catch (e: Exception) {
+                                   findNavController(R.id.nav_host_fragment).navigate(R.id.action_navigation_events_to_registrationFragment)
+                               }
                                //AppAuth.getInstance().setAuth(5, "x-token")
                                true
                            }

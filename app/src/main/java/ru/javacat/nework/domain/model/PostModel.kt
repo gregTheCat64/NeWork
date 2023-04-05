@@ -11,14 +11,15 @@ data class PostModel (
         val authorAvatar: String?,
         val authorJob: String?,
         val content: String,
-        val published:String?,
+        val published:LocalDateTime?,
         var coords: CoordinatesModel?,
         var link: String?,
-        val likeOwnerIds: List<Long>?,
-        var mentionIds: List<Long>?,
+        var likeOwnerIds: List<Long>?,
+        var mentionIds: List<Long>,
         val mentionMe: Boolean,
         val likedByMe: Boolean,
-        var attachment: AttachmentModel?,
+        val attachment: AttachmentModel?,
+        var playBtnPressed: Boolean = false,
         val ownedByMe: Boolean,
-        val users: Map<Int, UserPreview>?
+        val users: Map<Long, UserPreview>
         )

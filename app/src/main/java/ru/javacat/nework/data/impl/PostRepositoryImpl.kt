@@ -17,9 +17,7 @@ import ru.javacat.nework.data.dto.MediaUpload
 import ru.javacat.nework.data.dto.request.PostRequest
 import ru.javacat.nework.data.dto.response.Attachment
 import ru.javacat.nework.data.entity.PostEntity
-import ru.javacat.nework.data.entity.toEntity
-import ru.javacat.nework.data.toModel
-import ru.javacat.nework.domain.model.AttachmentModel
+import ru.javacat.nework.data.mappers.toEntity
 import ru.javacat.nework.domain.model.AttachmentType
 import ru.javacat.nework.domain.model.PostModel
 import ru.javacat.nework.domain.repository.PostRemoteMediator
@@ -55,7 +53,6 @@ class PostRepositoryImpl @Inject constructor(
         .map { it.map(PostEntity::toDto) }
 
 
-
     override suspend fun getAll() {
         try {
             val response = postsApi.getAll()
@@ -63,7 +60,7 @@ class PostRepositoryImpl @Inject constructor(
 //            for (i in body) {
 //                i.savedOnServer = true
 //            }
-            postDao.insert(body.map { it.toModel() }.toEntity())
+            postDao.insert(body.map { it.toEntity()})
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
@@ -72,7 +69,6 @@ class PostRepositoryImpl @Inject constructor(
 
     }
 
-
     override fun getNewerCount(id: Long): Flow<Int> = flow {
         while (true) {
             delay(10_000L)
@@ -80,9 +76,8 @@ class PostRepositoryImpl @Inject constructor(
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
-
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            postDao.insert(body.map { it.toModel() }.toEntity())
+            postDao.insert(body.map { it.toEntity() })
             emit(body.size)
         }
     }
@@ -90,7 +85,70 @@ class PostRepositoryImpl @Inject constructor(
         .flowOn(Dispatchers.Default)
 
 
+    override suspend fun save(post: PostRequest, upload: MediaUpload?) {
+        try {
+            val postWithAttachment = upload?.let {
+                upload(it)
+            }?.let {
+                post.copy(attachment =  Attachment(it.url, AttachmentType.IMAGE.name))
+            }
+            postsApi.save(postWithAttachment?: post)
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
 
+    override suspend fun upload(upload: MediaUpload): Media {
+        try {
+            val media = MultipartBody.Part.createFormData(
+                "file", upload.file.name, upload.file.asRequestBody()
+            )
+            println("UPLOADFILE: ${upload.file}")
+
+            val response = postsApi.upload(media)
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+            println("RESPONSE: ${response.body()}")
+            return response.body() ?: throw ApiError(response.code(), response.message())
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
+
+    override suspend fun removeById(id: Long) {
+        try {
+            postDao.removeById(id)
+            postsApi.removeById(id)
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
+
+    override suspend fun likeById(id: Long) {
+        val authorId = appAuth.authStateFlow.value.id
+        val  currentPost = postDao.getById(id)
+        var likeOwners = currentPost.likeOwnerIds
+        if (currentPost.likedByMe == true) {
+            likeOwners = likeOwners?.minusElement(authorId)
+            //currentPost.likedByMe = false
+            //postDao.insert(currentPost)
+            postDao.likeById(id, likeOwners)
+            postsApi.dislikeById(id)
+        } else {
+            likeOwners = likeOwners?.plusElement(authorId)
+            //currentPost.likedByMe = true
+            //postDao.insert(currentPost)
+            postDao.likeById(id, likeOwners)
+            postsApi.likeById(id)
+        }
+        }
 
     override suspend fun registerUser(login: String, pass: String, name: String, upload: MediaUpload?) {
         try {
@@ -120,84 +178,6 @@ class PostRepositoryImpl @Inject constructor(
 
         }
     }
-
-    override suspend fun save(post: PostRequest, upload: MediaUpload?) {
-        try {
-            val postWithAttachment = upload?.let {
-                println("UPLOAD = ${upload.file} ${AttachmentType.IMAGE.name}")
-                upload(it)
-            }?.let {
-                println("MEDIA: ${it.url}")
-                post.copy(attachment =  Attachment(it.url, AttachmentType.IMAGE.name))
-            }
-//            if (postWithAttachment!=null) {
-//                postDao.insert(PostEntity.fromDto(postWithAttachment))
-//            } else postDao.insert(PostEntity.fromDto(post))
-
-            val response = postsApi.save(postWithAttachment?: post)
-            response.body()
-
-        } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
-        }
-    }
-
-
-    override suspend fun upload(upload: MediaUpload): Media {
-        try {
-            val media = MultipartBody.Part.createFormData(
-                "file", upload.file.name, upload.file.asRequestBody()
-            )
-            println("UPLOADFILE: ${upload.file}")
-
-            val response = postsApi.upload(media)
-            if (!response.isSuccessful) {
-                throw ApiError(response.code(), response.message())
-            }
-            println("RESPONSE: ${response.body()}")
-            return response.body() ?: throw ApiError(response.code(), response.message())
-        } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw ru.javacat.nework.error.UnknownError
-        }
-    }
-
-    override suspend fun removeById(id: Long) {
-        try {
-            postDao.removeById(id)
-            postsApi.removeById(id)
-        } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
-        }
-    }
-
-    override suspend fun likeById(id: Long) {
-        //врем.решение
-        val  currentPost = postsApi.getById(id)
-        if (currentPost.body()?.likedByMe == true) {
-            postsApi.dislikeById(id)
-        } else postsApi.likeById(id)
-        //var currentPost: PostResponse = PostResponse(0, 0, "", "", "","",  "", null,)
-//        if (!posts.isNullOrEmpty()) {
-//            for (p in posts) {
-//                if (p.id == id) {
-//                    currentPost = p
-//                }
-//            }
-            //postDao.likeById(id)
-
-//            if (!currentPost.likedByMe) {
-//                postsApi.likeById(id)
-//            } else {
-//                postsApi.dislikeById(id)
-//            }
-        }
-
 
     override suspend fun updateUser(login: String, pass: String) {
         try {
