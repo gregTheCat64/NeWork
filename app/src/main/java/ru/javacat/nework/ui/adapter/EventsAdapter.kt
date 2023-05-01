@@ -16,6 +16,7 @@ import ru.javacat.nework.domain.model.AttachmentType
 import ru.javacat.nework.domain.model.EventModel
 import ru.javacat.nework.util.asString
 import ru.javacat.nework.util.load
+import ru.javacat.nework.util.loadAvatar
 import ru.javacat.nework.util.loadCircleCrop
 
 interface OnEventsListener {
@@ -23,7 +24,8 @@ interface OnEventsListener {
     fun onEdit(event: EventModel) {}
     fun onRemove(event: EventModel) {}
     fun onShare(event: EventModel) {}
-    fun onPlayAudio(event: EventModel)
+    fun onPlayAudio(event: EventModel){}
+    fun onParticipant(event: EventModel){}
 }
 class EventsAdapter(
     private val onEventsListener: OnEventsListener
@@ -61,7 +63,7 @@ class EventViewHolder(
         } else {binding.attachLayout.root.visibility = View.GONE}
 
         binding.apply {
-            avatar.loadCircleCrop(event.authorAvatar.toString())
+            avatar.loadAvatar(event.authorAvatar.toString())
             name.text = event.author
             published.text = event.published.asString()
             content.text = event.content
@@ -69,8 +71,8 @@ class EventViewHolder(
             locationOfEvent.text = event.coords.toString()
             typeOfEvent.text = event.type.toString()
             //likes:
-            likeBtn.isChecked = event.likedByMe
-            likeBtn.text = "${event.likeOwnerIds?.size?: ""}"
+            interactionPosts.likeBtn.isChecked = event.likedByMe
+            interactionPosts.likeBtn.text = "${event.likeOwnerIds?.size?: ""}"
 
             //speakers:
             if (event.speakerIds.isNotEmpty()) {
@@ -81,9 +83,17 @@ class EventViewHolder(
 
             //participants:
             if (event.participantsIds.isNotEmpty()) {
-                participants.text = event.participantsIds.map {
-                    event.users[it]?.name
-                }.joinToString ( ", " )
+                interactionPosts.mentioned.text = event.participantsIds.size.toString()
+            }
+
+            //participants:
+            if (event.participantsIds.isNotEmpty()) {
+                interactionPosts.mentioned.visibility = View.VISIBLE
+                interactionPosts.mentioned.text = event.participantsIds.size.toString()
+            } else  interactionPosts.mentioned.visibility = View.GONE
+
+            interactionPosts.mentioned.setOnClickListener {
+                onEventsListener.onParticipant(event)
             }
 
             //image
@@ -136,11 +146,11 @@ class EventViewHolder(
                 }.show()
             }
 
-            likeBtn.setOnClickListener {
+            interactionPosts.likeBtn.setOnClickListener {
                 onEventsListener.onLike(event)
             }
 
-            shareBtn.setOnClickListener {
+            interactionPosts.shareBtn.setOnClickListener {
                 onEventsListener.onShare(event)
             }
         }

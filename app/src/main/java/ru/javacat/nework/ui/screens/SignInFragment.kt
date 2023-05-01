@@ -8,7 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
+import ru.javacat.nework.R
 import ru.javacat.nework.databinding.FragmentSignInBinding
+import ru.javacat.nework.error.NetworkError
 import ru.javacat.nework.util.AndroidUtils
 import ru.javacat.nework.ui.viewmodels.SignInViewModel
 
@@ -28,11 +30,22 @@ class SignInFragment: Fragment() {
         binding.loginBtn.setOnClickListener {
             if (binding.loginEditText.text.toString().isNotEmpty()
                 && binding.passwordEditText.text.toString().isNotEmpty() ){
-                val login = binding.loginEditText.text.toString()
-                val pass = binding.passwordEditText.text.toString()
+                val login = binding.loginEditText.text.toString().trim()
+                val pass = binding.passwordEditText.text.toString().trim()
                 AndroidUtils.hideKeyboard(requireView())
-                viewModel.updateUser(login,pass)
+                try {
+                    viewModel.updateUser(login,pass)
+                } catch (e: NetworkError) {
+                    //TODO доработать момент
+                    Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
+                        .show()
+                }
+
             } else Snackbar.make(binding.root, "Заполните все поля", Snackbar.LENGTH_LONG).show()
+        }
+
+        binding.toRegistrationBtn.setOnClickListener {
+            findNavController().navigate(R.id.action_signInFragment_to_registrationFragment)
         }
         viewModel.tokenReceived.observe(viewLifecycleOwner) {
             if (it == 0){

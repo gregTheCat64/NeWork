@@ -2,11 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/navigation_posts"
+        android:id="@+id/posts"
         android:title="Посты"
         />
     <item
-        android:id="@+id/navigation_events"
+        android:id="@+id/events"
         android:title="Мероприятия" />
 
 </menu>

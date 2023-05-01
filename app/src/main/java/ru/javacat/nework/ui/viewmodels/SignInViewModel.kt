@@ -10,21 +10,24 @@ import ru.javacat.nework.data.auth.AppAuth
 import ru.javacat.nework.data.dao.PostDao
 import ru.javacat.nework.data.dao.PostRemoteKeyDao
 import ru.javacat.nework.data.AppDb
+import ru.javacat.nework.data.api.UserApi
+import ru.javacat.nework.data.dao.UserDao
 import ru.javacat.nework.domain.repository.PostRepository
 import ru.javacat.nework.data.impl.PostRepositoryImpl
+import ru.javacat.nework.data.impl.UserRepositoryImpl
+import ru.javacat.nework.domain.repository.UserRepository
 import ru.javacat.nework.util.SingleLiveEvent
 import javax.inject.Inject
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
-    postDao: PostDao,
-    apiService: PostsApi,
-    postRemoteKeyDao: PostRemoteKeyDao,
+    userDao: UserDao,
+    apiService: UserApi,
     appAuth: AppAuth,
-    appDb: AppDb
+
 ) : ViewModel() {
-    private val repository: PostRepository =
-        PostRepositoryImpl(postDao,apiService,postRemoteKeyDao, appAuth, appDb)
+    private val repository: UserRepository =
+        UserRepositoryImpl(userDao, apiService, appAuth)
 
     private val _tokenReceived = SingleLiveEvent<Int>()
     val tokenReceived: LiveData<Int>

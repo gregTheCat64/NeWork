@@ -74,12 +74,14 @@ class RegistrationFragment : Fragment() {
             if (!binding.loginEditText.text.isNullOrEmpty() &&
                 !binding.passwordEditText.text.isNullOrEmpty()&&
                 !binding.nameEditText.text.isNullOrEmpty()){
-                val login = binding.loginEditText.text.toString()
-                val password = binding.passwordEditText.text.toString()
-                val name = binding.nameEditText.text.toString()
+                val login = binding.loginEditText.text.toString().trim()
+                println("$login")
+                val password = binding.passwordEditText.text.toString().trim()
+                println("$password")
+                val name = binding.nameEditText.text.toString().trim()
                 AndroidUtils.hideKeyboard(requireView())
 
-                if (binding.passwordEditText.text.toString() == binding.passwordCheckEditText.text.toString()){
+                if (binding.passwordEditText.text.toString().trim() == binding.passwordCheckEditText.text.toString().trim()){
                     viewModel.registerUser(login,password,name)
                 } else Snackbar.make(binding.root, "Пароли не совпадают", Snackbar.LENGTH_LONG).show()
 
@@ -109,14 +111,4 @@ class RegistrationFragment : Fragment() {
         return binding.root
     }
 
-}
-
-fun getAvatars(avatar: String, binding: FragmentRegistrationBinding){
-    Glide.with(binding.avatarImage)
-        .load(avatar)
-        .placeholder(R.drawable.ic_baseline_account_circle_24)
-        .error(R.drawable.ic_baseline_account_circle_24)
-        .circleCrop()
-        .timeout(10_000)
-        .into(binding.avatarImage)
 }

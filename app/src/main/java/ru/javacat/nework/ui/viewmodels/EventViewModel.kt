@@ -4,7 +4,6 @@ import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -32,9 +31,32 @@ class EventViewModel @Inject constructor(
         }.asLiveData(Dispatchers.Default)
 
 
+
     private val _state = MutableLiveData(FeedModelState(idle = true))
     val state: LiveData<FeedModelState>
         get() = _state
+
+    private val _dataByAuthor = MutableLiveData<List<EventModel>>()
+    val dataByAuthor: LiveData<List<EventModel>>
+        get() = _dataByAuthor
+
+    //участники:
+    private val _participateIds = MutableLiveData(emptyList<Long>())
+    val participateIds:LiveData<List<Long>>
+        get() = _participateIds
+
+    private var _participateAdded = MutableLiveData<String>()
+    val participateAdded: LiveData<String>
+        get() = _participateAdded
+
+    //спикеры:
+    private val _speakerIds = MutableLiveData(emptyList<Long>())
+    val speakerIds:LiveData<List<Long>>
+        get() = _speakerIds
+
+    private var _speakerAdded = MutableLiveData<String>()
+    val speakerAdded: LiveData<String>
+        get() = _speakerAdded
 
     init {
         loadEvents()
@@ -52,10 +74,34 @@ class EventViewModel @Inject constructor(
         }
     }
 
+    fun getByAuthorId(id: Long){
+        viewModelScope.launch {
+           _dataByAuthor.value = repository.getEventsByAuthorId(id)
+            println("SPEAKER= ${_dataByAuthor.value.toString()}")
+        }
+
+        }
+
+
+
+
     fun likeById(id: Long) {
             viewModelScope.launch { repository.likeById(id) }
-
     }
 
+    fun setParticipantIds(list: List<Long>){
+        _participateIds.value = list
+    }
 
+    fun setSpeakerIds(list: List<Long>){
+        _speakerIds.value = list
+    }
+
+    fun setParticipantAdded(string: String){
+        _participateAdded.value = string
+    }
+
+    fun setSpeakerAdded(string: String){
+        _speakerAdded.value = string
+    }
 }

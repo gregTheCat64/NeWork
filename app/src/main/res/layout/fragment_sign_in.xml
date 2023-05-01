@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="@dimen/dim8dp"
     android:orientation="vertical"
     tools:context=".ui.screens.SignInFragment">
 
@@ -36,7 +37,16 @@
             android:layout_marginTop="@dimen/dim16dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="login" />
+            android:text="Войти" />
+
+    <Button
+        android:id="@+id/toRegistrationBtn"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dim16dp"
+        android:text="Регистрация"
+        />
 
 
 </LinearLayout>

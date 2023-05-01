@@ -1,6 +1,7 @@
 package ru.javacat.nework.data.impl
 
 
+import androidx.lifecycle.asLiveData
 import androidx.paging.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -17,7 +18,9 @@ import ru.javacat.nework.data.dto.MediaUpload
 import ru.javacat.nework.data.dto.request.PostRequest
 import ru.javacat.nework.data.dto.response.Attachment
 import ru.javacat.nework.data.entity.PostEntity
+import ru.javacat.nework.data.entity.toDto
 import ru.javacat.nework.data.mappers.toEntity
+import ru.javacat.nework.data.mappers.toModel
 import ru.javacat.nework.domain.model.AttachmentType
 import ru.javacat.nework.domain.model.PostModel
 import ru.javacat.nework.domain.repository.PostRemoteMediator
@@ -53,20 +56,36 @@ class PostRepositoryImpl @Inject constructor(
         .map { it.map(PostEntity::toDto) }
 
 
+
     override suspend fun getAll() {
         try {
             val response = postsApi.getAll()
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-//            for (i in body) {
-//                i.savedOnServer = true
-//            }
+
             postDao.insert(body.map { it.toEntity()})
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
             throw UnknownError
         }
+    }
 
+    override suspend fun getPostsByAuthorId(authorId: Long):List<PostModel>? {
+        val userPosts = postDao.getByAuthorId(authorId)
+        return userPosts.toDto()
+    }
+
+    override suspend fun updatePostsByAuthorId(authorId: Long): List<PostModel>? {
+        try {
+            val response = postsApi.getAll().body()?.filter {
+                it.authorId == authorId
+            }?.map { it.toModel() }
+            return response
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
     }
 
     override fun getNewerCount(id: Long): Flow<Int> = flow {
@@ -150,53 +169,4 @@ class PostRepositoryImpl @Inject constructor(
         }
         }
 
-    override suspend fun registerUser(login: String, pass: String, name: String, upload: MediaUpload?) {
-        try {
-            val response = if (upload != null){
-                val avatar = MultipartBody.Part.createFormData(
-                    "file", upload.file.name, upload.file.asRequestBody()
-                )
-                postsApi.registerWithPhoto(login, pass, name, avatar)
-            } else {
-                postsApi.registerUser(login, pass, name)
-            }
-
-            if (!response.isSuccessful) {
-                throw ApiError(response.code(), response.message())
-            }
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
-            val id = body.id
-            val token = body.token
-            if (token != null) {
-                appAuth.setAuth(id, token)
-            }
-        } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            println(e)
-            throw UnknownError
-
-        }
-    }
-
-    override suspend fun updateUser(login: String, pass: String) {
-        try {
-            val response = postsApi.updateUser(login, pass)
-            if (!response.isSuccessful) {
-                throw ApiError(response.code(), response.message())
-            }
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
-            val id = body.id
-            val token = body.token
-            if (token != null) {
-                appAuth.setAuth(id, token)
-            }
-
-        } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            println(e)
-            throw UnknownError
-        }
-    }
 }

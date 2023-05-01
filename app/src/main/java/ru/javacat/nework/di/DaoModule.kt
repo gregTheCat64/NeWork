@@ -5,9 +5,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import ru.javacat.nework.data.AppDb
-import ru.javacat.nework.data.dao.EventDao
-import ru.javacat.nework.data.dao.PostDao
-import ru.javacat.nework.data.dao.PostRemoteKeyDao
+import ru.javacat.nework.data.dao.*
+import ru.javacat.nework.domain.model.User
 
 @InstallIn(SingletonComponent::class)
 @Module
@@ -20,5 +19,11 @@ object DaoModule {
 
     @Provides
     fun provideEventDao(db: AppDb): EventDao = db.eventDao()
+
+    @Provides
+    fun provideUserDao(db: AppDb): UserDao = db.userDao()
+
+    @Provides
+    fun provideJobsDao(db: AppDb): JobsDao = db.jobDao()
 
 }

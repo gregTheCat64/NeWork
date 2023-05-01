@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_main"
-    app:startDestination="@id/navigation_posts">
+    app:startDestination="@id/posts">
 
     <fragment
-        android:id="@+id/navigation_posts"
+        android:id="@+id/posts"
         android:name="ru.javacat.nework.ui.screens.PostsFragment"
         android:label="Посты"
         tools:layout="@layout/fragment_posts" >
@@ -18,7 +18,7 @@
             app:destination="@id/newPostFragment" />
         <action
             android:id="@+id/action_navigation_posts_to_navigation_events"
-            app:destination="@id/navigation_events" />
+            app:destination="@id/events" />
         <action
             android:id="@+id/action_navigation_posts_to_registrationFragment"
             app:destination="@id/registrationFragment" />
@@ -27,7 +27,7 @@
             app:destination="@id/signInFragment" />
     </fragment>
     <fragment
-        android:id="@+id/navigation_events"
+        android:id="@+id/events"
         android:name="ru.javacat.nework.ui.screens.EventsFragment"
         android:label="Мероприятия"
         tools:layout="@layout/fragment_events" >
@@ -39,7 +39,7 @@
             app:destination="@id/wallFragment" />
         <action
             android:id="@+id/action_navigation_events_to_navigation_posts"
-            app:destination="@id/navigation_posts" />
+            app:destination="@id/posts" />
         <action
             android:id="@+id/action_navigation_events_to_signInFragment"
             app:destination="@id/signInFragment" />
@@ -55,17 +55,32 @@
         <action
             android:id="@+id/action_wallFragment_to_newJobFragment"
             app:destination="@id/newJobFragment" />
+        <argument
+            android:name="authorArg"
+            app:argType="long"
+            android:defaultValue="0L" />
+        <action
+            android:id="@+id/action_wallFragment_to_jobsFragment"
+            app:destination="@id/jobsFragment" />
     </fragment>
     <fragment
         android:id="@+id/newPostFragment"
         android:name="ru.javacat.nework.ui.screens.NewPostFragment"
         android:label="fragment_new_post"
-        tools:layout="@layout/fragment_new_post" />
+        tools:layout="@layout/fragment_new_post" >
+        <action
+            android:id="@+id/action_newPostFragment_to_usersAddingFragment"
+            app:destination="@id/usersAddingFragment" />
+    </fragment>
     <fragment
         android:id="@+id/newEventFragment"
         android:name="ru.javacat.nework.ui.screens.NewEventFragment"
         android:label="fragment_new_event"
-        tools:layout="@layout/fragment_new_event" />
+        tools:layout="@layout/fragment_new_event" >
+        <action
+            android:id="@+id/action_newEventFragment_to_usersAddingFragment"
+            app:destination="@id/usersAddingFragment" />
+    </fragment>
     <fragment
         android:id="@+id/newJobFragment"
         android:name="ru.javacat.nework.ui.screens.NewJobFragment"
@@ -80,5 +95,35 @@
         android:id="@+id/signInFragment"
         android:name="ru.javacat.nework.ui.screens.SignInFragment"
         android:label="fragment_sign_in"
-        tools:layout="@layout/fragment_sign_in" />
+        tools:layout="@layout/fragment_sign_in" >
+        <action
+            android:id="@+id/action_signInFragment_to_registrationFragment"
+            app:destination="@id/registrationFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/usersAddingFragment"
+        android:name="ru.javacat.nework.ui.screens.UsersAddingFragment"
+        android:label="UsersAddingFragment" >
+        <argument
+            android:name="usersArg"
+            app:argType="ru.javacat.nework.domain.model.UsersType"
+            android:defaultValue="MENTION" />
+    </fragment>
+    <dialog
+        android:id="@+id/userListDialogFragment"
+        android:name="ru.javacat.nework.ui.screens.UserListDialogFragment"
+        android:label="UserListDialogFragment" >
+        <action
+            android:id="@+id/action_userListDialogFragment_to_wallFragment"
+            app:destination="@id/wallFragment" />
+    </dialog>
+    <fragment
+        android:id="@+id/jobsFragment"
+        android:name="ru.javacat.nework.ui.screens.JobsFragment"
+        android:label="JobsFragment" >
+        <argument
+            android:name="authorArg"
+            app:argType="long"
+            android:defaultValue="0L" />
+    </fragment>
 </navigation>

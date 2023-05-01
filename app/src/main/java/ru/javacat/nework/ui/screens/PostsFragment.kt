@@ -1,22 +1,18 @@
 package ru.javacat.nework.ui.screens
 
 import android.Manifest
-import android.app.AlertDialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
@@ -25,16 +21,18 @@ import androidx.paging.LoadState
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import ru.javacat.nework.R
-import ru.javacat.nework.ui.adapter.OnInteractionListener
-import ru.javacat.nework.ui.adapter.PostsAdapter
 import ru.javacat.nework.data.auth.AppAuth
 import ru.javacat.nework.databinding.FragmentPostsBinding
 import ru.javacat.nework.domain.model.PostModel
 import ru.javacat.nework.mediaplayer.MediaLifecycleObserver
+import ru.javacat.nework.ui.adapter.OnInteractionListener
+import ru.javacat.nework.ui.adapter.PostsAdapter
 import ru.javacat.nework.ui.screens.NewPostFragment.Companion.textArg
 import ru.javacat.nework.ui.viewmodels.PostViewModel
+import ru.javacat.nework.util.showSignInDialog
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import javax.inject.Inject
@@ -42,7 +40,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class PostsFragment : Fragment() {
-    private val viewModel: PostViewModel by activityViewModels()
+    private val postViewModel: PostViewModel by activityViewModels()
 
     private val mediaObserver = MediaLifecycleObserver()
 
@@ -75,7 +73,7 @@ class PostsFragment : Fragment() {
                     requireContext(),
                     Manifest.permission.ACCESS_FINE_LOCATION
                 ) == PackageManager.PERMISSION_GRANTED -> {
-                    Toast.makeText(requireContext(), "Йес!", Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(requireContext(), "Йес!", Toast.LENGTH_SHORT).show()
                     val fusedLocationProviderClient = LocationServices
                         .getFusedLocationProviderClient(requireActivity())
 
@@ -87,7 +85,7 @@ class PostsFragment : Fragment() {
 //                    val longitude = String.format("%.7g%n", it.longitude).toDouble()
                         if (it != null) {
                             Log.i("MY_LOCATION", it.toString())
-                            viewModel.setCoordinates(
+                            postViewModel.setCoordinates(
                                 df.format(it.latitude).toDouble(),
                                 df.format(it.longitude).toDouble()
                             )
@@ -109,25 +107,25 @@ class PostsFragment : Fragment() {
             }
         }
 
-
         lifecycle.addObserver(mediaObserver)
+
 
         val adapter = PostsAdapter(object : OnInteractionListener {
             override fun onLike(post: PostModel) {
                 if (appAuth.authStateFlow.value.id != 0L) {
-                    viewModel.likeById(post.id)
-                } else showSignInDialog()
+                    postViewModel.likeById(post.id)
+                } else showSignInDialog(this@PostsFragment)
             }
 
             override fun onEdit(post: PostModel) {
                 val contentToEdit = post.content
                 findNavController().navigate(R.id.action_navigation_posts_to_newPostFragment,
                     Bundle().apply { textArg = contentToEdit })
-                viewModel.edit(post)
+                postViewModel.edit(post)
             }
 
             override fun onRemove(post: PostModel) {
-                viewModel.removeById(post.id)
+                postViewModel.removeById(post.id)
             }
 
             override fun onShare(post: PostModel) {
@@ -143,8 +141,8 @@ class PostsFragment : Fragment() {
             }
 
             override fun onResave(post: PostModel) {
-                viewModel.edit(post)
-                viewModel.save()
+                postViewModel.edit(post)
+                postViewModel.save()
             }
 
             override fun onPlayAudio(post: PostModel) {
@@ -170,15 +168,44 @@ class PostsFragment : Fragment() {
 //                }
             }
 
+            override fun onUser(post: PostModel) {
+                val bundle = Bundle()
+                bundle.putLong("userID", post.authorId)
+                //val action = PostsFragmentDirections.actionNavigationPostsToWallFragment(post.authorId)
+                findNavController().navigate(R.id.wallFragment, bundle)
+            }
+
+            override fun onImage(url: String) {
+                showImageDialog(url, childFragmentManager)
+            }
+
+            override fun onMention(post: PostModel) {
+                showUserListDialog(post.mentionIds, childFragmentManager)
+            }
+
+            override fun onCoords(post: PostModel) {
+                Toast.makeText(context, "${post.coords}", Toast.LENGTH_SHORT).show()
+            }
         })
 
         binding.postsList.adapter = adapter
 
         lifecycleScope.launchWhenCreated {
-            viewModel.data.collectLatest {
-                adapter.submitData(it)
-            }
+            postViewModel.data
+                .catch { e: Throwable ->
+                    e.printStackTrace()
+                    Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
+                        .setAction(R.string.retry_loading) {
+                            postViewModel.refresh()
+                        }
+                        .show()
+                }
+                .collectLatest {
+                    adapter.submitData(it)
+                }
         }
+
+
 
         lifecycleScope.launchWhenCreated {
             adapter.loadStateFlow.collectLatest {
@@ -187,14 +214,17 @@ class PostsFragment : Fragment() {
                         || it.prepend is LoadState.Loading
             }
         }
-//        viewModel.data.observe(viewLifecycleOwner) { feedModel ->
-//            adapter.submitList(feedModel.posts)
-//            with(binding){
-//                emptyText.isVisible = feedModel.empty
-//            }
-//        }
 
-        viewModel.state.observe(viewLifecycleOwner) { state ->
+        lifecycleScope.launchWhenCreated {
+            postViewModel.data.collectLatest {
+                if (it.toString().isEmpty()) {
+                    binding.emptyText.isVisible
+                }
+            }
+        }
+
+
+        postViewModel.state.observe(viewLifecycleOwner) { state ->
             with(binding) {
                 progress.isVisible = state.loading
                 swipeToRefresh.isRefreshing = state.refreshing
@@ -202,7 +232,7 @@ class PostsFragment : Fragment() {
             if (state.error) {
                 Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
                     .setAction(R.string.retry_loading) {
-                        viewModel.refresh()
+                        postViewModel.refresh()
                     }
                     .show()
             }
@@ -226,13 +256,18 @@ class PostsFragment : Fragment() {
 
         binding.swipeToRefresh.setOnRefreshListener {
             adapter.refresh()
+
         }
 
         binding.addPostBtn.setOnClickListener {
             if (appAuth.authStateFlow.value.token != null) {
                 findNavController().navigate(R.id.action_navigation_posts_to_newPostFragment)
-            } else showSignInDialog()
+            } else showSignInDialog(this)
 
+        }
+
+        binding.postListBtn.setOnClickListener {
+            binding.postsList.smoothScrollToPosition(0)
         }
 
         binding.eventsListBtn.setOnClickListener {
@@ -242,25 +277,10 @@ class PostsFragment : Fragment() {
         return binding.root
     }
 
-    private fun showSignInDialog() {
-        val listener = DialogInterface.OnClickListener { _, which ->
-            when (which) {
-                DialogInterface.BUTTON_POSITIVE -> findNavController().navigate(R.id.action_navigation_posts_to_signInFragment)
-                DialogInterface.BUTTON_NEGATIVE -> Toast.makeText(
-                    context,
-                    "Не забудьте авторизоваться",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-        val dialog = AlertDialog.Builder(context)
-            .setCancelable(false)
-            .setTitle("Вы не авторизованы!")
-            .setMessage("Пожалуйста, авторизуйтесь")
-            .setPositiveButton("Хорошо", listener)
-            .setNegativeButton("Позже", listener)
-            .create()
 
-        dialog.show()
-    }
+
+
 }
+
+
+

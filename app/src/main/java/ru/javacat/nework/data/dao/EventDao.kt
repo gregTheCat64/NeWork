@@ -15,6 +15,10 @@ interface EventDao {
     @Query("SELECT * FROM EventEntity WHERE id = :id")
     suspend fun getById(id: Long): EventEntity
 
+    @Query("SELECT * FROM EventEntity WHERE authorId = :authorId ")
+    suspend fun getByAuthorId(authorId: Long): List<EventEntity>
+
+
     @Query("SELECT COUNT(*) == 0 FROM EventEntity")
     suspend fun isEmpty(): Boolean
 

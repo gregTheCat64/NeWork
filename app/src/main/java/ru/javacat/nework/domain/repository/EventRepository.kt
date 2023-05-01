@@ -8,6 +8,7 @@ import ru.javacat.nework.domain.model.EventModel
 interface EventRepository {
     val eventData: Flow<List<EventModel>>
     suspend fun getAll()
+    suspend fun getEventsByAuthorId(authorId: Long): List<EventModel>
     suspend fun getById(id: Long)
     suspend fun removeById(id: Long)
     suspend fun likeById(id: Long)

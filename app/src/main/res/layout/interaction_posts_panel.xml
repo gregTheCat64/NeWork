@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/likeBtn"
+            style="@style/Widget.AppTheme.LikeCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:checkable="true"
+            android:text="33"
+            app:icon="@drawable/ic_like_selector" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/mentioned"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dim16dp"
+            android:text="2"
+            app:icon="@drawable/ic_baseline_people_24"
+            app:tint="#7C7C7C" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/shareBtn"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dim8dp"
+            app:icon="@drawable/ic_baseline_share_24"
+            />
+
+
+    </LinearLayout>

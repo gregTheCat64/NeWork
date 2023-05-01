@@ -1,60 +1,97 @@
 package ru.javacat.nework.ui.screens
 
+import android.app.DatePickerDialog
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import ru.javacat.nework.R
+import ru.javacat.nework.databinding.FragmentNewJobBinding
+import ru.javacat.nework.domain.model.JobModel
+import ru.javacat.nework.error.NetworkError
+import ru.javacat.nework.ui.viewmodels.JobsViewModel
+import ru.javacat.nework.util.AndroidUtils
+import ru.javacat.nework.util.toLocalDateTimeWhithoutZone
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [NewJobFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+@AndroidEntryPoint
 class NewJobFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+    override fun onStart() {
+        super.onStart()
+        (activity as AppCompatActivity).supportActionBar!!.hide()
     }
+
+    override fun onStop() {
+        super.onStop()
+        (activity as AppCompatActivity).supportActionBar!!.show()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (activity as AppCompatActivity).supportActionBar!!.hide()
+    }
+
+    private val viewModel: JobsViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        val binding = FragmentNewJobBinding.inflate(inflater)
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_new_job, container, false)
+
+        binding.cancelBtn.setOnClickListener {
+            AndroidUtils.hideKeyboard(requireView())
+            findNavController().navigateUp()
+        }
+
+        binding.startDateBtn.setOnClickListener {
+            showCalendar(parentFragmentManager, binding.startJobEditText)
+        }
+
+        binding.endDateBtn.setOnClickListener {
+            showCalendar(parentFragmentManager, binding.endJobEditText)
+        }
+
+
+        binding.saveJobBtn.setOnClickListener {
+            AndroidUtils.hideKeyboard(requireView())
+            if (binding.jobEditText.text.isNotEmpty()&&
+                    binding.positionEditText.text.isNotEmpty()&&
+                        binding.startJobEditText.text.isNotEmpty()
+                    ){
+                val job = binding.jobEditText.text.toString().trim()
+                val position = binding.positionEditText.text.toString().trim()
+                val start = binding.startJobEditText.text.toString().trim() + " 08:00:00"
+                var end: String? = binding.endJobEditText.text.toString().trim()
+                end = if(binding.endJobEditText.text.isNotEmpty()){
+                    "$end 18:00:00"
+                } else null
+
+                val link = binding.linkEditText.text.toString().trim()
+                try {
+                    viewModel.save(JobModel(0L,0L, job,position,start.toLocalDateTimeWhithoutZone(),
+                        end?.toLocalDateTimeWhithoutZone(), link))
+                    findNavController().navigateUp()
+                } catch (e: NetworkError) {
+                    Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
+                        .show()
+                }
+
+            } else Snackbar.make(binding.root, "Заполните обязательные поля", Snackbar.LENGTH_LONG).show()
+
+        }
+
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment NewJobFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            NewJobFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
-    }
 }
+

@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.MediaController
 import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -17,6 +18,7 @@ import ru.javacat.nework.domain.model.AttachmentType
 import ru.javacat.nework.domain.model.PostModel
 import ru.javacat.nework.util.asString
 import ru.javacat.nework.util.load
+import ru.javacat.nework.util.loadAvatar
 import ru.javacat.nework.util.loadCircleCrop
 
 
@@ -28,6 +30,10 @@ interface OnInteractionListener {
     fun onResave(post: PostModel) {}
     fun onPlayAudio(post: PostModel) {}
     fun onPlayVideo(post: PostModel) {}
+    fun onImage(url: String) {}
+    fun onUser(post: PostModel) {}
+    fun onMention(post: PostModel){}
+    fun onCoords(post: PostModel){}
 }
 
 
@@ -65,34 +71,53 @@ class PostViewHolder(
         } else binding.attachLayout.root.visibility = View.GONE
 
         binding.apply {
-            avatar.loadCircleCrop(post.authorAvatar.toString())
+            avatar.loadAvatar(post.authorAvatar.toString())
             name.text = post.author
             published.text = post.published?.asString()
             content.text = post.content
             linkText.text = post.link
 
             //likes:
-            likeBtn.isChecked = post.likedByMe //???
-            likeBtn.text = "${post.likeOwnerIds?.size ?: ""}"
+            interactionPosts.likeBtn.isChecked = post.likedByMe //???
+            interactionPosts.likeBtn.text = "${post.likeOwnerIds?.size ?: ""}"
+            if (post.likeOwnerIds?.size != 0){
+                likedList.visibility = View.VISIBLE
+                likedList.text = post.likeOwnerIds?.map{
+                    post.users[it]?.name
+                }?.joinToString (", ", "Оценили: ")
+            } else likedList.visibility = View.GONE
 
+            //coords:
             if (post.coords != null) {
-                locationTextView.text = "${post.coords?.toString()}"
+                locationBtn.visibility = View.VISIBLE
+                //text = "${post.coords?.toString()}"
             } else {
-                locationTextView.text = ""
+                locationBtn.visibility = View.GONE
             }
-            infoLayout.isVisible = true
+            locationBtn.setOnClickListener {
+                onInteractionListener.onCoords(post)
+            }
+            infoLayout.isVisible = post.link?.isNotEmpty() == true || post.coords != null
+
 
             //mentions:
             if (post.mentionIds.isNotEmpty()) {
-                mentionIds.text = post.mentionIds.map {
-                    post.users[it]?.name
-                }.joinToString (", ")
-            } else mentionIds.text = ""
+                interactionPosts.mentioned.visibility = View.VISIBLE
+                interactionPosts.mentioned.text = post.mentionIds.size.toString()
+            } else  interactionPosts.mentioned.visibility = View.GONE
 
-
+            interactionPosts.mentioned.setOnClickListener {
+                onInteractionListener.onMention(post)
+            }
 
             //image
+            avatar.setOnClickListener {
+                onInteractionListener.onImage(post.authorAvatar.toString())
+            }
             attachLayout.attachImage.isVisible = post.attachment?.type == AttachmentType.IMAGE
+            attachLayout.attachImage.setOnClickListener {
+                onInteractionListener.onImage(post.attachment?.url.toString())
+            }
 
             // audio:
             attachLayout.attachAudio.isVisible = post.attachment?.type == AttachmentType.AUDIO
@@ -121,11 +146,10 @@ class PostViewHolder(
                 }
             }
 
-//                onServer.setOnClickListener {
-//                    if (!post.savedOnServer){
-//                        onInteractionListener.onResave(post)
-//                    }
-//                }
+            //onUserTouch
+            postInfoHeader.setOnClickListener {
+                onInteractionListener.onUser(post)
+            }
 
             menu.isVisible = post.ownedByMe
             menu.setOnClickListener {
@@ -148,11 +172,11 @@ class PostViewHolder(
                 }.show()
             }
 
-            likeBtn.setOnClickListener {
+            interactionPosts.likeBtn.setOnClickListener {
                 onInteractionListener.onLike(post)
             }
 
-            shareBtn.setOnClickListener {
+            interactionPosts.shareBtn.setOnClickListener {
                 onInteractionListener.onShare(post)
             }
         }

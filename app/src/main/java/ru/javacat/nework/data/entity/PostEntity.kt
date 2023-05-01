@@ -41,7 +41,7 @@ data class PostEntity(
         coords = coords?.toDto(),
         link, likeOwnerIds, mentionIds, mentionMe, likedByMe,
         attachment = attachment?.toDto(),
-        ownedByMe, false, users
+        false, ownedByMe, users
     )
 
     companion object {

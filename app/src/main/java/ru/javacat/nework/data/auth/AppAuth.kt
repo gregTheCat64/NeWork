@@ -55,7 +55,6 @@ class AppAuth @Inject constructor(
             putString(tokenKey, token)
             apply()
         }
-        //sendPushToken()
     }
 
     @Synchronized
@@ -65,7 +64,6 @@ class AppAuth @Inject constructor(
             clear()
             commit()
         }
-        //sendPushToken()
     }
 
 

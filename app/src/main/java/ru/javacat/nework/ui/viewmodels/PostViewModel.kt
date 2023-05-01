@@ -1,11 +1,14 @@
 package ru.javacat.nework.ui.viewmodels
 
 import android.net.Uri
+import android.util.Log
 import androidx.core.net.toFile
 import androidx.lifecycle.*
 import androidx.paging.PagingData
+import androidx.paging.filter
 import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.flow.map
@@ -23,35 +26,41 @@ import java.io.File
 import javax.inject.Inject
 
 private val empty = PostModel(
-   0,0L,"",null,null,"",null,
-    null,null,null, emptyList(),false,false,null,
+    0, 0L, "", null, null, "", null,
+    null, null, null, emptyList(), false, false, null,
     false, false, emptyMap()
-    )
+)
 
 private val noPhoto = PhotoModel()
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class PostViewModel @Inject constructor(
-    private val repository: PostRepository,
-    appAuth: AppAuth
+    private val repository: PostRepository
 ) : ViewModel() {
-    val data: Flow<PagingData<PostModel>> = appAuth
-        .authStateFlow
-        .flatMapLatest { (myId, _) ->
-            repository.data
-                .map { posts ->
-                    posts.map { it.copy(ownedByMe = it.authorId == myId) }
-                }
-        }
+    val data: Flow<PagingData<PostModel>> = repository.data
+
+
+    private var _userPosts = MutableLiveData<List<PostModel>>()
+    val userPosts: LiveData<List<PostModel>>
+        get() = _userPosts
+
 
     private val _state = MutableLiveData(FeedModelState(idle = true))
     val state: LiveData<FeedModelState>
-    get() = _state
+        get() = _state
 
-    private val _coords = MutableLiveData(CoordinatesModel(0.0,0.0))
+    private val _coords = MutableLiveData(CoordinatesModel(0.0, 0.0))
     val coords: LiveData<CoordinatesModel>
-    get() = _coords
+        get() = _coords
+
+    private val _mentionIds = MutableLiveData(emptyList<Long>())
+    val mentionIds: LiveData<List<Long>>
+        get() = _mentionIds
+
+    private var _usersAdded = MutableLiveData<String>()
+    val usersAdded: LiveData<String>
+        get() = _usersAdded
+
 
 //    val newerCount: LiveData<Int> = data.switchMap {
 //        repository.getNewerCount(it.posts.firstOrNull()?.id ?: 0L)
@@ -69,16 +78,16 @@ class PostViewModel @Inject constructor(
     val photo: LiveData<PhotoModel>
         get() = _photo
 
-    init {
 
-        loadPosts()
+    init {
+        //loadPosts()
     }
 
     fun loadPosts() {
         viewModelScope.launch {
             try {
                 _state.value = FeedModelState(loading = true)
-                //repository.getAll()
+                repository.getAll()
                 _state.value = FeedModelState(idle = true)
             } catch (e: Exception) {
                 _state.value = FeedModelState(error = true)
@@ -86,12 +95,13 @@ class PostViewModel @Inject constructor(
         }
     }
 
+
     fun refresh() {
         viewModelScope.launch {
-            _state.value = FeedModelState(refreshing = true)
+            //_state.value = FeedModelState(refreshing = true)
             try {
                 //repository.getAll()
-                _state.value = FeedModelState(idle = true)
+                //_state.value = FeedModelState(idle = true)
             } catch (e: Exception) {
                 _state.value = FeedModelState(error = true)
             }
@@ -103,11 +113,12 @@ class PostViewModel @Inject constructor(
             viewModelScope.launch {
                 try {
                     it.link = null
-                    it.mentionIds = listOf()
+                    it.mentionIds = mentionIds.value!!
                     it.coords = coords.value
                     repository.save(
                         it.toPostRequest(), _photo.value?.uri?.let {
-                            MediaUpload(it.toFile()) }
+                            MediaUpload(it.toFile())
+                        }
                     )
                     _postCreated.value = Unit
                 } catch (e: Exception) {
@@ -145,7 +156,17 @@ class PostViewModel @Inject constructor(
         _photo.value = PhotoModel(uri, file)
     }
 
-    fun setCoordinates(lat: Double, long: Double){
+    fun setCoordinates(lat: Double, long: Double) {
         _coords.value = CoordinatesModel(lat, long)
     }
+
+    fun setMentionIds(list: List<Long>) {
+        _mentionIds.value = list
+    }
+
+    fun setUsersAdded(usersAdded: String) {
+        _usersAdded.value = usersAdded
+    }
+
+
 }

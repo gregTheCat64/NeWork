@@ -14,8 +14,6 @@ import ru.javacat.nework.data.dto.request.PostRequest
 import ru.javacat.nework.data.dto.response.PostResponse
 
 
-
-
 interface PostsApi {
 
     @GET("posts")
@@ -52,27 +50,5 @@ interface PostsApi {
     @POST("media")
     suspend fun upload(@Part media: MultipartBody.Part): Response<Media>
 
-    @FormUrlEncoded
-    @POST("users/authentication")
-    suspend fun updateUser(
-        @Field("login") login: String,
-        @Field("password") pass: String
-    ): Response<Token>
 
-    @FormUrlEncoded
-    @POST("users/registration")
-    suspend fun registerUser(
-        @Field("login") login: String,
-        @Field("password") pass: String,
-        @Field("name") name: String
-    ): Response<Token>
-
-    @Multipart
-    @POST("users/registration")
-    suspend fun registerWithPhoto(
-        @Part("login") login: String,
-        @Part("password") pass: String,
-        @Part("name") name: String,
-        @Part media: MultipartBody.Part,
-    ): Response<Token>
 }

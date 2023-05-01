@@ -12,13 +12,19 @@ import ru.javacat.nework.data.entity.PostEntity
 @Dao
 interface PostDao {
     @Query("SELECT * FROM PostEntity ORDER BY id DESC")
-    fun getAll(): Flow<List<PostEntity>>
+    fun getAll(): List<PostEntity>
 
     @Query("SELECT * FROM PostEntity ORDER BY id DESC")
     fun getPagingSource(): PagingSource<Int, PostEntity>
 
+    @Query("SELECT * FROM PostEntity WHERE authorId = :userId ORDER BY id DESC")
+    fun getWallPagingSource(userId: Long): PagingSource<Int, PostEntity>
+
     @Query("SELECT * FROM PostEntity WHERE id = :id")
     suspend fun getById(id: Long): PostEntity
+
+    @Query("SELECT * FROM PostEntity WHERE authorId = :authorId ORDER BY id DESC")
+    suspend fun getByAuthorId(authorId: Long): List<PostEntity>
 
     @Query("SELECT COUNT(*) == 0 FROM PostEntity")
     suspend fun isEmpty(): Boolean
