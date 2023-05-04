@@ -11,6 +11,8 @@ import ru.javacat.nework.data.dto.request.EventCreateRequest
 import ru.javacat.nework.data.entity.EventEntity
 import ru.javacat.nework.data.entity.toDto
 import ru.javacat.nework.data.mappers.toEventEntity
+import ru.javacat.nework.data.mappers.toEventModel
+import ru.javacat.nework.data.mappers.toModel
 import ru.javacat.nework.domain.model.EventModel
 import ru.javacat.nework.domain.repository.EventRepository
 import ru.javacat.nework.error.ApiError
@@ -52,6 +54,22 @@ class EventRepositoryImpl @Inject constructor(
     override suspend fun getEventsByAuthorId(authorId: Long):List<EventModel>  {
         val daoResult = eventDao.getByAuthorId(authorId)
         return daoResult.toDto()
+    }
+
+    override suspend fun updateEventsByAuthorId(authorId: Long):List<EventModel>?{
+        try {
+            val response = eventsApi.getAll().body()?.filter {
+                it.authorId == authorId
+            }
+            if (response != null) {
+                eventDao.insert(response.map { it.toEventEntity() })
+            }
+            return response?.map { it.toEventModel() }
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
     }
 
     override suspend fun removeById(id: Long) {

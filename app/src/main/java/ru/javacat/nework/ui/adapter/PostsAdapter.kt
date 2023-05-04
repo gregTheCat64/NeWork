@@ -59,9 +59,9 @@ class PostViewHolder(
     fun bind(post: PostModel) {
         if (post.attachment != null) {
             binding.attachLayout.root.visibility = View.VISIBLE
-            when (post.attachment.type) {
+            when (post.attachment!!.type) {
                 AttachmentType.IMAGE -> {
-                    binding.attachLayout.attachImage.load(post.attachment.url)
+                    binding.attachLayout.attachImage.load(post.attachment!!.url)
                 }
                 AttachmentType.VIDEO -> {
                 }

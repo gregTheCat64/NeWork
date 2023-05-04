@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import ru.javacat.nework.data.api.JobsApi
+import ru.javacat.nework.data.auth.AppAuth
 import ru.javacat.nework.data.dao.JobsDao
 import ru.javacat.nework.data.dto.request.JobCreateRequest
 import ru.javacat.nework.data.entity.JobEntity
@@ -21,23 +22,25 @@ import javax.inject.Inject
 
 class JobRepositoryImpl @Inject constructor(
     private val jobDao: JobsDao,
-    private val jobsApi: JobsApi
+    private val jobsApi: JobsApi,
+    private val appAuth: AppAuth,
 
-): JobRepository {
+    ) : JobRepository {
     override val jobsData: Flow<List<JobModel>> = jobDao.getAll()
-        .map ( List<JobEntity>::toModel )
+        .map(List<JobEntity>::toModel)
         .flowOn(Dispatchers.Default)
 
-    override suspend fun getJobsByUserId(id: Long):List<JobModel> {
+    override suspend fun getJobsByUserId(id: Long): List<JobModel> {
         try {
             val daoResult = jobDao.getByAuthorId(id)
-            Log.i("DAORES","$daoResult")
-            if (daoResult.isEmpty()){
+            Log.i("DAORES", "$daoResult")
+            if (daoResult.isEmpty()) {
                 val response = jobsApi.getJobsById(id)
                 val body = response.body() ?: throw ApiError(response.code(), response.message())
                 val result = body.map {
                     it.copy(userId = id)
                 }.map { it.toEntity() }
+                result.map { it.ownedByMe = appAuth.getId() == it.userId }
                 jobDao.insert(result)
             }
             return daoResult.toModel()
@@ -52,6 +55,17 @@ class JobRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun updateJobsByUserId(id: Long): List<JobModel>? {
+        try {
+            val result = jobsApi.getJobsById(id)
+            result.body()?.let { it -> jobDao.insert(it.map { it.toEntity() }) }
+            return result.body()?.map { it.toModel() }
+        }catch (e: Exception) {
+            e.printStackTrace()
+            throw UnknownError
+        }
+    }
+
     override suspend fun create(job: JobCreateRequest) {
         try {
             jobsApi.createJob(job)
@@ -61,13 +75,13 @@ class JobRepositoryImpl @Inject constructor(
     }
 
     override suspend fun removeById(id: Long) {
-       try {
-           jobsApi.removeById(id)
-           jobDao.removeById(id)
-       } catch (e: IOException) {
-           throw NetworkError
-       } catch (e: Exception) {
-           throw UnknownError
-       }
+        try {
+            jobsApi.removeById(id)
+            jobDao.removeById(id)
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
     }
 }

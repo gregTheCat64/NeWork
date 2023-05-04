@@ -18,21 +18,17 @@ import ru.javacat.nework.domain.model.EventModel
 import ru.javacat.nework.domain.model.PostModel
 import ru.javacat.nework.mediaplayer.MediaLifecycleObserver
 import ru.javacat.nework.ui.adapter.*
-import ru.javacat.nework.ui.viewmodels.EventViewModel
-import ru.javacat.nework.ui.viewmodels.JobsViewModel
-import ru.javacat.nework.ui.viewmodels.PostViewModel
-import ru.javacat.nework.ui.viewmodels.WallViewModel
+import ru.javacat.nework.ui.viewmodels.*
 import ru.javacat.nework.util.loadCircleCrop
 import ru.javacat.nework.util.showSignInDialog
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class WallFragment : Fragment() {
-
-    private val jobsViewModel: JobsViewModel by viewModels()
-    private val wallViewModel: WallViewModel by viewModels()
+    private val userViewModel: UserViewModel by viewModels()
     private val postViewModel: PostViewModel by viewModels()
     private val eventViewModel: EventViewModel by viewModels()
+    private val jobsViewModel: JobsViewModel by viewModels()
 
     private val mediaObserver = MediaLifecycleObserver()
 
@@ -55,9 +51,33 @@ class WallFragment : Fragment() {
         var expandedEvents = false
         var expandedJobs = false
 
+        //init
+        userViewModel.getUserById(authorId)
+        jobsViewModel.getJobsByUserId(authorId)
+        postViewModel.loadPostsByAuthorId(authorId)
+        eventViewModel.getByAuthorId(authorId)
+
+        //refresh
+        binding.refreshBtn.setOnClickListener {
+            postViewModel.updatePostsByAuthorId(authorId)
+            eventViewModel.updateEventsByAuthorId(authorId)
+            jobsViewModel.updateJobsByUserId(authorId)
+        }
+
+        postViewModel.state.observe(viewLifecycleOwner){state->
+            binding.refreshBtn.isVisible = !state.loading
+            binding.progress.isVisible = state.loading
+        }
+
+        //user:
+        userViewModel.user.observe(viewLifecycleOwner) { user ->
+            user?.avatar?.let { binding.avatar.loadCircleCrop(it) }
+            user?.name?.let { binding.name.text = it }
+        }
+
+        //jobs:
         val jobsAdapter = JobsAdapter()
 
-        //jobsAdapter:
         binding.jobsList.adapter = jobsAdapter
 
         jobsViewModel.userJobs.observe(viewLifecycleOwner) {
@@ -65,15 +85,12 @@ class WallFragment : Fragment() {
         }
         binding.jobsListBtn.setOnClickListener {
             jobsViewModel.getJobsByUserId(authorId)
-
             expandedJobs = !expandedJobs
             binding.jobsList.isVisible = expandedJobs
-//            binding.postsList.isVisible = false
-//            binding.eventsList.isVisible = false
         }
 
 
-        //postAdapter:
+        //posts:
         val postAdapter = UserPostsAdapter(object : OnInteractionListener {
             override fun onLike(post: PostModel) {
                 if (appAuth.authStateFlow.value.id != 0L) {
@@ -131,28 +148,19 @@ class WallFragment : Fragment() {
             }
         })
 
-
         binding.postsList.adapter = postAdapter
 
-        wallViewModel.userPosts.observe(viewLifecycleOwner) {
+        postViewModel.userPosts.observe(viewLifecycleOwner) {
             postAdapter.submitList(it)
         }
 
         binding.postListBtn.setOnClickListener {
-            wallViewModel.loadPostsByAuthorId(authorId)
+            //postViewModel.loadPostsByAuthorId(authorId)
             expandedPosts = !expandedPosts
-//            binding.jobsList.isVisible = false
-//            binding.eventsList.isVisible = false
             binding.postsList.isVisible = expandedPosts
         }
 
-        wallViewModel.getUserById(authorId)
-
-        wallViewModel.user.observe(viewLifecycleOwner) { user ->
-            user?.avatar?.let { binding.avatar.loadCircleCrop(it) }
-            user?.name?.let { binding.name.text = it }
-        }
-
+        //events:
         val eventsAdapter = EventsAdapter(object : OnEventsListener {
         })
 
@@ -163,13 +171,12 @@ class WallFragment : Fragment() {
         }
 
         binding.eventsListBtn.setOnClickListener {
-            eventViewModel.getByAuthorId(authorId)
+            //eventViewModel.getByAuthorId(authorId)
             expandedEvents = !expandedEvents
-//            binding.jobsList.isVisible = false
-//            binding.postsList.isVisible = false
             binding.eventsList.isVisible = expandedEvents
         }
 
+        //navigation:
         binding.addJobBtn.setOnClickListener {
             findNavController().navigate(R.id.newJobFragment)
         }

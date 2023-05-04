@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -63,7 +64,6 @@ class PostsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentPostsBinding.inflate(inflater, container, false)
-
 
         //Доступ к локации:
         lifecycle.coroutineScope.launchWhenCreated {
@@ -119,9 +119,10 @@ class PostsFragment : Fragment() {
 
             override fun onEdit(post: PostModel) {
                 val contentToEdit = post.content
+                postViewModel.edit(post)
                 findNavController().navigate(R.id.action_navigation_posts_to_newPostFragment,
                     Bundle().apply { textArg = contentToEdit })
-                postViewModel.edit(post)
+
             }
 
             override fun onRemove(post: PostModel) {

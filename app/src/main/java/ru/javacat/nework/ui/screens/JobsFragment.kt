@@ -12,7 +12,7 @@ import ru.javacat.nework.databinding.FragmentJobsBinding
 import ru.javacat.nework.ui.adapter.JobsAdapter
 import ru.javacat.nework.ui.viewmodels.JobsViewModel
 
-@AndroidEntryPoint
+
 class JobsFragment: Fragment() {
     private val viewModel: JobsViewModel by viewModels()
 
@@ -23,18 +23,18 @@ class JobsFragment: Fragment() {
     ): View? {
         val binding = FragmentJobsBinding.inflate(inflater)
 
-        val args: JobsFragmentArgs by navArgs()
-        val authorId = args.authorArg
-
-        viewModel.getJobsByUserId(authorId)
-
-        val adapter = JobsAdapter()
-
-        binding.jobsList.adapter = adapter
-
-        viewModel.userJobs.observe(viewLifecycleOwner){
-            adapter.submitList(it)
-        }
+//        val args: JobsFragmentArgs by navArgs()
+//        val authorId = args.authorArg
+//
+//        viewModel.getJobsByUserId(authorId)
+//
+//        val adapter = JobsAdapter()
+//
+//        binding.jobsList.adapter = adapter
+//
+//        viewModel.userJobs.observe(viewLifecycleOwner){
+//            adapter.submitList(it)
+//        }
 
 
         return binding.root

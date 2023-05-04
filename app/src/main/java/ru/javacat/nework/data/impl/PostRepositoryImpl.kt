@@ -20,6 +20,7 @@ import ru.javacat.nework.data.dto.response.Attachment
 import ru.javacat.nework.data.entity.PostEntity
 import ru.javacat.nework.data.entity.toDto
 import ru.javacat.nework.data.mappers.toEntity
+import ru.javacat.nework.data.mappers.toEventEntity
 import ru.javacat.nework.data.mappers.toModel
 import ru.javacat.nework.domain.model.AttachmentType
 import ru.javacat.nework.domain.model.PostModel
@@ -61,7 +62,6 @@ class PostRepositoryImpl @Inject constructor(
         try {
             val response = postsApi.getAll()
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-
             postDao.insert(body.map { it.toEntity()})
         } catch (e: IOException) {
             throw NetworkError
@@ -75,12 +75,16 @@ class PostRepositoryImpl @Inject constructor(
         return userPosts.toDto()
     }
 
-    override suspend fun updatePostsByAuthorId(authorId: Long): List<PostModel>? {
+    override suspend fun updatePostsByAuthorId(authorId: Long):List<PostModel>? {
         try {
             val response = postsApi.getAll().body()?.filter {
                 it.authorId == authorId
-            }?.map { it.toModel() }
-            return response
+            }
+            if (response != null) {
+                postDao.insert(response.map { it.toEntity() })
+            }
+            return response?.map { it.toModel() }
+
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {

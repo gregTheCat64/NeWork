@@ -3,6 +3,7 @@ package ru.javacat.nework.ui.viewmodels
 import android.net.Uri
 import android.util.Log
 import androidx.core.net.toFile
+import androidx.core.net.toUri
 import androidx.lifecycle.*
 import androidx.paging.PagingData
 import androidx.paging.filter
@@ -69,7 +70,10 @@ class PostViewModel @Inject constructor(
 //    }
 
 
-    private val edited = MutableLiveData(empty)
+    private val _edited = MutableLiveData(empty)
+    val edited: LiveData<PostModel>
+        get() = _edited
+
     private val _postCreated = SingleLiveEvent<Unit>()
     val postCreated: LiveData<Unit>
         get() = _postCreated
@@ -80,6 +84,8 @@ class PostViewModel @Inject constructor(
 
 
     init {
+        Log.i("MYTAG", "Init postViewModel")
+        println("PHOTO: ${photo.value?.uri}")
         //loadPosts()
     }
 
@@ -95,13 +101,35 @@ class PostViewModel @Inject constructor(
         }
     }
 
+    fun loadPostsByAuthorId(authorId: Long) = viewModelScope.launch {
+        try {
+            _state.value = FeedModelState(loading = true)
+            _userPosts.postValue(repository.getPostsByAuthorId(authorId))
+            _state.value = FeedModelState(idle = true)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            _state.value = FeedModelState(error = true)
+        }
+    }
+
+    fun updatePostsByAuthorId(authorId: Long) = viewModelScope.launch {
+        try {
+            _state.value = FeedModelState(loading = true)
+            _userPosts.postValue(repository.updatePostsByAuthorId(authorId))
+            _state.value = FeedModelState(idle = true)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            _state.value = FeedModelState(error = true)
+        }
+    }
+
 
     fun refresh() {
         viewModelScope.launch {
-            //_state.value = FeedModelState(refreshing = true)
+            _state.value = FeedModelState(refreshing = true)
             try {
                 //repository.getAll()
-                //_state.value = FeedModelState(idle = true)
+                _state.value = FeedModelState(idle = true)
             } catch (e: Exception) {
                 _state.value = FeedModelState(error = true)
             }
@@ -126,20 +154,23 @@ class PostViewModel @Inject constructor(
                 }
             }
         }
-        edited.value = empty
+        _edited.value = empty
         _photo.value = noPhoto
     }
 
     fun edit(post: PostModel) {
-        edited.value = post
+        //changePhoto(post.attachment?.url?.toUri())
+        //changeContent(post.content)
+            _edited.value = post
     }
 
     fun changeContent(content: String) {
         val text = content.trim()
+
         if (edited.value?.content == text) {
             return
         }
-        edited.value = edited.value?.copy(content = text)
+        _edited.value = edited.value?.copy(content = text)
     }
 
     fun likeById(id: Long) {
@@ -152,8 +183,15 @@ class PostViewModel @Inject constructor(
         }
     }
 
-    fun changePhoto(uri: Uri?, file: File?) {
-        _photo.value = PhotoModel(uri, file)
+    fun changePhoto(uri: Uri?) {
+        _photo.value = PhotoModel(uri)
+        println("URI: ${_photo.value!!.uri.toString()}")
+        println("PHOTO after changePhotot: ${photo.value?.uri}")
+    }
+
+    fun deleteAttechment(){
+        _photo.value = noPhoto
+        _edited.value?.attachment = null
     }
 
     fun setCoordinates(lat: Double, long: Double) {

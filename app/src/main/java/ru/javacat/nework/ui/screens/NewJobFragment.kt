@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
@@ -66,7 +67,8 @@ class NewJobFragment : Fragment() {
             AndroidUtils.hideKeyboard(requireView())
             if (binding.jobEditText.text.isNotEmpty()&&
                     binding.positionEditText.text.isNotEmpty()&&
-                        binding.startJobEditText.text.isNotEmpty()
+                        binding.startJobEditText.text.isNotEmpty()&&
+                        binding.linkEditText.text.isNotEmpty()
                     ){
                 val job = binding.jobEditText.text.toString().trim()
                 val position = binding.positionEditText.text.toString().trim()
@@ -78,8 +80,10 @@ class NewJobFragment : Fragment() {
 
                 val link = binding.linkEditText.text.toString().trim()
                 try {
-                    viewModel.save(JobModel(0L,0L, job,position,start.toLocalDateTimeWhithoutZone(),
+                    viewModel.save(JobModel(0L,0L, true,job,position,start.toLocalDateTimeWhithoutZone(),
                         end?.toLocalDateTimeWhithoutZone(), link))
+                    Snackbar.make(binding.root, "Успешно", Snackbar.LENGTH_LONG)
+                        .show()
                     findNavController().navigateUp()
                 } catch (e: NetworkError) {
                     Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
@@ -87,7 +91,10 @@ class NewJobFragment : Fragment() {
                 }
 
             } else Snackbar.make(binding.root, "Заполните обязательные поля", Snackbar.LENGTH_LONG).show()
+        }
 
+        viewModel.state.observe(viewLifecycleOwner){state->
+            binding.progress.isVisible = state.loading
         }
 
         return binding.root

@@ -5,6 +5,7 @@ import java.time.LocalDateTime
 data class JobModel(
     val userId: Long,
     val id: Long,
+    val ownedByMe: Boolean,
     val name: String,
     val position: String,
     val start:LocalDateTime,

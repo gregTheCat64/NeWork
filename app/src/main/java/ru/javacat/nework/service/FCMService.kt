@@ -1,4 +1,4 @@
-//package ru.javacat.nework.service
+package ru.javacat.nework.service//package ru.javacat.nework.service
 //
 //import android.app.NotificationChannel
 //import android.app.NotificationManager

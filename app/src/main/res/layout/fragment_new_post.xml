@@ -80,17 +80,18 @@
 
                 <ImageView
                     android:id="@+id/photo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
                     android:layout_gravity="center" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/clearPicBtn"
-                    style="@style/Widget.Material3.Button.TextButton"
+                    app:icon="@drawable/ic_baseline_delete_24"
+                    style="@style/Widget.Material3.Button.IconButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal|bottom"
-                    android:text="Очистить" />
+                    android:layout_gravity="end|center_vertical"
+                    />
             </FrameLayout>
 
             <TextView

@@ -7,9 +7,11 @@ import android.view.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toFile
+import androidx.core.net.toUri
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.android.material.snackbar.Snackbar
@@ -21,6 +23,7 @@ import ru.javacat.nework.util.AndroidUtils
 import ru.javacat.nework.util.StringArg
 import ru.javacat.nework.ui.viewmodels.PostViewModel
 import ru.javacat.nework.ui.viewmodels.UserViewModel
+import ru.javacat.nework.util.load
 
 @AndroidEntryPoint
 class NewPostFragment : Fragment() {
@@ -57,23 +60,23 @@ class NewPostFragment : Fragment() {
         var usersAddedText = ""
 
         //*** Так можно добавить меню на appBar
-        requireActivity().addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.create_post_menu, menu)
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
-                when (menuItem.itemId){
-                    R.id.saveBtn ->{
-                        postViewModel.changeContent(binding.edit.text.toString())
-                        postViewModel.save()
-                        AndroidUtils.hideKeyboard(requireView())
-                        findNavController().navigateUp()
-                        true
-                    }
-                        else -> false
-                }
-        }, viewLifecycleOwner)
+//        requireActivity().addMenuProvider(object : MenuProvider {
+//            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+//                menuInflater.inflate(R.menu.create_post_menu, menu)
+//            }
+//
+//            override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
+//                when (menuItem.itemId){
+//                    R.id.saveBtn ->{
+//                        postViewModel.changeContent(binding.edit.text.toString())
+//                        postViewModel.save()
+//                        AndroidUtils.hideKeyboard(requireView())
+//                        findNavController().navigateUp()
+//                        true
+//                    }
+//                        else -> false
+//                }
+//        }, viewLifecycleOwner)
 
 
         val pickPhotoLauncher =
@@ -88,7 +91,7 @@ class NewPostFragment : Fragment() {
                     }
                     Activity.RESULT_OK -> {
                         val uri: Uri? = it.data?.data
-                        postViewModel.changePhoto(uri, uri?.toFile())
+                        postViewModel.changePhoto(uri)
                     }
                 }
             }
@@ -112,18 +115,28 @@ class NewPostFragment : Fragment() {
                 }
         }
 
-        postViewModel.photo.observe(viewLifecycleOwner) {
-            if (it?.uri == null) {
+        postViewModel.photo.observe(viewLifecycleOwner){
+            if (it.uri == null){
                 binding.photoContainer.visibility = View.GONE
                 return@observe
+            } else {
+                binding.photoContainer.visibility = View.VISIBLE
+                binding.photo.load(it.uri.toString())
             }
+        }
 
-            binding.photoContainer.visibility = View.VISIBLE
-            binding.photo.setImageURI(it.uri)
+        postViewModel.edited.observe(viewLifecycleOwner) {post->
+            //println("PHOTO: ${post.attachment?.url?.toUri()}")
+            binding.edit.setText(post.content.trim())
+            if (post.attachment?.url?.toUri() != null) {
+                binding.photoContainer.visibility = View.VISIBLE
+                binding.photo.load(post.attachment!!.url.toUri().toString())
+            } else binding.photoContainer.visibility = View.GONE
+
         }
 
         binding.clearPicBtn.setOnClickListener {
-            postViewModel.changePhoto(null, null)
+            postViewModel.deleteAttechment()
         }
 
         binding.saveBtn.setOnClickListener {

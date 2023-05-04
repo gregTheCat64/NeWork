@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import ru.javacat.nework.data.mappers.toJobRequest
+import ru.javacat.nework.domain.model.FeedModelState
 import ru.javacat.nework.domain.model.JobModel
 import ru.javacat.nework.domain.repository.JobRepository
 import javax.inject.Inject
@@ -23,6 +24,10 @@ class JobsViewModel @Inject constructor(
     val userJobs: LiveData<List<JobModel>>
         get() = _userJobs
 
+    private val _state = MutableLiveData(FeedModelState(idle = true))
+    val state: LiveData<FeedModelState>
+        get() = _state
+
 
     fun getJobsByUserId(id: Long){
         viewModelScope.launch {
@@ -34,11 +39,24 @@ class JobsViewModel @Inject constructor(
         }
     }
 
+    fun updateJobsByUserId(id: Long){
+        viewModelScope.launch {
+            try {
+                _userJobs.postValue(repository.updateJobsByUserId(id))
+            } catch (e: Exception){
+                e.printStackTrace()
+            }
+        }
+    }
+
     fun save(jobModel: JobModel){
         viewModelScope.launch {
             try {
+                _state.value = FeedModelState(loading = true)
                 repository.create(jobModel.toJobRequest())
+                _state.value = FeedModelState(idle = true)
             }catch (e: Exception) {
+                _state.value = FeedModelState(error = true)
                 e.printStackTrace()
             }
         }

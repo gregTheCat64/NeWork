@@ -36,7 +36,7 @@ class JobViewHolder(
             jobEnd.text = job.finish?.asString()
             linkOfJob.text = job.link
 
-            //menuBtn.isVisible = job.id == //передать аргумент авторизации
+            menuBtn.isVisible = job.ownedByMe == true
             menuBtn.setOnClickListener {
                 PopupMenu(it.context, it).apply {
                     inflate(R.menu.options_post)

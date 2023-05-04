@@ -59,6 +59,6 @@ class RegistrationViewModel @Inject constructor(
     }
 
     fun changePhoto(uri: Uri?, file: File?) {
-        _photo.value = PhotoModel(uri, file)
+        _photo.value = PhotoModel(uri)
     }
 }

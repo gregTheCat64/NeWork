@@ -9,9 +9,10 @@ import ru.javacat.nework.util.toLocalDateTime
 
 @Entity
 data class JobEntity (
-   @PrimaryKey(autoGenerate = true)
+    @PrimaryKey(autoGenerate = true)
     val id: Long,
     val userId: Long,
+    var ownedByMe: Boolean,
     val name: String,
     val position: String,
     val start: String,
@@ -19,7 +20,7 @@ data class JobEntity (
     val link: String?
         ){
     fun toModel() = JobModel(
-        userId,id,name,position,start.toLocalDateTime(),finish?.toLocalDateTime(),link
+        userId,id,ownedByMe, name,position,start.toLocalDateTime(),finish?.toLocalDateTime(),link
     )
 
     companion object {
@@ -27,6 +28,7 @@ data class JobEntity (
             JobEntity(
                 model.id,
                 model.userId,
+                model.ownedByMe,
                 model.name,
                 model.position,
                 model.start.asString(),
@@ -40,5 +42,9 @@ fun List<JobEntity>.toModel(): List<JobModel> = map ( JobEntity::toModel )
 fun List<JobModel>.toEntity(): List<JobEntity> = map(JobEntity.Companion::fromModel)
 
 fun JobResponse.toEntity(): JobEntity = JobEntity(
-    id, userId, name, position, start, finish, link
+    id, userId,false, name, position, start, finish, link
+)
+
+fun JobResponse.toModel(): JobModel = JobModel(
+    id, userId,false, name, position, start.toLocalDateTime(), finish?.toLocalDateTime(), link
 )

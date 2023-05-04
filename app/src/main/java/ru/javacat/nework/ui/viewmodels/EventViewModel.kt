@@ -21,15 +21,14 @@ class EventViewModel @Inject constructor(
 ) : ViewModel() {
     val data: LiveData<List<EventModel>> = auth
         .authStateFlow
-        .flatMapLatest { (myId, _)->
+        .flatMapLatest { (myId, _) ->
             repository.eventData
-                .map {events->
+                .map { events ->
                     events.map {
                         it.copy(ownedByMe = it.authorId == myId)
                     }
                 }
         }.asLiveData(Dispatchers.Default)
-
 
 
     private val _state = MutableLiveData(FeedModelState(idle = true))
@@ -42,7 +41,7 @@ class EventViewModel @Inject constructor(
 
     //участники:
     private val _participateIds = MutableLiveData(emptyList<Long>())
-    val participateIds:LiveData<List<Long>>
+    val participateIds: LiveData<List<Long>>
         get() = _participateIds
 
     private var _participateAdded = MutableLiveData<String>()
@@ -51,7 +50,7 @@ class EventViewModel @Inject constructor(
 
     //спикеры:
     private val _speakerIds = MutableLiveData(emptyList<Long>())
-    val speakerIds:LiveData<List<Long>>
+    val speakerIds: LiveData<List<Long>>
         get() = _speakerIds
 
     private var _speakerAdded = MutableLiveData<String>()
@@ -68,40 +67,45 @@ class EventViewModel @Inject constructor(
                 _state.value = FeedModelState(loading = true)
                 repository.getAll()
                 _state.value = FeedModelState()
-            } catch (e:Exception){
+            } catch (e: Exception) {
                 _state.value = FeedModelState(error = true)
             }
         }
     }
 
-    fun getByAuthorId(id: Long){
+    fun getByAuthorId(id: Long) {
         viewModelScope.launch {
-           _dataByAuthor.value = repository.getEventsByAuthorId(id)
-            println("SPEAKER= ${_dataByAuthor.value.toString()}")
+            _dataByAuthor.value = repository.getEventsByAuthorId(id)
+            //println("SPEAKER= ${_dataByAuthor.value.toString()}")
         }
+    }
 
+    fun updateEventsByAuthorId(authorId: Long) = viewModelScope.launch {
+        try {
+            _dataByAuthor.postValue(repository.updateEventsByAuthorId(authorId))
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-
-
+    }
 
 
     fun likeById(id: Long) {
-            viewModelScope.launch { repository.likeById(id) }
+        viewModelScope.launch { repository.likeById(id) }
     }
 
-    fun setParticipantIds(list: List<Long>){
+    fun setParticipantIds(list: List<Long>) {
         _participateIds.value = list
     }
 
-    fun setSpeakerIds(list: List<Long>){
+    fun setSpeakerIds(list: List<Long>) {
         _speakerIds.value = list
     }
 
-    fun setParticipantAdded(string: String){
+    fun setParticipantAdded(string: String) {
         _participateAdded.value = string
     }
 
-    fun setSpeakerAdded(string: String){
+    fun setSpeakerAdded(string: String) {
         _speakerAdded.value = string
     }
 }
