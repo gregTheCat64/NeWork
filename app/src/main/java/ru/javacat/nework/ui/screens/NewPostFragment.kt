@@ -128,6 +128,7 @@ class NewPostFragment : Fragment() {
         postViewModel.edited.observe(viewLifecycleOwner) {post->
             //println("PHOTO: ${post.attachment?.url?.toUri()}")
             binding.edit.setText(post.content.trim())
+            binding.usersTextView.text = post.mentionIds.toString()
             if (post.attachment?.url?.toUri() != null) {
                 binding.photoContainer.visibility = View.VISIBLE
                 binding.photo.load(post.attachment!!.url.toUri().toString())
