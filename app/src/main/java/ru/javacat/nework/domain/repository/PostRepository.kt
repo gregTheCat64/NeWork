@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import ru.javacat.nework.data.dto.Media
 import ru.javacat.nework.data.dto.MediaUpload
 import ru.javacat.nework.data.dto.request.PostRequest
+import ru.javacat.nework.domain.model.AttachmentType
 import ru.javacat.nework.domain.model.PostModel
 
 
@@ -17,7 +18,7 @@ interface PostRepository {
     suspend fun updatePostsByAuthorId(authorId: Long):List<PostModel>?
     fun getNewerCount(id: Long): Flow<Int>
     suspend fun likeById(id: Long)
-    suspend fun save(post: PostRequest, upload: MediaUpload?)
+    suspend fun save(post: PostRequest, upload: MediaUpload?, type: AttachmentType?)
     suspend fun removeById(id: Long)
     suspend fun upload(upload: MediaUpload): Media
     }

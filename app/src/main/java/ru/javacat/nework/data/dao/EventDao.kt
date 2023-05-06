@@ -1,16 +1,21 @@
 package ru.javacat.nework.data.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 import ru.javacat.nework.data.entity.EventEntity
+import ru.javacat.nework.data.entity.PostEntity
 
 @Dao
 interface EventDao {
     @Query("SELECT * FROM EventEntity ORDER BY id DESC")
     fun getAll(): Flow<List<EventEntity>>
+
+    @Query("SELECT * FROM EventEntity ORDER BY id DESC")
+    fun getPagingSource(): PagingSource<Int, EventEntity>
 
     @Query("SELECT * FROM EventEntity WHERE id = :id")
     suspend fun getById(id: Long): EventEntity

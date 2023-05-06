@@ -12,16 +12,14 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.android.material.snackbar.Snackbar
-import ru.javacat.nework.R
 import ru.javacat.nework.databinding.FragmentRegistrationBinding
-import ru.javacat.nework.domain.model.PhotoModel
+import ru.javacat.nework.domain.model.AttachModel
 import ru.javacat.nework.util.AndroidUtils
 import ru.javacat.nework.ui.viewmodels.RegistrationViewModel
 
-private var avatar = PhotoModel()
+private var avatar = AttachModel()
 
 class RegistrationFragment : Fragment() {
 

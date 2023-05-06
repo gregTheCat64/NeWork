@@ -1,9 +1,11 @@
 package ru.javacat.nework.ui.viewmodels
 
 import androidx.lifecycle.*
+import androidx.paging.PagingData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -13,31 +15,32 @@ import ru.javacat.nework.domain.model.FeedModelState
 import ru.javacat.nework.domain.repository.EventRepository
 import javax.inject.Inject
 
-@OptIn(ExperimentalCoroutinesApi::class)
+
 @HiltViewModel
 class EventViewModel @Inject constructor(
-    private val repository: EventRepository,
-    auth: AppAuth
+    private val repository: EventRepository
 ) : ViewModel() {
-    val data: LiveData<List<EventModel>> = auth
-        .authStateFlow
-        .flatMapLatest { (myId, _) ->
-            repository.eventData
-                .map { events ->
-                    events.map {
-                        it.copy(ownedByMe = it.authorId == myId)
-                    }
-                }
-        }.asLiveData(Dispatchers.Default)
+//    val data: LiveData<List<EventModel>> = auth
+//        .authStateFlow
+//        .flatMapLatest { (myId, _) ->
+//            repository.eventData
+//                .map { events ->
+//                    events.map {
+//                        it.copy(ownedByMe = it.authorId == myId)
+//                    }
+//                }
+//        }.asLiveData(Dispatchers.Default)
 
+    val data: Flow<PagingData<EventModel>> = repository.eventData
+
+    private val _userEvents = MutableLiveData<List<EventModel>>()
+    val userEvents: LiveData<List<EventModel>>
+        get() = _userEvents
 
     private val _state = MutableLiveData(FeedModelState(idle = true))
     val state: LiveData<FeedModelState>
         get() = _state
 
-    private val _dataByAuthor = MutableLiveData<List<EventModel>>()
-    val dataByAuthor: LiveData<List<EventModel>>
-        get() = _dataByAuthor
 
     //участники:
     private val _participateIds = MutableLiveData(emptyList<Long>())
@@ -58,7 +61,7 @@ class EventViewModel @Inject constructor(
         get() = _speakerAdded
 
     init {
-        loadEvents()
+        //loadEvents()
     }
 
     fun loadEvents() {
@@ -75,14 +78,16 @@ class EventViewModel @Inject constructor(
 
     fun getByAuthorId(id: Long) {
         viewModelScope.launch {
-            _dataByAuthor.value = repository.getEventsByAuthorId(id)
+            _state.value = FeedModelState(loading = true)
+            _userEvents.postValue(repository.getEventsByAuthorId(id))
+            _state.value = FeedModelState(idle = true)
             //println("SPEAKER= ${_dataByAuthor.value.toString()}")
         }
     }
 
     fun updateEventsByAuthorId(authorId: Long) = viewModelScope.launch {
         try {
-            _dataByAuthor.postValue(repository.updateEventsByAuthorId(authorId))
+            _userEvents.postValue(repository.updateEventsByAuthorId(authorId))
         } catch (e: Exception) {
             e.printStackTrace()
         }

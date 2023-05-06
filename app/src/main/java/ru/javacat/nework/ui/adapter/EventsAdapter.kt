@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import android.widget.MediaController
 import android.widget.PopupMenu
 import androidx.core.view.isVisible
+import androidx.paging.PagingData
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -26,17 +28,19 @@ interface OnEventsListener {
     fun onShare(event: EventModel) {}
     fun onPlayAudio(event: EventModel){}
     fun onParticipant(event: EventModel){}
+    fun onUser(event: EventModel){}
+    fun onImage(url: String){}
 }
 class EventsAdapter(
     private val onEventsListener: OnEventsListener
-):ListAdapter<EventModel, EventViewHolder>(EventsDiffCallback()) {
+):PagingDataAdapter<EventModel, EventViewHolder>(EventsDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventViewHolder {
         val binding = CardEventBinding.inflate(LayoutInflater.from(parent.context),parent,false)
         return EventViewHolder(binding, onEventsListener)
     }
 
     override fun onBindViewHolder(holder: EventViewHolder, position: Int) {
-        val event = getItem(position)
+        val event = getItem(position) ?: return
         holder.bind(event)
     }
 
@@ -70,6 +74,16 @@ class EventViewHolder(
             dateOfEvent.text = event.datetime.asString()
             locationOfEvent.text = event.coords.toString()
             typeOfEvent.text = event.type.toString()
+
+            //onUser:
+            avatar.setOnClickListener {
+                onEventsListener.onImage(event.authorAvatar.toString())
+            }
+            eventHeader.setOnClickListener {
+                onEventsListener.onUser(event)
+            }
+
+
             //likes:
             interactionPosts.likeBtn.isChecked = event.likedByMe
             interactionPosts.likeBtn.text = "${event.likeOwnerIds?.size?: ""}"
@@ -78,7 +92,6 @@ class EventViewHolder(
             if (event.speakerIds.isNotEmpty()) {
                 speakers.text = event.speakerIds.map {
                     event.users[it]?.name }.joinToString(", ")
-
             }
 
             //participants:
@@ -98,7 +111,9 @@ class EventViewHolder(
 
             //image
             attachLayout.attachImage.isVisible = event.attachment?.type == AttachmentType.IMAGE
-
+            attachLayout.attachImage.setOnClickListener {
+                onEventsListener.onImage(event.attachment?.url.toString())
+            }
             // audio:
             attachLayout.attachAudio.isVisible = event.attachment?.type == AttachmentType.AUDIO
             attachLayout.attachAudio.setOnClickListener {

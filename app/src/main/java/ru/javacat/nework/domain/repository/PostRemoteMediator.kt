@@ -67,7 +67,6 @@ class PostRemoteMediator(
                                     )
                                 )
                             )
-
                     }
 
                     LoadType.APPEND -> {
@@ -90,8 +89,7 @@ class PostRemoteMediator(
                 //val result = body.map { it.toModel() }.map(PostEntity::fromDto)
                 //println("POST_MEDIATOR: $body")
 
-                 val result = body.map { it.toEntity() }
-                println("MEDIATOR: $result")
+
                 dao.insert(
                     body.map { it.toEntity() }
                 )

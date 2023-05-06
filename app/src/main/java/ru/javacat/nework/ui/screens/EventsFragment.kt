@@ -6,8 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import ru.javacat.nework.R
 import ru.javacat.nework.data.auth.AppAuth
 import ru.javacat.nework.databinding.FragmentEventsBinding
@@ -26,7 +30,6 @@ class EventsFragment : Fragment() {
     private val mediaObserver = MediaLifecycleObserver()
     @Inject
     lateinit var appAuth: AppAuth
-
 
 
     override fun onCreateView(
@@ -60,6 +63,17 @@ class EventsFragment : Fragment() {
                 showUserListDialog(event.participantsIds, childFragmentManager)
             }
 
+            override fun onUser(event: EventModel) {
+                val bundle = Bundle()
+                bundle.putLong("userID", event.authorId)
+                //val action = PostsFragmentDirections.actionNavigationPostsToWallFragment(post.authorId)
+                findNavController().navigate(R.id.wallFragment, bundle)
+            }
+
+            override fun onImage(url: String) {
+                showImageDialog(url, childFragmentManager)
+            }
+
             override fun onPlayAudio(event: EventModel) {
                 mediaObserver.apply {
                     mediaPlayer?.reset()
@@ -75,16 +89,34 @@ class EventsFragment : Fragment() {
         binding.eventsList.adapter = adapter
 
         binding.swipeToRefresh.setOnRefreshListener {
-            viewModel.loadEvents()
+            adapter.refresh()
         }
-        viewModel.data.observe(viewLifecycleOwner){
-        adapter.submitList(it)
+//        viewModel.data.observe(viewLifecycleOwner){
+//        adapter.submitList(it)
+//        }
+
+        lifecycleScope.launchWhenCreated {
+            viewModel.data
+                .catch { e:Throwable->
+                    e.printStackTrace()
+                }
+                .collectLatest {
+                    adapter.submitData(it)
+                }
         }
 
-        viewModel.state.observe(viewLifecycleOwner) {
-            binding.swipeToRefresh.isRefreshing = it.refreshing
-                    || it.loading
+        lifecycleScope.launchWhenCreated {
+            adapter.loadStateFlow.collectLatest {
+                binding.swipeToRefresh.isRefreshing = it.refresh is LoadState.Loading
+                        ||it.append is LoadState.Loading
+                        ||it.prepend is LoadState.Loading
+            }
         }
+
+//        viewModel.state.observe(viewLifecycleOwner) {
+//            binding.swipeToRefresh.isRefreshing = it.refreshing
+//                    || it.loading
+//        }
 
 
         binding.postListBtn.setOnClickListener {
@@ -92,7 +124,7 @@ class EventsFragment : Fragment() {
         }
 
         binding.eventsListBtn.setOnClickListener{
-            viewModel.loadEvents()
+            binding.eventsList.smoothScrollToPosition(0)
         }
 
         binding.newEventBtn.setOnClickListener {

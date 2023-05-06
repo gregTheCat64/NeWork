@@ -40,7 +40,6 @@ class PostRepositoryImpl @Inject constructor(
     postRemoteKeyDao: PostRemoteKeyDao,
     private val appAuth: AppAuth,
     appDb: AppDb
-
 ) : PostRepository {
 
     @OptIn(ExperimentalPagingApi::class)
@@ -108,12 +107,12 @@ class PostRepositoryImpl @Inject constructor(
         .flowOn(Dispatchers.Default)
 
 
-    override suspend fun save(post: PostRequest, upload: MediaUpload?) {
+    override suspend fun save(post: PostRequest, upload: MediaUpload?, type: AttachmentType?) {
         try {
             val postWithAttachment = upload?.let {
                 upload(it)
             }?.let {
-                post.copy(attachment =  Attachment(it.url, AttachmentType.IMAGE.name))
+                post.copy(attachment = type?.name?.let { type -> Attachment(it.url, type) })
             }
             postsApi.save(postWithAttachment?: post)
         } catch (e: IOException) {
@@ -128,13 +127,10 @@ class PostRepositoryImpl @Inject constructor(
             val media = MultipartBody.Part.createFormData(
                 "file", upload.file.name, upload.file.asRequestBody()
             )
-            println("UPLOADFILE: ${upload.file}")
-
             val response = postsApi.upload(media)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
-            println("RESPONSE: ${response.body()}")
             return response.body() ?: throw ApiError(response.code(), response.message())
         } catch (e: IOException) {
             throw NetworkError

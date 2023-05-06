@@ -10,6 +10,7 @@ import ru.javacat.nework.util.Converters
 @Database(entities = [
     PostEntity::class,
     PostRemoteKeyEntity::class,
+    EventRemoteKeyEntity::class,
     EventEntity::class,
     UserEntity::class,
     JobEntity::class
@@ -19,6 +20,7 @@ abstract class AppDb : RoomDatabase() {
     abstract fun postDao(): PostDao
     abstract fun postRemoteKeyDao(): PostRemoteKeyDao
     abstract fun eventDao(): EventDao
+    abstract fun eventRemoteKeyDao(): EventRemoteKeyDao
     abstract fun userDao(): UserDao
     abstract fun jobDao(): JobsDao
 

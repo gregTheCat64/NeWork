@@ -1,20 +1,32 @@
 package ru.javacat.nework.data.impl
 
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import ru.javacat.nework.data.AppDb
 import ru.javacat.nework.data.api.EventsApi
 import ru.javacat.nework.data.auth.AppAuth
 import ru.javacat.nework.data.dao.EventDao
+import ru.javacat.nework.data.dao.EventRemoteKeyDao
 import ru.javacat.nework.data.dto.request.EventCreateRequest
 import ru.javacat.nework.data.entity.EventEntity
+import ru.javacat.nework.data.entity.PostEntity
 import ru.javacat.nework.data.entity.toDto
 import ru.javacat.nework.data.mappers.toEventEntity
 import ru.javacat.nework.data.mappers.toEventModel
 import ru.javacat.nework.data.mappers.toModel
 import ru.javacat.nework.domain.model.EventModel
+import ru.javacat.nework.domain.model.PostModel
+import ru.javacat.nework.domain.repository.EventRemoteMediator
 import ru.javacat.nework.domain.repository.EventRepository
+import ru.javacat.nework.domain.repository.PostRemoteMediator
 import ru.javacat.nework.error.ApiError
 import ru.javacat.nework.error.NetworkError
 import ru.javacat.nework.error.UnknownError
@@ -24,11 +36,25 @@ import javax.inject.Inject
 class EventRepositoryImpl @Inject constructor(
     private val eventDao: EventDao,
     private val eventsApi: EventsApi,
-    private val appAuth: AppAuth
+    eventRemoteKeyDao: EventRemoteKeyDao,
+    private val appAuth: AppAuth,
+    appDb: AppDb
 ) : EventRepository {
-    override val eventData = eventDao.getAll()
-        .map(List<EventEntity>::toDto)
-        .flowOn(Dispatchers.Default)
+    //    override val eventData = eventDao.getAll()
+//        .map(List<EventEntity>::toDto)
+//        .flowOn(Dispatchers.Default)
+    @OptIn(ExperimentalPagingApi::class)
+    override val eventData: Flow<PagingData<EventModel>> = Pager(
+        config = PagingConfig(pageSize = 5),
+        pagingSourceFactory = { eventDao.getPagingSource() },
+        remoteMediator = EventRemoteMediator(
+            eventsApi,
+            eventDao,
+            eventRemoteKeyDao,
+            appDb
+        )
+    ).flow
+        .map { it.map(EventEntity::toDto) }
 
     override suspend fun getAll() {
         try {
@@ -51,12 +77,12 @@ class EventRepositoryImpl @Inject constructor(
         TODO("Not yet implemented")
     }
 
-    override suspend fun getEventsByAuthorId(authorId: Long):List<EventModel>  {
+    override suspend fun getEventsByAuthorId(authorId: Long): List<EventModel> {
         val daoResult = eventDao.getByAuthorId(authorId)
         return daoResult.toDto()
     }
 
-    override suspend fun updateEventsByAuthorId(authorId: Long):List<EventModel>?{
+    override suspend fun updateEventsByAuthorId(authorId: Long): List<EventModel>? {
         try {
             val response = eventsApi.getAll().body()?.filter {
                 it.authorId == authorId

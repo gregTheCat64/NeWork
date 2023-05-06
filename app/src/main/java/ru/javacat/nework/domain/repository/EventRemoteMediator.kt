@@ -70,7 +70,6 @@ class EventRemoteMediator(
                                 )
                             )
                         )
-
                     }
 
                     LoadType.APPEND -> {

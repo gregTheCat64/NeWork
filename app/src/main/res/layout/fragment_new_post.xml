@@ -73,8 +73,10 @@
                 android:inputType="textMultiLine"
                 android:padding="@dimen/dim16dp" />
 
+
+
             <FrameLayout
-                android:id="@+id/photoContainer"
+                android:id="@+id/attachmentContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -84,13 +86,34 @@
                     android:layout_height="200dp"
                     android:layout_gravity="center" />
 
+                <include
+                    android:id="@+id/audioContainer"
+                    android:layout_marginTop="@dimen/dim4dp"
+                    android:visibility="gone"
+                    layout="@layout/audio_attachment"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
+
+                <include
+                    android:id="@+id/videoContainer"
+                    android:visibility="gone"
+                    layout="@layout/video_attachment"
+                    android:layout_marginTop="@dimen/dim4dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
+
+
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/clearPicBtn"
                     app:icon="@drawable/ic_baseline_delete_24"
                     style="@style/Widget.Material3.Button.IconButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="end|center_vertical"
+                    android:layout_gravity="end|top"
                     />
             </FrameLayout>
 
@@ -157,6 +180,15 @@
                 android:contentDescription="@string/description_take_photo"
                 android:padding="@dimen/dim16dp"
                 app:icon="@drawable/ic_baseline_audiotrack_24" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/videoBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.AppTheme.IconButton"
+                app:icon="@drawable/baseline_movie_24"
+                />
+
             <Button
                 android:id="@+id/addUsersBtn"
                 android:layout_width="wrap_content"

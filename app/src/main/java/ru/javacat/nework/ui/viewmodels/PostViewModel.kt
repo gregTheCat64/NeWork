@@ -3,27 +3,20 @@ package ru.javacat.nework.ui.viewmodels
 import android.net.Uri
 import android.util.Log
 import androidx.core.net.toFile
-import androidx.core.net.toUri
 import androidx.lifecycle.*
 import androidx.paging.PagingData
-import androidx.paging.filter
-import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import ru.javacat.nework.data.auth.AppAuth
 import ru.javacat.nework.data.dto.MediaUpload
 import ru.javacat.nework.data.mappers.toPostRequest
+import ru.javacat.nework.domain.model.AttachmentType
 import ru.javacat.nework.domain.model.CoordinatesModel
 import ru.javacat.nework.domain.model.FeedModelState
-import ru.javacat.nework.domain.model.PhotoModel
+import ru.javacat.nework.domain.model.AttachModel
 import ru.javacat.nework.domain.model.PostModel
 import ru.javacat.nework.domain.repository.PostRepository
 import ru.javacat.nework.util.SingleLiveEvent
-import java.io.File
 import javax.inject.Inject
 
 private val empty = PostModel(
@@ -32,7 +25,7 @@ private val empty = PostModel(
     false, false, emptyMap()
 )
 
-private val noPhoto = PhotoModel()
+private val noPhoto = AttachModel()
 
 @HiltViewModel
 class PostViewModel @Inject constructor(
@@ -79,7 +72,7 @@ class PostViewModel @Inject constructor(
         get() = _postCreated
 
     private val _photo = MutableLiveData(noPhoto)
-    val photo: LiveData<PhotoModel>
+    val photo: LiveData<AttachModel>
         get() = _photo
 
 
@@ -136,7 +129,7 @@ class PostViewModel @Inject constructor(
         }
     }
 
-    fun save() {
+    fun save(type: AttachmentType?) {
         edited.value?.let {
             viewModelScope.launch {
                 try {
@@ -146,7 +139,7 @@ class PostViewModel @Inject constructor(
                     repository.save(
                         it.toPostRequest(), _photo.value?.uri?.let {
                             MediaUpload(it.toFile())
-                        }
+                        }, type
                     )
                     _postCreated.value = Unit
                 } catch (e: Exception) {
@@ -183,8 +176,8 @@ class PostViewModel @Inject constructor(
         }
     }
 
-    fun changePhoto(uri: Uri?) {
-        _photo.value = PhotoModel(uri)
+    fun changeAttach(uri: Uri?, type: AttachmentType?) {
+        _photo.value = AttachModel(uri, type)
         println("URI: ${_photo.value!!.uri.toString()}")
         println("PHOTO after changePhotot: ${photo.value?.uri}")
     }

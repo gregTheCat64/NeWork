@@ -5,24 +5,18 @@ import androidx.core.net.toFile
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import ru.javacat.nework.data.api.PostsApi
 import ru.javacat.nework.data.auth.AppAuth
-import ru.javacat.nework.data.dao.PostDao
-import ru.javacat.nework.data.dao.PostRemoteKeyDao
-import ru.javacat.nework.data.AppDb
 import ru.javacat.nework.data.api.UserApi
 import ru.javacat.nework.data.dao.UserDao
 import ru.javacat.nework.data.dto.MediaUpload
-import ru.javacat.nework.domain.model.PhotoModel
-import ru.javacat.nework.domain.repository.PostRepository
-import ru.javacat.nework.data.impl.PostRepositoryImpl
+import ru.javacat.nework.domain.model.AttachModel
 import ru.javacat.nework.data.impl.UserRepositoryImpl
 import ru.javacat.nework.domain.repository.UserRepository
 import ru.javacat.nework.util.SingleLiveEvent
 import java.io.File
 import javax.inject.Inject
 
-private val noPhoto = PhotoModel()
+private val noPhoto = AttachModel()
 
 @HiltViewModel
 class RegistrationViewModel @Inject constructor(
@@ -38,7 +32,7 @@ class RegistrationViewModel @Inject constructor(
         get() = _tokenReceived
 
     private val _photo = MutableLiveData(noPhoto)
-    val photo: LiveData<PhotoModel>
+    val photo: LiveData<AttachModel>
         get() = _photo
 
 
@@ -59,6 +53,6 @@ class RegistrationViewModel @Inject constructor(
     }
 
     fun changePhoto(uri: Uri?, file: File?) {
-        _photo.value = PhotoModel(uri)
+        _photo.value = AttachModel(uri)
     }
 }

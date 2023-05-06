@@ -8,9 +8,11 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import ru.javacat.nework.R
 import ru.javacat.nework.data.auth.AppAuth
 import ru.javacat.nework.databinding.FragmentWallBinding
@@ -161,12 +163,12 @@ class WallFragment : Fragment() {
         }
 
         //events:
-        val eventsAdapter = EventsAdapter(object : OnEventsListener {
+        val eventsAdapter = UserEventsAdapter(object : OnEventsListener {
         })
 
         binding.eventsList.adapter = eventsAdapter
 
-        eventViewModel.dataByAuthor.observe(viewLifecycleOwner) {
+        eventViewModel.userEvents.observe(viewLifecycleOwner){
             eventsAdapter.submitList(it)
         }
 

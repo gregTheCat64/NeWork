@@ -143,7 +143,7 @@ class PostsFragment : Fragment() {
 
             override fun onResave(post: PostModel) {
                 postViewModel.edit(post)
-                postViewModel.save()
+                //postViewModel.save()
             }
 
             override fun onPlayAudio(post: PostModel) {

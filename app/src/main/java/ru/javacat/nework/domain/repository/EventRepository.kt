@@ -6,7 +6,7 @@ import ru.javacat.nework.data.dto.request.EventCreateRequest
 import ru.javacat.nework.domain.model.EventModel
 
 interface EventRepository {
-    val eventData: Flow<List<EventModel>>
+    val eventData: Flow<PagingData<EventModel>>
     suspend fun getAll()
     suspend fun getEventsByAuthorId(authorId: Long): List<EventModel>
     suspend fun updateEventsByAuthorId(authorId: Long):List<EventModel>?
