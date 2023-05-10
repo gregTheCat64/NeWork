@@ -96,7 +96,6 @@ class NewPostFragment : Fragment() {
                     Activity.RESULT_OK -> {
                         val uri: Uri? = it.data?.data
                         println("file: ${uri?.toString()}")
-                        choosenType = AttachmentType.IMAGE
                         postViewModel.changeAttach(uri, choosenType)
                     }
                 }
@@ -107,27 +106,18 @@ class NewPostFragment : Fragment() {
                 when(it.resultCode) {
                     RESULT_OK -> {
                         val uri = it.data?.data
-                        val realUri = getRealPathFromUri(uri)
-                        val file = it.data?.data?.let {
-                            getFileFromUri(
-                                requireContext().contentResolver,
-                                uri,
-                                requireContext().cacheDir
-                            )
-                        }
-                        //val myFile = context?.contentResolver?.openInputStream(intent?.data!!)
-                        println("contentUri: ${uri?.toString()}")
-                        println("file!: ${file?.absolutePath.toString()}")
-                        println("realUri: ${realUri?.toUri().toString()}")
-                        //Log.i("URI", uri.toString())
-                        //choosenType = AttachmentType.AUDIO
-                        postViewModel.changeAttach(file?.toUri(),choosenType)
-
+                        val file = getFileFromUri(
+                            requireContext().contentResolver,
+                            uri,
+                            requireContext().cacheDir
+                        )
+                        postViewModel.changeAttach(file.toUri(),choosenType)
                     }
                 }
             }
 
         binding.takePhoto.setOnClickListener {
+            choosenType = AttachmentType.IMAGE
             ImagePicker.Builder(this)
                 .cameraOnly()
                 .maxResultSize(2048,2048)
@@ -137,6 +127,7 @@ class NewPostFragment : Fragment() {
         }
 
         binding.pickPhoto.setOnClickListener {
+            choosenType = AttachmentType.IMAGE
             ImagePicker.Builder(this)
                 .galleryOnly()
                 .crop()
@@ -152,7 +143,6 @@ class NewPostFragment : Fragment() {
                 .setAction(Intent.ACTION_GET_CONTENT)
             choosenType = AttachmentType.AUDIO
             pickAudioFileLauncher.launch(intent)
-            //startActivityForResult(Intent.createChooser(intent, "Select a file"), 111)
         }
 
         binding.videoBtn.setOnClickListener {
@@ -161,11 +151,10 @@ class NewPostFragment : Fragment() {
                 .setAction(Intent.ACTION_GET_CONTENT)
             choosenType = AttachmentType.VIDEO
             pickAudioFileLauncher.launch(intent)
-
         }
 
         postViewModel.attachFile.observe(viewLifecycleOwner){
-            Toast.makeText(requireContext(), "$choosenType and ${it.uri} ", Toast.LENGTH_SHORT).show()
+            //Toast.makeText(requireContext(), "$choosenType and ${it.uri} ", Toast.LENGTH_SHORT).show()
             if (it.uri == null){
                 binding.attachmentContainer.visibility = View.GONE
                 return@observe
@@ -201,7 +190,7 @@ class NewPostFragment : Fragment() {
                 binding.attachmentContainer.visibility = View.GONE
                 return@observe
             } else { binding.attachmentContainer.visibility = View.VISIBLE
-                when (choosenType){
+                when (post.attachment!!.type){
                     AttachmentType.IMAGE ->{binding.photo.visibility = View.VISIBLE
                         binding.audioContainer.root.visibility = View.GONE
                         binding.videoContainer.root.visibility = View.GONE
@@ -265,16 +254,16 @@ class NewPostFragment : Fragment() {
         return binding.root
     }
 
-    private fun getRealPathFromUri(contentUri: Uri?): String?{
-        val proj = arrayOf( MediaStore.Audio.Media.DATA)
-        val loader = CursorLoader(requireContext(), contentUri!!, proj ,null,null,null)
-        val cursor = loader.loadInBackground()
-        val column_index = cursor?.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
-        cursor?.moveToFirst()
-        val result = column_index?.let { cursor.getString(it) }
-        cursor?.close()
-        return result
-    }
+//    private fun getRealPathFromUri(contentUri: Uri?): String?{
+//        val proj = arrayOf( MediaStore.Audio.Media.DATA)
+//        val loader = CursorLoader(requireContext(), contentUri!!, proj ,null,null,null)
+//        val cursor = loader.loadInBackground()
+//        val column_index = cursor?.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
+//        cursor?.moveToFirst()
+//        val result = column_index?.let { cursor.getString(it) }
+//        cursor?.close()
+//        return result
+//    }
 
     private fun getFileFromUri(contentResolver: ContentResolver, uri: Uri?, directory: File): File {
         val file =
