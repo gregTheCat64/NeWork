@@ -25,7 +25,7 @@ private val empty = PostModel(
     false, false, emptyMap()
 )
 
-private val noPhoto = AttachModel()
+private val noAttach = AttachModel()
 
 @HiltViewModel
 class PostViewModel @Inject constructor(
@@ -47,7 +47,7 @@ class PostViewModel @Inject constructor(
     val coords: LiveData<CoordinatesModel>
         get() = _coords
 
-    private val _mentionIds = MutableLiveData(emptyList<Long>())
+    private var _mentionIds = MutableLiveData(emptyList<Long>())
     val mentionIds: LiveData<List<Long>>
         get() = _mentionIds
 
@@ -71,14 +71,14 @@ class PostViewModel @Inject constructor(
     val postCreated: LiveData<Unit>
         get() = _postCreated
 
-    private val _photo = MutableLiveData(noPhoto)
-    val photo: LiveData<AttachModel>
-        get() = _photo
+    private val _attachFile = MutableLiveData(noAttach)
+    val attachFile: LiveData<AttachModel>
+        get() = _attachFile
 
 
     init {
         Log.i("MYTAG", "Init postViewModel")
-        println("PHOTO: ${photo.value?.uri}")
+        println("PHOTO: ${attachFile.value?.uri}")
         //loadPosts()
     }
 
@@ -121,7 +121,7 @@ class PostViewModel @Inject constructor(
         viewModelScope.launch {
             _state.value = FeedModelState(refreshing = true)
             try {
-                //repository.getAll()
+                repository.data.collectLatest {  }
                 _state.value = FeedModelState(idle = true)
             } catch (e: Exception) {
                 _state.value = FeedModelState(error = true)
@@ -130,6 +130,7 @@ class PostViewModel @Inject constructor(
     }
 
     fun save(type: AttachmentType?) {
+        println("Edited: ${edited.value}")
         edited.value?.let {
             viewModelScope.launch {
                 try {
@@ -137,7 +138,7 @@ class PostViewModel @Inject constructor(
                     it.mentionIds = mentionIds.value!!
                     it.coords = coords.value
                     repository.save(
-                        it.toPostRequest(), _photo.value?.uri?.let {
+                        it.toPostRequest(), _attachFile.value?.uri?.let {
                             MediaUpload(it.toFile())
                         }, type
                     )
@@ -148,7 +149,19 @@ class PostViewModel @Inject constructor(
             }
         }
         _edited.value = empty
-        _photo.value = noPhoto
+        _attachFile.value = noAttach
+        _mentionIds.value = emptyList()
+    }
+
+    fun changeAttach(uri: Uri?, type: AttachmentType?) {
+        _attachFile.value = AttachModel(uri, type)
+        println("URI: ${_attachFile.value!!.uri.toString()}")
+        println("PHOTO after changePhotot: ${attachFile.value?.uri}")
+    }
+
+    fun deleteAttechment(){
+        _attachFile.value = noAttach
+        _edited.value?.attachment = null
     }
 
     fun edit(post: PostModel) {
@@ -174,17 +187,6 @@ class PostViewModel @Inject constructor(
         viewModelScope.launch {
             repository.removeById(id)
         }
-    }
-
-    fun changeAttach(uri: Uri?, type: AttachmentType?) {
-        _photo.value = AttachModel(uri, type)
-        println("URI: ${_photo.value!!.uri.toString()}")
-        println("PHOTO after changePhotot: ${photo.value?.uri}")
-    }
-
-    fun deleteAttechment(){
-        _photo.value = noPhoto
-        _edited.value?.attachment = null
     }
 
     fun setCoordinates(lat: Double, long: Double) {

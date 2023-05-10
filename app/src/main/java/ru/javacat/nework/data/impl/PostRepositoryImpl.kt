@@ -108,6 +108,7 @@ class PostRepositoryImpl @Inject constructor(
 
 
     override suspend fun save(post: PostRequest, upload: MediaUpload?, type: AttachmentType?) {
+        print("сейв: ${upload?.file}")
         try {
             val postWithAttachment = upload?.let {
                 upload(it)

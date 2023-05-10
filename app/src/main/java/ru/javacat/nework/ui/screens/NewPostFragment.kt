@@ -2,19 +2,19 @@ package ru.javacat.nework.ui.screens
 
 import android.app.Activity
 import android.app.Activity.RESULT_OK
+import android.content.ContentResolver
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
+import android.provider.MediaStore
 import android.view.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.net.toFile
 import androidx.core.net.toUri
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.loader.content.CursorLoader
 import androidx.navigation.fragment.findNavController
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.android.material.snackbar.Snackbar
@@ -22,9 +22,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import ru.javacat.nework.databinding.FragmentNewPostBinding
 import ru.javacat.nework.domain.model.AttachmentType
 import ru.javacat.nework.domain.model.UsersType
+import ru.javacat.nework.ui.viewmodels.PostViewModel
 import ru.javacat.nework.util.AndroidUtils
 import ru.javacat.nework.util.StringArg
-import ru.javacat.nework.ui.viewmodels.PostViewModel
 import ru.javacat.nework.util.load
 import java.io.File
 
@@ -95,6 +95,7 @@ class NewPostFragment : Fragment() {
                     }
                     Activity.RESULT_OK -> {
                         val uri: Uri? = it.data?.data
+                        println("file: ${uri?.toString()}")
                         choosenType = AttachmentType.IMAGE
                         postViewModel.changeAttach(uri, choosenType)
                     }
@@ -105,10 +106,22 @@ class NewPostFragment : Fragment() {
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
                 when(it.resultCode) {
                     RESULT_OK -> {
-                        val uri: Uri? = it.data?.data
+                        val uri = it.data?.data
+                        val realUri = getRealPathFromUri(uri)
+                        val file = it.data?.data?.let {
+                            getFileFromUri(
+                                requireContext().contentResolver,
+                                uri,
+                                requireContext().cacheDir
+                            )
+                        }
+                        //val myFile = context?.contentResolver?.openInputStream(intent?.data!!)
+                        println("contentUri: ${uri?.toString()}")
+                        println("file!: ${file?.absolutePath.toString()}")
+                        println("realUri: ${realUri?.toUri().toString()}")
                         //Log.i("URI", uri.toString())
-                        choosenType = AttachmentType.AUDIO
-                        postViewModel.changeAttach(uri,choosenType)
+                        //choosenType = AttachmentType.AUDIO
+                        postViewModel.changeAttach(file?.toUri(),choosenType)
 
                     }
                 }
@@ -137,7 +150,7 @@ class NewPostFragment : Fragment() {
             val intent = Intent()
                 .setType("audio/*")
                 .setAction(Intent.ACTION_GET_CONTENT)
-
+            choosenType = AttachmentType.AUDIO
             pickAudioFileLauncher.launch(intent)
             //startActivityForResult(Intent.createChooser(intent, "Select a file"), 111)
         }
@@ -146,12 +159,12 @@ class NewPostFragment : Fragment() {
             val intent = Intent()
                 .setType("video/*")
                 .setAction(Intent.ACTION_GET_CONTENT)
-
+            choosenType = AttachmentType.VIDEO
             pickAudioFileLauncher.launch(intent)
 
         }
 
-        postViewModel.photo.observe(viewLifecycleOwner){
+        postViewModel.attachFile.observe(viewLifecycleOwner){
             Toast.makeText(requireContext(), "$choosenType and ${it.uri} ", Toast.LENGTH_SHORT).show()
             if (it.uri == null){
                 binding.attachmentContainer.visibility = View.GONE
@@ -174,7 +187,6 @@ class NewPostFragment : Fragment() {
                         binding.audioContainer.root.visibility = View.GONE
                         binding.videoContainer.videoName.text = it.uri.toString()
                     }
-
                     else -> {binding.attachmentContainer.visibility = View.GONE}
                 }
 
@@ -227,7 +239,7 @@ class NewPostFragment : Fragment() {
         }
 
         postViewModel.postCreated.observe(viewLifecycleOwner) {
-            postViewModel.loadPosts()
+            postViewModel.refresh()
             findNavController().navigateUp()
         }
 
@@ -251,6 +263,30 @@ class NewPostFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    private fun getRealPathFromUri(contentUri: Uri?): String?{
+        val proj = arrayOf( MediaStore.Audio.Media.DATA)
+        val loader = CursorLoader(requireContext(), contentUri!!, proj ,null,null,null)
+        val cursor = loader.loadInBackground()
+        val column_index = cursor?.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
+        cursor?.moveToFirst()
+        val result = column_index?.let { cursor.getString(it) }
+        cursor?.close()
+        return result
+    }
+
+    private fun getFileFromUri(contentResolver: ContentResolver, uri: Uri?, directory: File): File {
+        val file =
+            File.createTempFile("prefix", "suffix", directory)
+        file.outputStream().use {
+            if (uri != null) {
+                val input = contentResolver.openInputStream(uri)
+                input?.copyTo(it)
+                input?.close()
+            }
+        }
+        return file
     }
 
 //    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

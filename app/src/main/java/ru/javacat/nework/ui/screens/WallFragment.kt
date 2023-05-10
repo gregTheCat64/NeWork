@@ -160,6 +160,7 @@ class WallFragment : Fragment() {
             //postViewModel.loadPostsByAuthorId(authorId)
             expandedPosts = !expandedPosts
             binding.postsList.isVisible = expandedPosts
+            binding.eventsList.isVisible = false
         }
 
         //events:
