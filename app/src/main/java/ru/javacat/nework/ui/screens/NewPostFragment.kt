@@ -62,7 +62,7 @@ class NewPostFragment : Fragment() {
         val binding = FragmentNewPostBinding.inflate(inflater, container, false)
 
         //postViewModel.edited.value?.let { initBindings(it,binding) }
-        println("EDITED: ${postViewModel.edited.value}")
+
 
         var choosenType: AttachmentType? = null
         //var addedUsers:List<User>
@@ -211,6 +211,7 @@ class NewPostFragment : Fragment() {
 
         postViewModel.edited.observe(viewLifecycleOwner) { post ->
             println("POST_IDS: ${post.mentionIds}")
+            println("EDITED: ${postViewModel.edited.value}")
             postViewModel.getUsersById(post.mentionIds)
             postViewModel.setAddedUsersIds(post.mentionIds)
 

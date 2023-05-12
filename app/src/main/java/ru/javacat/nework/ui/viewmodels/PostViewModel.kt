@@ -146,10 +146,10 @@ class PostViewModel @Inject constructor(
                             MediaUpload(it.toFile())
                         }, type
                     )
-                    _addedUsers.value = emptyList()
-                    _edited.value = empty
+                    _addedUsers.postValue(emptyList())
+                    _edited.postValue(empty)
 
-                    _postCreated.value = Unit
+                    _postCreated.postValue(Unit)
                 } catch (e: Exception) {
                     _state.value = FeedModelState(error = true)
                 }
@@ -182,9 +182,9 @@ class PostViewModel @Inject constructor(
     fun changeContent(content: String) {
         val text = content.trim()
 
-        if (edited.value?.content == text) {
-            return
-        }
+//        if (edited.value?.content == text) {
+//            return
+//        }
         _edited.value = edited.value?.copy(content = text)
     }
 
