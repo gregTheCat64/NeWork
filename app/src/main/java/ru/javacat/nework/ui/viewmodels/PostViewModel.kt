@@ -14,8 +14,11 @@ import ru.javacat.nework.domain.model.AttachmentType
 import ru.javacat.nework.domain.model.CoordinatesModel
 import ru.javacat.nework.domain.model.FeedModelState
 import ru.javacat.nework.domain.model.AttachModel
+import ru.javacat.nework.domain.model.AttachmentModel
 import ru.javacat.nework.domain.model.PostModel
+import ru.javacat.nework.domain.model.User
 import ru.javacat.nework.domain.repository.PostRepository
+import ru.javacat.nework.domain.repository.UserRepository
 import ru.javacat.nework.util.SingleLiveEvent
 import javax.inject.Inject
 
@@ -29,9 +32,10 @@ private val noAttach = AttachModel()
 
 @HiltViewModel
 class PostViewModel @Inject constructor(
-    private val repository: PostRepository
+    private val postRepository: PostRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
-    val data: Flow<PagingData<PostModel>> = repository.data
+    val data: Flow<PagingData<PostModel>> = postRepository.data
 
 
     private var _userPosts = MutableLiveData<List<PostModel>>()
@@ -47,13 +51,13 @@ class PostViewModel @Inject constructor(
     val coords: LiveData<CoordinatesModel>
         get() = _coords
 
-    private var _mentionIds = MutableLiveData(emptyList<Long>())
-    val mentionIds: LiveData<List<Long>>
-        get() = _mentionIds
+    private var _addedUsersIds = MutableLiveData(emptyList<Long>())
+    val addedUsersIds: LiveData<List<Long>>
+        get() = _addedUsersIds
 
-    private var _usersAdded = MutableLiveData<String>()
-    val usersAdded: LiveData<String>
-        get() = _usersAdded
+    private val _addedUsers = MutableLiveData<List<User>>(emptyList())
+    val addedUsers: LiveData<List<User>>
+        get() = _addedUsers
 
 
 //    val newerCount: LiveData<Int> = data.switchMap {
@@ -79,6 +83,7 @@ class PostViewModel @Inject constructor(
     init {
         Log.i("MYTAG", "Init postViewModel")
         println("PHOTO: ${attachFile.value?.uri}")
+        println("ПОСТ: ${_edited.value?.content}")
         //loadPosts()
     }
 
@@ -86,7 +91,7 @@ class PostViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 _state.value = FeedModelState(loading = true)
-                repository.getAll()
+                postRepository.getAll()
                 _state.value = FeedModelState(idle = true)
             } catch (e: Exception) {
                 _state.value = FeedModelState(error = true)
@@ -97,7 +102,7 @@ class PostViewModel @Inject constructor(
     fun loadPostsByAuthorId(authorId: Long) = viewModelScope.launch {
         try {
             _state.value = FeedModelState(loading = true)
-            _userPosts.postValue(repository.getPostsByAuthorId(authorId))
+            _userPosts.postValue(postRepository.getPostsByAuthorId(authorId))
             _state.value = FeedModelState(idle = true)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -108,7 +113,7 @@ class PostViewModel @Inject constructor(
     fun updatePostsByAuthorId(authorId: Long) = viewModelScope.launch {
         try {
             _state.value = FeedModelState(loading = true)
-            _userPosts.postValue(repository.updatePostsByAuthorId(authorId))
+            _userPosts.postValue(postRepository.updatePostsByAuthorId(authorId))
             _state.value = FeedModelState(idle = true)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -121,7 +126,7 @@ class PostViewModel @Inject constructor(
         viewModelScope.launch {
             _state.value = FeedModelState(refreshing = true)
             try {
-                repository.data.collectLatest {  }
+                postRepository.data.collectLatest { }
                 _state.value = FeedModelState(idle = true)
             } catch (e: Exception) {
                 _state.value = FeedModelState(error = true)
@@ -135,39 +140,43 @@ class PostViewModel @Inject constructor(
             viewModelScope.launch {
                 try {
                     it.link = null
-                    it.mentionIds = mentionIds.value!!
                     it.coords = coords.value
-                    repository.save(
+                    postRepository.save(
                         it.toPostRequest(), _attachFile.value?.uri?.let {
                             MediaUpload(it.toFile())
                         }, type
                     )
+                    _addedUsers.value = emptyList()
+                    _edited.value = empty
+
                     _postCreated.value = Unit
                 } catch (e: Exception) {
                     _state.value = FeedModelState(error = true)
                 }
             }
         }
-        _edited.value = empty
-        _attachFile.value = noAttach
-        _mentionIds.value = emptyList()
+
+//        _attachFile.value = noAttach
+//        _mentionIds.value = emptyList()
+    }
+
+    fun getUsersById(list: List<Long>) {
+        viewModelScope.launch {
+            _addedUsers.postValue(userRepository.getUsersById(list) as List<User>?)
+        }
+    }
+
+    fun setAddedUsersIds(list: List<Long>) {
+        _addedUsersIds.value = list
     }
 
     fun changeAttach(uri: Uri?, type: AttachmentType?) {
-        _attachFile.value = AttachModel(uri, type)
-        println("URI: ${_attachFile.value!!.uri.toString()}")
-        println("PHOTO after changePhotot: ${attachFile.value?.uri}")
-    }
-
-    fun deleteAttechment(){
-        _attachFile.value = noAttach
-        _edited.value?.attachment = null
-    }
-
-    fun edit(post: PostModel) {
-        //changePhoto(post.attachment?.url?.toUri())
-        //changeContent(post.content)
-            _edited.value = post
+        //_attachFile.value = AttachModel(uri, type)
+        _edited.value = edited.value?.copy(attachment = type?.let {
+            AttachmentModel(uri.toString(),
+                it
+            )
+        })
     }
 
     fun changeContent(content: String) {
@@ -179,13 +188,31 @@ class PostViewModel @Inject constructor(
         _edited.value = edited.value?.copy(content = text)
     }
 
+    fun deleteAttechment() {
+        _attachFile.value = noAttach
+        _edited.value?.attachment = null
+    }
+
+    fun edit(post: PostModel) {
+        _edited.value = post
+        _addedUsersIds.value = post.mentionIds
+        println("POST2: ${_edited.value!!.content}")
+    }
+
+    fun clearEdit(){
+        _edited.value = empty
+        _addedUsers.value = emptyList()
+    }
+
+
+
     fun likeById(id: Long) {
-        viewModelScope.launch { repository.likeById(id) }
+        viewModelScope.launch { postRepository.likeById(id) }
     }
 
     fun removeById(id: Long) {
         viewModelScope.launch {
-            repository.removeById(id)
+            postRepository.removeById(id)
         }
     }
 
@@ -193,13 +220,6 @@ class PostViewModel @Inject constructor(
         _coords.value = CoordinatesModel(lat, long)
     }
 
-    fun setMentionIds(list: List<Long>) {
-        _mentionIds.value = list
-    }
-
-    fun setUsersAdded(usersAdded: String) {
-        _usersAdded.value = usersAdded
-    }
 
 
 }

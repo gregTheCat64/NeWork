@@ -10,7 +10,7 @@ data class PostModel (
     val author: String,
     val authorAvatar: String?,
     val authorJob: String?,
-    val content: String,
+    var content: String,
     val published:LocalDateTime?,
     var coords: CoordinatesModel?,
     var link: String?,

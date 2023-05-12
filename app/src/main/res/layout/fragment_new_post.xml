@@ -90,6 +90,7 @@
                     android:id="@+id/audioContainer"
                     android:layout_marginTop="@dimen/dim4dp"
                     android:visibility="gone"
+                    android:layout_marginEnd="@dimen/dim16dp"
                     layout="@layout/audio_attachment"
                     android:layout_gravity="center_horizontal"
                     android:layout_width="wrap_content"
@@ -127,6 +128,14 @@
                 android:id="@+id/usersTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/addedUsersList"
+                app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                />
 
 
         </LinearLayout>

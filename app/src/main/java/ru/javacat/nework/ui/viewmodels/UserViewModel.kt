@@ -29,6 +29,10 @@ class UserViewModel @Inject constructor(
     val user: LiveData<User>
         get() = _user
 
+    private val _addedUsers = MutableLiveData<List<User>>(emptyList())
+    val addedUsers: LiveData<List<User>>
+        get() = _addedUsers
+
 
     init {
         loadUsers()
@@ -49,6 +53,12 @@ class UserViewModel @Inject constructor(
             } catch (e: Exception){
                 e.printStackTrace()
             }
+        }
+    }
+
+    fun getUsersById(list: List<Long>) {
+        viewModelScope.launch {
+            _addedUsers.postValue(repository.getUsersById(list) as List<User>?)
         }
     }
 

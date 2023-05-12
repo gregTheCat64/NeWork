@@ -1,12 +1,15 @@
 package ru.javacat.nework.ui.screens
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -89,21 +92,25 @@ class UsersAddingFragment : Fragment() {
 
 
         binding.saveBtn.setOnClickListener {
-            when (typeOfUsers){
-                UsersType.MENTION -> {
-                    postViewModel.setMentionIds(usersIds)
-                    postViewModel.setUsersAdded(sb.toString())
-                }
-                UsersType.PARTICIPANT -> {
-                    eventViewModel.setParticipantIds(usersIds)
-                    eventViewModel.setParticipantAdded(sb.toString())
-                }
-                UsersType.SPEAKER -> {
-                    eventViewModel.setSpeakerIds(usersIds)
-                    eventViewModel.setSpeakerAdded(sb.toString())
-                }
-            }
-
+//            val usersIntent = Intent().apply {
+//                putExtra("IDS", usersIds.toLongArray())
+//            }
+            val users = usersIds.toLongArray()
+            setFragmentResult("IDS", bundleOf("IDS" to users))
+//            when (typeOfUsers){
+//                UsersType.MENTION -> {
+//                    postViewModel.setMentionIds(usersIds)
+//                    postViewModel.setUsersAdded(sb.toString())
+//                }
+//                UsersType.PARTICIPANT -> {
+//                    eventViewModel.setParticipantIds(usersIds)
+//                    eventViewModel.setParticipantAdded(sb.toString())
+//                }
+//                UsersType.SPEAKER -> {
+//                    eventViewModel.setSpeakerIds(usersIds)
+//                    eventViewModel.setSpeakerAdded(sb.toString())
+//                }
+//            }
             findNavController().navigateUp()
         }
 

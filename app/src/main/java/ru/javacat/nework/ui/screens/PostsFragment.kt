@@ -262,7 +262,7 @@ class PostsFragment : Fragment() {
 
         binding.addPostBtn.setOnClickListener {
             if (appAuth.authStateFlow.value.token != null) {
-                findNavController().navigate(R.id.action_navigation_posts_to_newPostFragment)
+                findNavController().navigate(R.id.newPostFragment)
             } else showSignInDialog(this)
 
         }
@@ -272,7 +272,7 @@ class PostsFragment : Fragment() {
         }
 
         binding.eventsListBtn.setOnClickListener {
-            findNavController().navigate(R.id.action_navigation_posts_to_navigation_events)
+            findNavController().navigate(R.id.events)
         }
 
         return binding.root

@@ -35,7 +35,6 @@ class UserListDialogFragment: DialogFragment() {
 
         val adapter = UsersAdapter(object: OnUserListener{
             override fun onTouch(user: User) {
-                //val action = PostsFragmentDirections.actionNavigationPostsToWallFragment(user.id)
                 val bundle = Bundle()
                 bundle.putLong("userID", user.id)
                 findNavController().navigate(R.id.wallFragment, bundle)

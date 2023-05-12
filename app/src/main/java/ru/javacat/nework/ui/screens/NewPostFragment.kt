@@ -6,22 +6,24 @@ import android.content.ContentResolver
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.view.*
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.loader.content.CursorLoader
+import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.fragment.findNavController
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import ru.javacat.nework.R
 import ru.javacat.nework.databinding.FragmentNewPostBinding
 import ru.javacat.nework.domain.model.AttachmentType
-import ru.javacat.nework.domain.model.UsersType
+import ru.javacat.nework.domain.model.PostModel
+import ru.javacat.nework.domain.model.User
+import ru.javacat.nework.ui.adapter.OnUserListener
+import ru.javacat.nework.ui.adapter.UsersAdapter
 import ru.javacat.nework.ui.viewmodels.PostViewModel
 import ru.javacat.nework.util.AndroidUtils
 import ru.javacat.nework.util.StringArg
@@ -36,7 +38,6 @@ class NewPostFragment : Fragment() {
     }
 
     private val postViewModel: PostViewModel by activityViewModels()
-    //private val userViewModel: UserViewModel by activityViewModels()
 
     override fun onStart() {
         super.onStart()
@@ -60,8 +61,12 @@ class NewPostFragment : Fragment() {
     ): View {
         val binding = FragmentNewPostBinding.inflate(inflater, container, false)
 
+        //postViewModel.edited.value?.let { initBindings(it,binding) }
+        println("EDITED: ${postViewModel.edited.value}")
+
         var choosenType: AttachmentType? = null
-        var usersAddedText = ""
+        //var addedUsers:List<User>
+        //println("users: $addedUsers")
 
         //*** Так можно добавить меню на appBar
 //        requireActivity().addMenuProvider(object : MenuProvider {
@@ -93,6 +98,7 @@ class NewPostFragment : Fragment() {
                             Snackbar.LENGTH_LONG
                         ).show()
                     }
+
                     Activity.RESULT_OK -> {
                         val uri: Uri? = it.data?.data
                         println("file: ${uri?.toString()}")
@@ -102,8 +108,8 @@ class NewPostFragment : Fragment() {
             }
 
         val pickAudioFileLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
-                when(it.resultCode) {
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                when (it.resultCode) {
                     RESULT_OK -> {
                         val uri = it.data?.data
                         val file = getFileFromUri(
@@ -111,22 +117,25 @@ class NewPostFragment : Fragment() {
                             uri,
                             requireContext().cacheDir
                         )
-                        postViewModel.changeAttach(file.toUri(),choosenType)
+                        postViewModel.changeAttach(file.toUri(), choosenType)
                     }
                 }
             }
 
+
         binding.takePhoto.setOnClickListener {
+            postViewModel.changeContent(binding.edit.text.trim().toString())
             choosenType = AttachmentType.IMAGE
             ImagePicker.Builder(this)
                 .cameraOnly()
-                .maxResultSize(2048,2048)
+                .maxResultSize(2048, 2048)
                 .createIntent {
                     pickPhotoLauncher.launch(it)
                 }
         }
 
         binding.pickPhoto.setOnClickListener {
+            postViewModel.changeContent(binding.edit.text.trim().toString())
             choosenType = AttachmentType.IMAGE
             ImagePicker.Builder(this)
                 .galleryOnly()
@@ -138,6 +147,7 @@ class NewPostFragment : Fragment() {
         }
 
         binding.audio.setOnClickListener {
+            postViewModel.changeContent(binding.edit.text.trim().toString())
             val intent = Intent()
                 .setType("audio/*")
                 .setAction(Intent.ACTION_GET_CONTENT)
@@ -146,6 +156,7 @@ class NewPostFragment : Fragment() {
         }
 
         binding.videoBtn.setOnClickListener {
+            postViewModel.changeContent(binding.edit.text.trim().toString())
             val intent = Intent()
                 .setType("video/*")
                 .setAction(Intent.ACTION_GET_CONTENT)
@@ -153,66 +164,32 @@ class NewPostFragment : Fragment() {
             pickAudioFileLauncher.launch(intent)
         }
 
-        postViewModel.attachFile.observe(viewLifecycleOwner){
-            //Toast.makeText(requireContext(), "$choosenType and ${it.uri} ", Toast.LENGTH_SHORT).show()
-            if (it.uri == null){
-                binding.attachmentContainer.visibility = View.GONE
-                return@observe
-            } else { binding.attachmentContainer.visibility = View.VISIBLE
-                when (choosenType){
-                    AttachmentType.IMAGE ->{binding.photo.visibility = View.VISIBLE
-                        binding.audioContainer.root.visibility = View.GONE
-                        binding.videoContainer.root.visibility = View.GONE
-                        binding.photo.load(it.uri.toString())}
-                    AttachmentType.AUDIO->{
-                        binding.audioContainer.root.visibility = View.VISIBLE
-                        binding.photo.visibility = View.GONE
-                        binding.videoContainer.root.visibility = View.GONE
-                    binding.audioContainer.audioName.text = it.uri.toString()
-                    }
-                    AttachmentType.VIDEO->{
-                        binding.videoContainer.root.visibility = View.VISIBLE
-                        binding.photo.visibility = View.GONE
-                        binding.audioContainer.root.visibility = View.GONE
-                        binding.videoContainer.videoName.text = it.uri.toString()
-                    }
-                    else -> {binding.attachmentContainer.visibility = View.GONE}
+        binding.addUsersBtn.setOnClickListener {
+            postViewModel.changeContent(binding.edit.text.trim().toString())
+            setFragmentResultListener("IDS") { _, bundle ->
+                val result = bundle.getLongArray("IDS")
+                if (result != null) {
+                    postViewModel.getUsersById(result.toList())
+                    //postViewModel.setAddedUsersIds(result.toList())
+                    postViewModel.edited.value?.mentionIds = result.toList()
                 }
-
             }
+            findNavController().navigate(R.id.usersAddingFragment)
         }
 
-        postViewModel.edited.observe(viewLifecycleOwner) {post->
-            //println("PHOTO: ${post.attachment?.url?.toUri()}")
-            binding.edit.setText(post.content.trim())
-            binding.usersTextView.text = post.mentionIds.toString()
-            if (post.attachment?.url == null){
-                binding.attachmentContainer.visibility = View.GONE
-                return@observe
-            } else { binding.attachmentContainer.visibility = View.VISIBLE
-                when (post.attachment!!.type){
-                    AttachmentType.IMAGE ->{binding.photo.visibility = View.VISIBLE
-                        binding.audioContainer.root.visibility = View.GONE
-                        binding.videoContainer.root.visibility = View.GONE
-                        binding.photo.load(post.attachment?.url.toString())}
-                    AttachmentType.AUDIO->{
-                        binding.audioContainer.root.visibility = View.VISIBLE
-                        binding.photo.visibility = View.GONE
-                        binding.videoContainer.root.visibility = View.GONE
-                        binding.audioContainer.audioName.text = post.attachment?.url.toString()
-                    }
-                    AttachmentType.VIDEO->{
-                        binding.videoContainer.root.visibility = View.VISIBLE
-                        binding.photo.visibility = View.GONE
-                        binding.audioContainer.root.visibility = View.GONE
-                        binding.videoContainer.videoName.text = post.attachment?.url.toString()
-                    }
 
-                    else -> {binding.attachmentContainer.visibility = View.GONE}
-                }
+        //usersList:
+        val list = binding.addedUsersList
 
+        val adapter = UsersAdapter(object : OnUserListener {
+            override fun onTouch(user: User) {
+                val bundle = Bundle()
+                bundle.putLong("userID", user.id)
+                findNavController().navigate(R.id.wallFragment, bundle)
             }
-        }
+        })
+
+        list.adapter = adapter
 
         binding.clearPicBtn.setOnClickListener {
             choosenType = null
@@ -222,8 +199,7 @@ class NewPostFragment : Fragment() {
         binding.saveBtn.setOnClickListener {
             postViewModel.changeContent(binding.edit.text.toString())
             postViewModel.save(choosenType)
-            postViewModel.setUsersAdded("")
-            binding.usersTextView.text=""
+            binding.usersTextView.text = ""
             AndroidUtils.hideKeyboard(requireView())
         }
 
@@ -233,22 +209,23 @@ class NewPostFragment : Fragment() {
         }
 
 
-        postViewModel.usersAdded.observe(viewLifecycleOwner){
-            usersAddedText = "Отмечены: "
-            usersAddedText += it
-            binding.usersTextView.text = usersAddedText
+        postViewModel.edited.observe(viewLifecycleOwner) { post ->
+            println("POST_IDS: ${post.mentionIds}")
+            postViewModel.getUsersById(post.mentionIds)
+            postViewModel.setAddedUsersIds(post.mentionIds)
+
+            initBindings(post, binding)
+        }
+
+        postViewModel.addedUsers.observe(viewLifecycleOwner) {
+            adapter.submitList(it)
+            //addedUsers = it
         }
 
         binding.cancelButton.setOnClickListener {
-            postViewModel.setUsersAdded("")
+            postViewModel.clearEdit()
             AndroidUtils.hideKeyboard(requireView())
             findNavController().navigateUp()
-        }
-
-
-        binding.addUsersBtn.setOnClickListener {
-            val action = NewPostFragmentDirections.actionNewPostFragmentToUsersAddingFragment(UsersType.MENTION)
-            findNavController().navigate(action)
         }
 
         return binding.root
@@ -276,6 +253,44 @@ class NewPostFragment : Fragment() {
             }
         }
         return file
+    }
+
+    private fun initBindings(post: PostModel, binding: FragmentNewPostBinding) {
+        binding.edit.setText(post.content.trim())
+        binding.usersTextView.text = "Отмечены:"
+        if (post.attachment?.url == null) {
+            binding.attachmentContainer.visibility = View.GONE
+            return
+        } else {
+            binding.attachmentContainer.visibility = View.VISIBLE
+            when (post.attachment!!.type) {
+                AttachmentType.IMAGE -> {
+                    binding.photo.visibility = View.VISIBLE
+                    binding.audioContainer.root.visibility = View.GONE
+                    binding.videoContainer.root.visibility = View.GONE
+                    binding.photo.load(post.attachment?.url.toString())
+                }
+
+                AttachmentType.AUDIO -> {
+                    binding.audioContainer.root.visibility = View.VISIBLE
+                    binding.photo.visibility = View.GONE
+                    binding.videoContainer.root.visibility = View.GONE
+                    binding.audioContainer.audioName.text = post.attachment?.url.toString()
+                }
+
+                AttachmentType.VIDEO -> {
+                    binding.videoContainer.root.visibility = View.VISIBLE
+                    binding.photo.visibility = View.GONE
+                    binding.audioContainer.root.visibility = View.GONE
+                    binding.videoContainer.videoName.text = post.attachment?.url.toString()
+                }
+
+                else -> {
+                    binding.attachmentContainer.visibility = View.GONE
+                }
+            }
+
+        }
     }
 
 //    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
