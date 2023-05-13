@@ -189,8 +189,9 @@ class PostViewModel @Inject constructor(
     }
 
     fun deleteAttechment() {
-        _attachFile.value = noAttach
-        _edited.value?.attachment = null
+       // _attachFile.value = noAttach
+        //_edited.value?.attachment = null //observer не срабатывает
+        _edited.value = _edited.value?.copy(attachment = null) //срабатывает
     }
 
     fun edit(post: PostModel) {

@@ -259,7 +259,7 @@ class NewPostFragment : Fragment() {
     private fun initBindings(post: PostModel, binding: FragmentNewPostBinding) {
         binding.edit.setText(post.content.trim())
         binding.usersTextView.text = "Отмечены:"
-        if (post.attachment?.url == null) {
+        if (post.attachment == null) {
             binding.attachmentContainer.visibility = View.GONE
             return
         } else {
