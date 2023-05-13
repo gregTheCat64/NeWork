@@ -92,9 +92,6 @@ class UsersAddingFragment : Fragment() {
 
 
         binding.saveBtn.setOnClickListener {
-//            val usersIntent = Intent().apply {
-//                putExtra("IDS", usersIds.toLongArray())
-//            }
             val users = usersIds.toLongArray()
             setFragmentResult("IDS", bundleOf("IDS" to users))
 //            when (typeOfUsers){

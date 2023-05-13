@@ -60,13 +60,9 @@ class NewPostFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentNewPostBinding.inflate(inflater, container, false)
-
+        var choosenType: AttachmentType? = null
         //postViewModel.edited.value?.let { initBindings(it,binding) }
 
-
-        var choosenType: AttachmentType? = null
-        //var addedUsers:List<User>
-        //println("users: $addedUsers")
 
         //*** Так можно добавить меню на appBar
 //        requireActivity().addMenuProvider(object : MenuProvider {
@@ -87,7 +83,7 @@ class NewPostFragment : Fragment() {
 //                }
 //        }, viewLifecycleOwner)
 
-
+            //pickers:
         val pickPhotoLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                 when (it.resultCode) {
@@ -123,6 +119,7 @@ class NewPostFragment : Fragment() {
             }
 
 
+        //listeners:
         binding.takePhoto.setOnClickListener {
             postViewModel.changeContent(binding.edit.text.trim().toString())
             choosenType = AttachmentType.IMAGE
@@ -170,11 +167,28 @@ class NewPostFragment : Fragment() {
                 val result = bundle.getLongArray("IDS")
                 if (result != null) {
                     postViewModel.getUsersById(result.toList())
-                    //postViewModel.setAddedUsersIds(result.toList())
                     postViewModel.edited.value?.mentionIds = result.toList()
                 }
             }
             findNavController().navigate(R.id.usersAddingFragment)
+        }
+
+        binding.cancelButton.setOnClickListener {
+            postViewModel.clearEdit()
+            AndroidUtils.hideKeyboard(requireView())
+            findNavController().navigateUp()
+        }
+
+        binding.clearPicBtn.setOnClickListener {
+            choosenType = null
+            postViewModel.deleteAttechment()
+        }
+
+        binding.saveBtn.setOnClickListener {
+            postViewModel.changeContent(binding.edit.text.toString())
+            postViewModel.save(choosenType)
+            binding.usersTextView.text = ""
+            AndroidUtils.hideKeyboard(requireView())
         }
 
 
@@ -191,18 +205,11 @@ class NewPostFragment : Fragment() {
 
         list.adapter = adapter
 
-        binding.clearPicBtn.setOnClickListener {
-            choosenType = null
-            postViewModel.deleteAttechment()
+        postViewModel.addedUsers.observe(viewLifecycleOwner) {
+            adapter.submitList(it)
         }
 
-        binding.saveBtn.setOnClickListener {
-            postViewModel.changeContent(binding.edit.text.toString())
-            postViewModel.save(choosenType)
-            binding.usersTextView.text = ""
-            AndroidUtils.hideKeyboard(requireView())
-        }
-
+        //observers:
         postViewModel.postCreated.observe(viewLifecycleOwner) {
             postViewModel.refresh()
             findNavController().navigateUp()
@@ -214,20 +221,10 @@ class NewPostFragment : Fragment() {
             println("EDITED: ${postViewModel.edited.value}")
             postViewModel.getUsersById(post.mentionIds)
             postViewModel.setAddedUsersIds(post.mentionIds)
-
             initBindings(post, binding)
         }
 
-        postViewModel.addedUsers.observe(viewLifecycleOwner) {
-            adapter.submitList(it)
-            //addedUsers = it
-        }
 
-        binding.cancelButton.setOnClickListener {
-            postViewModel.clearEdit()
-            AndroidUtils.hideKeyboard(requireView())
-            findNavController().navigateUp()
-        }
 
         return binding.root
     }
