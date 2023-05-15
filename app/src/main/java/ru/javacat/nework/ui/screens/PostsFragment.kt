@@ -41,6 +41,8 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class PostsFragment : Fragment() {
+
+
     private val postViewModel: PostViewModel by activityViewModels()
 
     private val mediaObserver = MediaLifecycleObserver()
@@ -64,6 +66,8 @@ class PostsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentPostsBinding.inflate(inflater, container, false)
+
+        //postViewModel.refresh()
 
         //Доступ к локации:
         lifecycle.coroutineScope.launchWhenCreated {
@@ -172,7 +176,6 @@ class PostsFragment : Fragment() {
             override fun onUser(post: PostModel) {
                 val bundle = Bundle()
                 bundle.putLong("userID", post.authorId)
-                //val action = PostsFragmentDirections.actionNavigationPostsToWallFragment(post.authorId)
                 findNavController().navigate(R.id.wallFragment, bundle)
             }
 
@@ -203,33 +206,38 @@ class PostsFragment : Fragment() {
                 }
                 .collectLatest {
                     adapter.submitData(it)
+                    binding.postsList.smoothScrollToPosition(0)
+
                 }
         }
 
 
-
         lifecycleScope.launchWhenCreated {
             adapter.loadStateFlow.collectLatest {
-                binding.swipeToRefresh.isRefreshing = it.refresh is LoadState.Loading
+                binding.swipeToRefresh.isRefreshing =
+                    it.refresh is LoadState.Loading
                         || it.append is LoadState.Loading
                         || it.prepend is LoadState.Loading
             }
         }
 
-        lifecycleScope.launchWhenCreated {
-            postViewModel.data.collectLatest {
-                if (it.toString().isEmpty()) {
-                    binding.emptyText.isVisible
-                }
-            }
-        }
+//        lifecycleScope.launchWhenCreated {
+//            postViewModel.data.collectLatest {
+//                if (it.toString().isEmpty()) {
+//                    binding.emptyText.isVisible
+//                }
+//            }
+//        }
 
 
         postViewModel.state.observe(viewLifecycleOwner) { state ->
+            println("state: $state")
+
             with(binding) {
                 progress.isVisible = state.loading
-                swipeToRefresh.isRefreshing = state.refreshing
+                //swipeToRefresh.isRefreshing = state.refreshing
             }
+            //if (!state.refreshing){binding.postsList.smoothScrollToPosition(0)}
             if (state.error) {
                 Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
                     .setAction(R.string.retry_loading) {
@@ -237,6 +245,12 @@ class PostsFragment : Fragment() {
                     }
                     .show()
             }
+        }
+
+
+
+        postViewModel.postCreated.observe(viewLifecycleOwner){
+            binding.postsList.smoothScrollToPosition(0)
         }
 
 //        viewModel.newerCount.observe(viewLifecycleOwner) { state ->

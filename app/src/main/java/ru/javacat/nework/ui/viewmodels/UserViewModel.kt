@@ -20,6 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class UserViewModel @Inject constructor(
     private val repository: UserRepository
+
 ) : ViewModel() {
     private val userData = repository.userData
 
@@ -32,6 +33,10 @@ class UserViewModel @Inject constructor(
     private val _addedUsers = MutableLiveData<List<User>>(emptyList())
     val addedUsers: LiveData<List<User>>
         get() = _addedUsers
+
+    private val _speakers = MutableLiveData<List<User>>(emptyList())
+    val speakers: LiveData<List<User>>
+        get() = _speakers
 
 
     init {
@@ -58,7 +63,15 @@ class UserViewModel @Inject constructor(
 
     fun getUsersById(list: List<Long>) {
         viewModelScope.launch {
-            _addedUsers.postValue(repository.getUsersById(list) as List<User>?)
+            val users = repository.getUsersById(list)
+            _addedUsers.postValue(users as List<User>?)
+        }
+    }
+
+    fun getSpeakersById(list: List<Long>) {
+        viewModelScope.launch {
+            val users = repository.getUsersById(list)
+            _speakers.postValue(users as List<User>?)
         }
     }
 

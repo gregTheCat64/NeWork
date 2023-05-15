@@ -90,7 +90,7 @@
                 android:layout_height="wrap_content"
                 android:hint="Дата начала"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/positionEditText" />
+                app:layout_constraintTop_toBottomOf="@+id/eventEditText" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/startDateBtn"
@@ -114,7 +114,7 @@
                 android:layout_height="wrap_content"
                 android:hint="Дата окончания"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/positionEditText" />
+                app:layout_constraintTop_toBottomOf="@+id/eventEditText" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/endDateBtn"

@@ -5,20 +5,29 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.setFragmentResultListener
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import ru.javacat.nework.R
 import ru.javacat.nework.databinding.FragmentNewEventBinding
+import ru.javacat.nework.domain.model.User
 import ru.javacat.nework.domain.model.UsersType
+import ru.javacat.nework.ui.adapter.OnUserListener
+import ru.javacat.nework.ui.adapter.UsersAdapter
 import ru.javacat.nework.ui.viewmodels.EventViewModel
+import ru.javacat.nework.ui.viewmodels.UserViewModel
+import ru.javacat.nework.util.AndroidUtils
 
 @AndroidEntryPoint
 class NewEventFragment : Fragment() {
 
     private val eventViewModel: EventViewModel by activityViewModels()
+    private val userViewModel: UserViewModel by activityViewModels()
 
     override fun onStart() {
         super.onStart()
@@ -42,21 +51,47 @@ class NewEventFragment : Fragment() {
         val binding = FragmentNewEventBinding.inflate(inflater, container, false)
 
 
-        binding.addParticipatesBtn.setOnClickListener {
-            val action = NewEventFragmentDirections.actionNewEventFragmentToUsersAddingFragment(UsersType.PARTICIPANT)
-            findNavController().navigate(action)
-        }
+        val speakerAdapter = UsersAdapter(object : OnUserListener {
+            override fun onTouch(user: User) {
+                super.onTouch(user)
+            }
+        })
 
+        val participantAdapter = UsersAdapter(object : OnUserListener {
+            override fun onTouch(user: User) {
+                super.onTouch(user)
+            }
+        })
+
+
+        //listeners
         binding.addSpeakerBtn.setOnClickListener {
-            val action = NewEventFragmentDirections.actionNewEventFragmentToUsersAddingFragment(UsersType.SPEAKER)
-            findNavController().navigate(action)
+            setFragmentResultListener("IDS") { _, bundle ->
+                val result = bundle.getLongArray("IDS")
+                println("result: ${result.contentToString()}")
+                if (result != null) {
+                    eventViewModel.setSpeakers(result.toList())
+                }
+            }
+            findNavController().navigate(R.id.usersAddingFragment)
         }
 
-        binding.cancelBtn.setOnClickListener {
+
+        binding.clearPicBtn.setOnClickListener {
+            eventViewModel.clearEdit()
+            AndroidUtils.hideKeyboard(requireView())
             findNavController().navigateUp()
         }
 
-        binding.onLineBtn.setOnClickListener{
+
+
+        binding.cancelBtn.setOnClickListener {
+            eventViewModel.clearEdit()
+            AndroidUtils.hideKeyboard(requireView())
+            findNavController().navigateUp()
+        }
+
+        binding.onLineBtn.setOnClickListener {
             binding.linkEditText.isVisible = true
             binding.locationGroup.isVisible = false
         }
@@ -66,22 +101,22 @@ class NewEventFragment : Fragment() {
             binding.locationGroup.isVisible = true
         }
 
-
-        eventViewModel.participateAdded.observe(viewLifecycleOwner){
-            binding.apply {
-                participantsEditText.text.clear()
-                participantsEditText.text.append(it)
-            }
-
+        binding.clearPicBtn.setOnClickListener {
+            //TODO: добавить тип аттача и удалить
+            eventViewModel.deleteAttachment()
         }
 
-        eventViewModel.speakerAdded.observe(viewLifecycleOwner){
-            binding.apply {
-                speakersEditText.text.clear()
-                speakersEditText.text.append(it)
-            }
+        binding.saveEventBtn.setOnClickListener {
+            //TODO: доделать сейв
         }
 
+        //lists:
+        val speakersList = binding.speakersRecView
+        speakersList.adapter = speakerAdapter
+
+        userViewModel.speakers.observe(viewLifecycleOwner){
+            speakerAdapter.submitList(it)
+        }
 
         return binding.root
     }

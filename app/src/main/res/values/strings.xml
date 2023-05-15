@@ -40,4 +40,7 @@
     <string name="retry_loading">Повторить</string>
     <string name="chooser_share_post">Поделиться записью</string>
     <string name="notification_new_post">%1$s published new post</string>
+    <string name="posts">записи</string>
+    <string name="events">мероприятия</string>
+    <string name="assign_Users">назначить</string>
 </resources>

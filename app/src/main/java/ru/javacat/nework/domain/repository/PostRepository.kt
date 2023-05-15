@@ -14,6 +14,8 @@ import ru.javacat.nework.domain.model.PostModel
 interface PostRepository {
     val data: Flow<PagingData<PostModel>>
     suspend fun getAll()
+
+    suspend fun getLatest(count: Int)
     suspend fun getPostsByAuthorId(authorId: Long):List<PostModel>?
     suspend fun updatePostsByAuthorId(authorId: Long):List<PostModel>?
     fun getNewerCount(id: Long): Flow<Int>

@@ -10,6 +10,7 @@ import android.view.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
@@ -20,11 +21,13 @@ import dagger.hilt.android.AndroidEntryPoint
 import ru.javacat.nework.R
 import ru.javacat.nework.databinding.FragmentNewPostBinding
 import ru.javacat.nework.domain.model.AttachmentType
+import ru.javacat.nework.domain.model.FeedModelState
 import ru.javacat.nework.domain.model.PostModel
 import ru.javacat.nework.domain.model.User
 import ru.javacat.nework.ui.adapter.OnUserListener
 import ru.javacat.nework.ui.adapter.UsersAdapter
 import ru.javacat.nework.ui.viewmodels.PostViewModel
+import ru.javacat.nework.ui.viewmodels.UserViewModel
 import ru.javacat.nework.util.AndroidUtils
 import ru.javacat.nework.util.StringArg
 import ru.javacat.nework.util.load
@@ -38,6 +41,7 @@ class NewPostFragment : Fragment() {
     }
 
     private val postViewModel: PostViewModel by activityViewModels()
+    private val userViewModel: UserViewModel by activityViewModels()
 
     override fun onStart() {
         super.onStart()
@@ -98,6 +102,7 @@ class NewPostFragment : Fragment() {
                     Activity.RESULT_OK -> {
                         val uri: Uri? = it.data?.data
                         println("file: ${uri?.toString()}")
+                        println("UPLOADING")
                         postViewModel.changeAttach(uri, choosenType)
                     }
                 }
@@ -120,8 +125,9 @@ class NewPostFragment : Fragment() {
 
 
         //listeners:
-        binding.takePhoto.setOnClickListener {
-            postViewModel.changeContent(binding.edit.text.trim().toString())
+        binding.buttonPanel.takePhoto.setOnClickListener {
+            //TODO вынести функцию
+            postViewModel.changeContent(binding.edit.text?.trim().toString())
             choosenType = AttachmentType.IMAGE
             ImagePicker.Builder(this)
                 .cameraOnly()
@@ -131,8 +137,9 @@ class NewPostFragment : Fragment() {
                 }
         }
 
-        binding.pickPhoto.setOnClickListener {
-            postViewModel.changeContent(binding.edit.text.trim().toString())
+        binding.buttonPanel.pickPhoto.setOnClickListener {
+            postViewModel.setState(FeedModelState(loading = true))
+            postViewModel.changeContent(binding.edit.text?.trim().toString())
             choosenType = AttachmentType.IMAGE
             ImagePicker.Builder(this)
                 .galleryOnly()
@@ -143,8 +150,8 @@ class NewPostFragment : Fragment() {
                 }
         }
 
-        binding.audio.setOnClickListener {
-            postViewModel.changeContent(binding.edit.text.trim().toString())
+        binding.buttonPanel.audio.setOnClickListener {
+            postViewModel.changeContent(binding.edit.text?.trim().toString())
             val intent = Intent()
                 .setType("audio/*")
                 .setAction(Intent.ACTION_GET_CONTENT)
@@ -152,8 +159,8 @@ class NewPostFragment : Fragment() {
             pickAudioFileLauncher.launch(intent)
         }
 
-        binding.videoBtn.setOnClickListener {
-            postViewModel.changeContent(binding.edit.text.trim().toString())
+        binding.buttonPanel.videoBtn.setOnClickListener {
+            postViewModel.changeContent(binding.edit.text?.trim().toString())
             val intent = Intent()
                 .setType("video/*")
                 .setAction(Intent.ACTION_GET_CONTENT)
@@ -161,13 +168,16 @@ class NewPostFragment : Fragment() {
             pickAudioFileLauncher.launch(intent)
         }
 
-        binding.addUsersBtn.setOnClickListener {
-            postViewModel.changeContent(binding.edit.text.trim().toString())
+        binding.mentionUsersBtn.setOnClickListener {
+            postViewModel.changeContent(binding.edit.text?.trim().toString())
             setFragmentResultListener("IDS") { _, bundle ->
                 val result = bundle.getLongArray("IDS")
                 if (result != null) {
-                    postViewModel.getUsersById(result.toList())
-                    postViewModel.edited.value?.mentionIds = result.toList()
+//                    userViewModel.getUsersById(result.toList())
+//                    val added = userViewModel.addedUsers.value
+//                    println("$added")
+                    //postViewModel.edited.value?.mentionIds = result.toList()
+                    postViewModel.setMentions(result.toList())
                 }
             }
             findNavController().navigate(R.id.usersAddingFragment)
@@ -181,13 +191,13 @@ class NewPostFragment : Fragment() {
 
         binding.clearPicBtn.setOnClickListener {
             choosenType = null
-            postViewModel.deleteAttechment()
+            postViewModel.deleteAttachment()
         }
 
         binding.saveBtn.setOnClickListener {
             postViewModel.changeContent(binding.edit.text.toString())
             postViewModel.save(choosenType)
-            binding.usersTextView.text = ""
+            //binding.usersTextView.text = ""
             AndroidUtils.hideKeyboard(requireView())
         }
 
@@ -205,7 +215,7 @@ class NewPostFragment : Fragment() {
 
         list.adapter = adapter
 
-        postViewModel.addedUsers.observe(viewLifecycleOwner) {
+        userViewModel.addedUsers.observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }
 
@@ -213,15 +223,19 @@ class NewPostFragment : Fragment() {
         postViewModel.postCreated.observe(viewLifecycleOwner) {
             postViewModel.refresh()
             findNavController().navigateUp()
-        }
 
+        }
 
         postViewModel.edited.observe(viewLifecycleOwner) { post ->
             println("POST_IDS: ${post.mentionIds}")
             println("EDITED: ${postViewModel.edited.value}")
-            postViewModel.getUsersById(post.mentionIds)
-            postViewModel.setAddedUsersIds(post.mentionIds)
+            userViewModel.getUsersById(post.mentionIds)
+            //postViewModel.setAddedUsersIds(post.mentionIds)
             initBindings(post, binding)
+        }
+
+        postViewModel.state.observe(viewLifecycleOwner) {
+            binding.progressBar.isVisible = it.loading
         }
 
 
@@ -242,7 +256,7 @@ class NewPostFragment : Fragment() {
 
     private fun getFileFromUri(contentResolver: ContentResolver, uri: Uri?, directory: File): File {
         val file =
-            File.createTempFile("prefix", "suffix", directory)
+            File.createTempFile("tmp", "@gree", directory)
         file.outputStream().use {
             if (uri != null) {
                 val input = contentResolver.openInputStream(uri)
@@ -255,7 +269,7 @@ class NewPostFragment : Fragment() {
 
     private fun initBindings(post: PostModel, binding: FragmentNewPostBinding) {
         binding.edit.setText(post.content.trim())
-        binding.usersTextView.text = "Отмечены:"
+        //binding.usersTextView.text = "Отмечены:"
         if (post.attachment == null) {
             binding.attachmentContainer.visibility = View.GONE
             return

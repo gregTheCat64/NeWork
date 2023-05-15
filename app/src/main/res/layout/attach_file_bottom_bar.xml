@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/buttonPanel"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="bottom|center_horizontal"
+    android:background="@color/color_primary"
+   >
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/pickPhoto"
+        style="@style/Widget.AppTheme.IconButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/description_select_photo"
+        android:padding="@dimen/dim16dp"
+        app:icon="@drawable/ic_baseline_image_24" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/takePhoto"
+        style="@style/Widget.AppTheme.IconButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/description_take_photo"
+        android:padding="@dimen/dim16dp"
+        app:icon="@drawable/ic_baseline_camera_alt_24" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/audio"
+        style="@style/Widget.AppTheme.IconButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/description_take_photo"
+        android:padding="@dimen/dim16dp"
+        app:icon="@drawable/ic_baseline_audiotrack_24" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/videoBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Widget.AppTheme.IconButton"
+        app:icon="@drawable/baseline_movie_24"
+        />
+
+    <Button
+        android:id="@+id/addUsersBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Widget.AppTheme.IconButton"
+        app:icon = "@drawable/ic_baseline_alternate_email_24"
+        />
+</LinearLayout>

@@ -69,9 +69,9 @@ class EventViewHolder(
         binding.apply {
             avatar.loadAvatar(event.authorAvatar.toString())
             name.text = event.author
-            published.text = event.published.asString()
+            published.text = event.published?.asString()
             content.text = event.content
-            dateOfEvent.text = event.datetime.asString()
+            dateOfEvent.text = event.datetime?.asString()
             locationOfEvent.text = event.coords.toString()
             typeOfEvent.text = event.type.toString()
 

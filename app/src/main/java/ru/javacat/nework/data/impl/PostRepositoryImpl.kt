@@ -69,6 +69,18 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getLatest(count: Int) {
+        try {
+            val response = postsApi.getLatest(count)
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
+            postDao.insert(body.map { it.toEntity()})
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
+
     override suspend fun getPostsByAuthorId(authorId: Long):List<PostModel>? {
         val userPosts = postDao.getByAuthorId(authorId)
         return userPosts.toDto()
