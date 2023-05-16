@@ -2,7 +2,6 @@ package ru.javacat.nework.ui.screens
 
 import android.app.Activity
 import android.app.Activity.RESULT_OK
-import android.content.ContentResolver
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -31,7 +30,7 @@ import ru.javacat.nework.ui.viewmodels.UserViewModel
 import ru.javacat.nework.util.AndroidUtils
 import ru.javacat.nework.util.StringArg
 import ru.javacat.nework.util.load
-import java.io.File
+import ru.javacat.nework.util.toFile
 
 @AndroidEntryPoint
 class NewPostFragment : Fragment() {
@@ -108,17 +107,13 @@ class NewPostFragment : Fragment() {
                 }
             }
 
-        val pickAudioFileLauncher =
+        //media:
+        val pickFileLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                 when (it.resultCode) {
                     RESULT_OK -> {
-                        val uri = it.data?.data
-                        val file = getFileFromUri(
-                            requireContext().contentResolver,
-                            uri,
-                            requireContext().cacheDir
-                        )
-                        postViewModel.changeAttach(file.toUri(), choosenType)
+                        val file = it.data?.data?.toFile(requireContext())
+                        postViewModel.changeAttach(file?.toUri(), choosenType)
                     }
                 }
             }
@@ -156,7 +151,7 @@ class NewPostFragment : Fragment() {
                 .setType("audio/*")
                 .setAction(Intent.ACTION_GET_CONTENT)
             choosenType = AttachmentType.AUDIO
-            pickAudioFileLauncher.launch(intent)
+            pickFileLauncher.launch(intent)
         }
 
         binding.buttonPanel.videoBtn.setOnClickListener {
@@ -165,7 +160,7 @@ class NewPostFragment : Fragment() {
                 .setType("video/*")
                 .setAction(Intent.ACTION_GET_CONTENT)
             choosenType = AttachmentType.VIDEO
-            pickAudioFileLauncher.launch(intent)
+            pickFileLauncher.launch(intent)
         }
 
         binding.mentionUsersBtn.setOnClickListener {
@@ -254,18 +249,18 @@ class NewPostFragment : Fragment() {
 //        return result
 //    }
 
-    private fun getFileFromUri(contentResolver: ContentResolver, uri: Uri?, directory: File): File {
-        val file =
-            File.createTempFile("tmp", "@gree", directory)
-        file.outputStream().use {
-            if (uri != null) {
-                val input = contentResolver.openInputStream(uri)
-                input?.copyTo(it)
-                input?.close()
-            }
-        }
-        return file
-    }
+//    private fun getFileFromUri(contentResolver: ContentResolver, uri: Uri?, directory: File): File {
+//        val file =
+//            File.createTempFile("tmp", "@gree", directory)
+//        file.outputStream().use {
+//            if (uri != null) {
+//                val input = contentResolver.openInputStream(uri)
+//                input?.copyTo(it)
+//                input?.close()
+//            }
+//        }
+//        return file
+//    }
 
     private fun initBindings(post: PostModel, binding: FragmentNewPostBinding) {
         binding.edit.setText(post.content.trim())

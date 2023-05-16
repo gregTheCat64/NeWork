@@ -22,7 +22,6 @@ import ru.javacat.nework.mediaplayer.MediaLifecycleObserver
 import ru.javacat.nework.ui.adapter.*
 import ru.javacat.nework.ui.viewmodels.*
 import ru.javacat.nework.util.loadCircleCrop
-import ru.javacat.nework.util.showSignInDialog
 import javax.inject.Inject
 
 @AndroidEntryPoint

@@ -20,7 +20,6 @@ import ru.javacat.nework.mediaplayer.MediaLifecycleObserver
 import ru.javacat.nework.ui.adapter.EventsAdapter
 import ru.javacat.nework.ui.adapter.OnEventsListener
 import ru.javacat.nework.ui.viewmodels.EventViewModel
-import ru.javacat.nework.util.showSignInDialog
 import javax.inject.Inject
 
 @AndroidEntryPoint

@@ -1,25 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-
     tools:context=".ui.screens.NewPostFragment">
 
-    <FrameLayout
-        android:id="@+id/toolBarFrame"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.appcompat.widget.Toolbar
+
+        <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/dim48dp"
-            android:background="@color/color_primary" />
+            android:background="@color/color_primary">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/topAppBar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:title="Новая запись"
+
+                style="@style/Widget.MaterialComponents.Toolbar.Primary"
+                />
+        </com.google.android.material.appbar.AppBarLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/cancel_button"
@@ -47,15 +50,14 @@
             android:layout_gravity="end"
             app:icon="@drawable/ic_baseline_done_24" />
 
-    </FrameLayout>
 
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintTop_toBottomOf="@id/toolBarFrame">
-
-
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        >
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -112,7 +114,7 @@
                     android:id="@+id/photo"
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
-                     />
+                    />
 
                 <include
                     android:id="@+id/audioContainer"
@@ -143,15 +145,15 @@
                     app:icon="@drawable/ic_baseline_delete_24" />
             </FrameLayout>
 
-
-
         </LinearLayout>
 
+    </androidx.core.widget.NestedScrollView>
 
         <LinearLayout
             android:id="@+id/buttonPanelLayout"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -162,6 +164,5 @@
 
         </LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

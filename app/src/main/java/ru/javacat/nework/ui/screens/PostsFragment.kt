@@ -33,7 +33,6 @@ import ru.javacat.nework.ui.adapter.OnInteractionListener
 import ru.javacat.nework.ui.adapter.PostsAdapter
 import ru.javacat.nework.ui.screens.NewPostFragment.Companion.textArg
 import ru.javacat.nework.ui.viewmodels.PostViewModel
-import ru.javacat.nework.util.showSignInDialog
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import javax.inject.Inject
