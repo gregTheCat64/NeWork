@@ -9,6 +9,7 @@ import android.view.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
+import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -77,7 +78,7 @@ class NewPostFragment : Fragment() {
 //                when (menuItem.itemId){
 //                    R.id.saveBtn ->{
 //                        postViewModel.changeContent(binding.edit.text.toString())
-//                        postViewModel.save()
+//                        postViewModel.save(choosenType)
 //                        AndroidUtils.hideKeyboard(requireView())
 //                        findNavController().navigateUp()
 //                        true
@@ -178,22 +179,32 @@ class NewPostFragment : Fragment() {
             findNavController().navigate(R.id.usersAddingFragment)
         }
 
-        binding.cancelButton.setOnClickListener {
-            postViewModel.clearEdit()
-            AndroidUtils.hideKeyboard(requireView())
-            findNavController().navigateUp()
-        }
+
 
         binding.clearPicBtn.setOnClickListener {
             choosenType = null
             postViewModel.deleteAttachment()
         }
 
-        binding.saveBtn.setOnClickListener {
-            postViewModel.changeContent(binding.edit.text.toString())
-            postViewModel.save(choosenType)
-            //binding.usersTextView.text = ""
+        //appBAR:
+        binding.topAppBar.setNavigationOnClickListener {
+            postViewModel.clearEdit()
             AndroidUtils.hideKeyboard(requireView())
+            findNavController().navigateUp()
+        }
+
+        binding.topAppBar.setOnMenuItemClickListener {menuItem->
+            when (menuItem.itemId) {
+                R.id.create -> {
+                    postViewModel.changeContent(binding.edit.text.toString())
+                    postViewModel.save(choosenType)
+                    AndroidUtils.hideKeyboard(requireView())
+                    true
+                }
+
+                else -> {false}
+            }
+
         }
 
 
@@ -300,13 +311,4 @@ class NewPostFragment : Fragment() {
         }
     }
 
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, data)
-//
-//        if (requestCode == 111 && resultCode == RESULT_OK) {
-//            val uri = data?.data // The URI with the location of the file
-//            postViewModel.changeAttach(uri)
-//
-//        }
-//    }
 }

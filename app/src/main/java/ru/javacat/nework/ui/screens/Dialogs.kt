@@ -5,14 +5,19 @@ import android.app.DatePickerDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
+import android.view.View
 import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.navigation.fragment.NavHostFragment
+import com.google.android.material.datepicker.MaterialCalendar
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.TimeFormat
 import ru.javacat.nework.R
 import java.time.Instant
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -49,6 +54,28 @@ fun showCalendar(fm: FragmentManager, editText: EditText){
     }
     picker.show(fm,"materialDatePicker")
 }
+
+fun showTimePicker(fm: FragmentManager,editText: EditText){
+    val selectedHour: Int? = null
+    val selectedMinute: Int? = null
+    val hour = selectedHour ?: LocalDateTime.now().hour
+    val minute = selectedMinute ?: LocalDateTime.now().minute
+
+    MaterialTimePicker.Builder()
+        .setTimeFormat(TimeFormat.CLOCK_24H)
+        .setHour(hour)
+        .setMinute(minute)
+        .build()
+        .apply {
+            addOnPositiveButtonClickListener {
+                val hourAsText = if (this.hour < 10) "0${this.hour}" else this.hour
+                val minuteAsText = if (this.minute < 10) "0${this.minute}" else this.minute
+                val time = "${hourAsText}:${minuteAsText}"
+                editText.setText(time)
+                 }
+        }.show(fm, MaterialTimePicker::class.java.canonicalName)
+}
+
 
 fun showSignInDialog(fragment: Fragment) {
     val listener = DialogInterface.OnClickListener { _, which ->

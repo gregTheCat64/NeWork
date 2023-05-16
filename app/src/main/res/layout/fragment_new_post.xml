@@ -11,46 +11,19 @@
 
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/dim48dp"
-            android:background="@color/color_primary">
+            android:layout_height="wrap_content"
+            >
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/topAppBar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                app:navigationIcon="@drawable/ic_baseline_close_24"
                 app:title="Новая запись"
-
+                app:menu="@menu/create_post_menu"
                 style="@style/Widget.MaterialComponents.Toolbar.Primary"
                 />
         </com.google.android.material.appbar.AppBarLayout>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/cancel_button"
-            style="@style/Widget.AppTheme.WhiteIconButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            app:icon="@drawable/ic_baseline_close_24" />
-
-        <TextView
-            style="@style/TextAppearance.AppCompat.WhiteCaption"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Новая запись"
-
-            />
-
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/saveBtn"
-            style="@style/Widget.AppTheme.WhiteIconButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            app:icon="@drawable/ic_baseline_done_24" />
-
-
 
 
     <androidx.core.widget.NestedScrollView

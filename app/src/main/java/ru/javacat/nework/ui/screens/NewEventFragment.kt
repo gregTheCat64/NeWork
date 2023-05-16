@@ -22,8 +22,11 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import ru.javacat.nework.R
 import ru.javacat.nework.databinding.FragmentNewEventBinding
+import ru.javacat.nework.databinding.FragmentNewPostBinding
 import ru.javacat.nework.domain.model.AttachmentType
+import ru.javacat.nework.domain.model.EventModel
 import ru.javacat.nework.domain.model.FeedModelState
+import ru.javacat.nework.domain.model.PostModel
 import ru.javacat.nework.domain.model.User
 import ru.javacat.nework.domain.model.UsersType
 import ru.javacat.nework.ui.adapter.OnUserListener
@@ -31,6 +34,7 @@ import ru.javacat.nework.ui.adapter.UsersAdapter
 import ru.javacat.nework.ui.viewmodels.EventViewModel
 import ru.javacat.nework.ui.viewmodels.UserViewModel
 import ru.javacat.nework.util.AndroidUtils
+import ru.javacat.nework.util.load
 import ru.javacat.nework.util.toFile
 
 @AndroidEntryPoint
@@ -97,8 +101,6 @@ class NewEventFragment : Fragment() {
                 }
             }
 
-
-
         //listeners
         binding.buttonPanel.takePhoto.setOnClickListener {
             //TODO вынести функцию
@@ -154,18 +156,17 @@ class NewEventFragment : Fragment() {
             findNavController().navigate(R.id.usersAddingFragment)
         }
 
+        binding.dateEditText.setOnClickListener {
+            showCalendar(parentFragmentManager, binding.dateEditText)
+        }
+
+        binding.timeEditText.setOnClickListener {
+            showTimePicker(parentFragmentManager, binding.timeEditText)
+        }
 
         binding.clearPicBtn.setOnClickListener {
             eventViewModel.deleteAttachment()
             AndroidUtils.hideKeyboard(requireView())
-        }
-
-
-
-        binding.cancelBtn.setOnClickListener {
-            eventViewModel.clearEdit()
-            AndroidUtils.hideKeyboard(requireView())
-            findNavController().navigateUp()
         }
 
         binding.onLineBtn.setOnClickListener {
@@ -179,12 +180,23 @@ class NewEventFragment : Fragment() {
         }
 
         binding.clearPicBtn.setOnClickListener {
-            //TODO: добавить тип аттача и удалить
+            choosenType = null
             eventViewModel.deleteAttachment()
         }
 
-        binding.saveEventBtn.setOnClickListener {
-            //TODO: доделать сейв
+        //appBar
+        binding.topAppBar.setNavigationOnClickListener {
+            eventViewModel.clearEdit()
+            AndroidUtils.hideKeyboard(requireView())
+            findNavController().navigateUp()
+        }
+        binding.topAppBar.setOnMenuItemClickListener {menuItem->
+            when(menuItem.itemId){
+                R.id.create->{
+                    true
+                }
+                else -> {false}
+            }
         }
 
         //lists:
@@ -193,6 +205,11 @@ class NewEventFragment : Fragment() {
 
         eventViewModel.edited.observe(viewLifecycleOwner){event->
             userViewModel.getUsersById(event.speakerIds)
+            initBindings(event, binding)
+        }
+
+        eventViewModel.state.observe(viewLifecycleOwner) {
+            //binding.isVisible = it.loading
         }
 
         userViewModel.addedUsers.observe(viewLifecycleOwner){
@@ -200,6 +217,44 @@ class NewEventFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    private fun initBindings(event: EventModel, binding: FragmentNewEventBinding) {
+        binding.eventEditText.setText(event.content.trim())
+        //binding.usersTextView.text = "Отмечены:"
+        if (event.attachment == null) {
+            binding.attachmentContainer.visibility = View.GONE
+            return
+        } else {
+            binding.attachmentContainer.visibility = View.VISIBLE
+            when (event.attachment!!.type) {
+                AttachmentType.IMAGE -> {
+                    binding.photo.visibility = View.VISIBLE
+                    binding.audioContainer.root.visibility = View.GONE
+                    binding.videoContainer.root.visibility = View.GONE
+                    binding.photo.load(event.attachment?.url.toString())
+                }
+
+                AttachmentType.AUDIO -> {
+                    binding.audioContainer.root.visibility = View.VISIBLE
+                    binding.photo.visibility = View.GONE
+                    binding.videoContainer.root.visibility = View.GONE
+                    binding.audioContainer.audioName.text = event.attachment?.url.toString()
+                }
+
+                AttachmentType.VIDEO -> {
+                    binding.videoContainer.root.visibility = View.VISIBLE
+                    binding.photo.visibility = View.GONE
+                    binding.audioContainer.root.visibility = View.GONE
+                    binding.videoContainer.videoName.text = event.attachment?.url.toString()
+                }
+
+                else -> {
+                    binding.attachmentContainer.visibility = View.GONE
+                }
+            }
+
+        }
     }
 
 
