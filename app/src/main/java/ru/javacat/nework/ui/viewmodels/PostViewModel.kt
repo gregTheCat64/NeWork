@@ -172,11 +172,12 @@ class PostViewModel @Inject constructor(
 
     fun changeContent(content: String) {
         val text = content.trim()
-
-//        if (edited.value?.content == text) {
-//            return
-//        }
         _edited.value = edited.value?.copy(content = text)
+    }
+
+    fun changeLink(link: String){
+        val link = link.trim().toString()
+        _edited.value = edited.value?.copy(link = link)
     }
 
     fun deleteAttachment() {

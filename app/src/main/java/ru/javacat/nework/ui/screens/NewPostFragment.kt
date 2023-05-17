@@ -135,7 +135,7 @@ class NewPostFragment : Fragment() {
 
         binding.buttonPanel.pickPhoto.setOnClickListener {
             postViewModel.setState(FeedModelState(loading = true))
-            postViewModel.changeContent(binding.edit.text?.trim().toString())
+            //postViewModel.changeContent(binding.edit.text?.trim().toString())
             choosenType = AttachmentType.IMAGE
             ImagePicker.Builder(this)
                 .galleryOnly()
@@ -147,7 +147,7 @@ class NewPostFragment : Fragment() {
         }
 
         binding.buttonPanel.audio.setOnClickListener {
-            postViewModel.changeContent(binding.edit.text?.trim().toString())
+            //postViewModel.changeContent(binding.edit.text?.trim().toString())
             val intent = Intent()
                 .setType("audio/*")
                 .setAction(Intent.ACTION_GET_CONTENT)
@@ -156,7 +156,7 @@ class NewPostFragment : Fragment() {
         }
 
         binding.buttonPanel.videoBtn.setOnClickListener {
-            postViewModel.changeContent(binding.edit.text?.trim().toString())
+            //postViewModel.changeContent(binding.edit.text?.trim().toString())
             val intent = Intent()
                 .setType("video/*")
                 .setAction(Intent.ACTION_GET_CONTENT)
@@ -165,7 +165,7 @@ class NewPostFragment : Fragment() {
         }
 
         binding.mentionUsersBtn.setOnClickListener {
-            postViewModel.changeContent(binding.edit.text?.trim().toString())
+           // postViewModel.changeContent(binding.edit.text?.trim().toString())
             setFragmentResultListener("IDS") { _, bundle ->
                 val result = bundle.getLongArray("IDS")
                 if (result != null) {
@@ -196,17 +196,22 @@ class NewPostFragment : Fragment() {
         binding.topAppBar.setOnMenuItemClickListener {menuItem->
             when (menuItem.itemId) {
                 R.id.create -> {
-                    postViewModel.changeContent(binding.edit.text.toString())
+                    val link = binding.linkEditText.text.toString()
+                    val content = binding.edit.text.toString()
+                    if (link.isNotEmpty()){
+                        postViewModel.changeLink(link.trim())
+                    }
+                    if (content.isNotEmpty()){
+                        postViewModel.changeContent(binding.edit.text.toString())
+                    }
                     postViewModel.save(choosenType)
                     AndroidUtils.hideKeyboard(requireView())
                     true
                 }
-
                 else -> {false}
             }
 
         }
-
 
         //usersList:
         val list = binding.addedUsersList
@@ -244,8 +249,6 @@ class NewPostFragment : Fragment() {
             binding.progressBar.isVisible = it.loading
         }
 
-
-
         return binding.root
     }
 
@@ -274,8 +277,13 @@ class NewPostFragment : Fragment() {
 //    }
 
     private fun initBindings(post: PostModel, binding: FragmentNewPostBinding) {
-        binding.edit.setText(post.content.trim())
-        //binding.usersTextView.text = "Отмечены:"
+        if (post.content.isNotEmpty() && binding.edit.text.toString().isEmpty()){
+            binding.edit.setText(post.content.trim())
+        }
+
+        if(post.link != null && binding.linkEditText.text.toString().isEmpty()) {
+            binding.linkEditText.setText(post.link.toString().trim())
+        }
         if (post.attachment == null) {
             binding.attachmentContainer.visibility = View.GONE
             return

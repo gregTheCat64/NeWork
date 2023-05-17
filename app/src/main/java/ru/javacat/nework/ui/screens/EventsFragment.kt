@@ -47,11 +47,12 @@ class EventsFragment : Fragment() {
             }
 
             override fun onEdit(event: EventModel) {
-                super.onEdit(event)
+                viewModel.edit(event)
+                findNavController().navigate(R.id.newEventFragment)
             }
 
             override fun onRemove(event: EventModel) {
-                super.onRemove(event)
+               viewModel.removeById(event.id)
             }
 
             override fun onShare(event: EventModel) {

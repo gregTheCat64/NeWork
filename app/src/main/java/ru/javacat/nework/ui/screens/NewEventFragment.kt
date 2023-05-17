@@ -104,7 +104,7 @@ class NewEventFragment : Fragment() {
         //listeners
         binding.buttonPanel.takePhoto.setOnClickListener {
             //TODO вынести функцию
-            eventViewModel.changeContent(binding.eventEditText.text?.trim().toString())
+            //eventViewModel.changeContent(binding.eventEditText.text?.trim().toString())
             choosenType = AttachmentType.IMAGE
             ImagePicker.Builder(this)
                 .cameraOnly()
@@ -116,7 +116,7 @@ class NewEventFragment : Fragment() {
 
         binding.buttonPanel.pickPhoto.setOnClickListener {
             eventViewModel.setState(FeedModelState(loading = true))
-            eventViewModel.changeContent(binding.eventEditText.text?.trim().toString())
+            // eventViewModel.changeContent(binding.eventEditText.text?.trim().toString())
             choosenType = AttachmentType.IMAGE
             ImagePicker.Builder(this)
                 .galleryOnly()
@@ -128,7 +128,7 @@ class NewEventFragment : Fragment() {
         }
 
         binding.buttonPanel.audio.setOnClickListener {
-            eventViewModel.changeContent(binding.eventEditText.text?.trim().toString())
+            // eventViewModel.changeContent(binding.eventEditText.text?.trim().toString())
             val intent = Intent()
                 .setType("audio/*")
                 .setAction(Intent.ACTION_GET_CONTENT)
@@ -137,7 +137,7 @@ class NewEventFragment : Fragment() {
         }
 
         binding.buttonPanel.videoBtn.setOnClickListener {
-            eventViewModel.changeContent(binding.eventEditText.text?.trim().toString())
+            // eventViewModel.changeContent(binding.eventEditText.text?.trim().toString())
             val intent = Intent()
                 .setType("video/*")
                 .setAction(Intent.ACTION_GET_CONTENT)
@@ -190,29 +190,37 @@ class NewEventFragment : Fragment() {
             AndroidUtils.hideKeyboard(requireView())
             findNavController().navigateUp()
         }
-        binding.topAppBar.setOnMenuItemClickListener {menuItem->
-            when(menuItem.itemId){
-                R.id.create->{
+        binding.topAppBar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.create -> {
                     val content = binding.eventEditText.text.toString()
-                    if (content.isNotEmpty()){
-                       eventViewModel.changeContent(content.trim())
-                    }
                     val startDate = binding.dateEditText.text.toString()
                     val startTime = binding.timeEditText.text.toString()
-                    if (startDate.isNotEmpty() && startTime.isNotEmpty()){
+                    if (content.isEmpty() || startDate.isEmpty() || startTime.isEmpty()) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Заполните обязательные поля",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        eventViewModel.changeContent(content.trim())
                         val start = "$startDate $startTime:00"
                         eventViewModel.setStartDateTime(start)
-                        Toast.makeText(requireContext(), "$start", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), start, Toast.LENGTH_SHORT).show()
+
+                        val link = binding.linkEditText.text.toString()
+                        if (link.isNotEmpty()) {
+                            eventViewModel.setLink(link.trim())
+                        }
+                        eventViewModel.save(choosenType)
                     }
-                    val link = binding.linkEditText.text.toString()
-                    if (link.isNotEmpty()){
-                        eventViewModel.setLink(link.trim())
-                    }
-                    eventViewModel.save(choosenType)
 
                     true
                 }
-                else -> {false}
+
+                else -> {
+                    false
+                }
             }
         }
 
@@ -220,19 +228,19 @@ class NewEventFragment : Fragment() {
         val speakersList = binding.speakersRecView
         speakersList.adapter = speakerAdapter
 
-        eventViewModel.edited.observe(viewLifecycleOwner){event->
+        eventViewModel.edited.observe(viewLifecycleOwner) { event ->
             userViewModel.getUsersById(event.speakerIds)
             initBindings(event, binding)
         }
 
         eventViewModel.state.observe(viewLifecycleOwner) {
-           binding.progress.isVisible = it.loading
+            binding.progress.isVisible = it.loading
         }
-        eventViewModel.postCreated.observe(viewLifecycleOwner){
+        eventViewModel.postCreated.observe(viewLifecycleOwner) {
             findNavController().navigateUp()
         }
 
-        userViewModel.addedUsers.observe(viewLifecycleOwner){
+        userViewModel.addedUsers.observe(viewLifecycleOwner) {
             speakerAdapter.submitList(it)
         }
 
@@ -240,7 +248,20 @@ class NewEventFragment : Fragment() {
     }
 
     private fun initBindings(event: EventModel, binding: FragmentNewEventBinding) {
-        binding.eventEditText.setText(event.content.trim())
+        if (event.content.isNotEmpty() && binding.eventEditText.text.toString().isEmpty()) {
+            binding.eventEditText.setText(event.content.trim())
+        }
+        if (event.link != null && binding.linkEditText.text.toString().isEmpty()) {
+            binding.linkEditText.setText(event.link)
+        }
+
+        if (event.datetime != null
+            && binding.dateEditText.text.toString().isEmpty()
+            && binding.timeEditText.text.toString().isEmpty()){
+            //binding.dateEditText.setText(event.datetime.toString())
+                    // todo: разделить время и дату
+        }
+
         //binding.usersTextView.text = "Отмечены:"
         if (event.attachment == null) {
             binding.attachmentContainer.visibility = View.GONE
