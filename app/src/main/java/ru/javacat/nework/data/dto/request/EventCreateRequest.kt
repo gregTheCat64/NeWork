@@ -6,7 +6,7 @@ import ru.javacat.nework.data.dto.response.Coordinates
 data class EventCreateRequest (
     val id: Long,
     val content: String,
-    val dateTime: String,
+    val datetime: String,
     val coords: Coordinates?,
     val type: String,
     val attachment: Attachment?,

@@ -141,7 +141,7 @@ class PostViewModel @Inject constructor(
             viewModelScope.launch {
                 try {
                     _state.value = FeedModelState(loading = true)
-                    it.link = null
+                    //it.link = null
                     it.coords = coords.value
                     postRepository.save(
                         it.toPostRequest(), _attachFile.value?.uri?.let {

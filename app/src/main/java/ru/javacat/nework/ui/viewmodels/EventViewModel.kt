@@ -1,6 +1,7 @@
 package ru.javacat.nework.ui.viewmodels
 
 import android.net.Uri
+import androidx.core.net.toFile
 import androidx.lifecycle.*
 import androidx.paging.PagingData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -11,6 +12,8 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.javacat.nework.data.auth.AppAuth
+import ru.javacat.nework.data.dto.MediaUpload
+import ru.javacat.nework.data.mappers.toEventRequest
 import ru.javacat.nework.domain.model.AttachModel
 import ru.javacat.nework.domain.model.AttachmentModel
 import ru.javacat.nework.domain.model.AttachmentType
@@ -21,6 +24,8 @@ import ru.javacat.nework.domain.model.PostModel
 import ru.javacat.nework.domain.model.User
 import ru.javacat.nework.domain.repository.EventRepository
 import ru.javacat.nework.util.SingleLiveEvent
+import ru.javacat.nework.util.toFile
+import ru.javacat.nework.util.toLocalDateTimeWhithoutZone
 import javax.inject.Inject
 
 private val emptyEvent = EventModel(
@@ -143,6 +148,14 @@ class EventViewModel @Inject constructor(
         _edited.value = edited.value?.copy(content = content)
     }
 
+    fun setStartDateTime(dateTime: String){
+        _edited.value = edited.value?.copy(datetime = dateTime.toLocalDateTimeWhithoutZone())
+    }
+
+    fun setLink(link: String){
+        _edited.value = edited.value?.copy(link = link)
+    }
+
     fun setSpeakers(list: List<Long>){
         _edited.value = edited.value?.copy(speakerIds = list)
     }
@@ -153,6 +166,26 @@ class EventViewModel @Inject constructor(
 
     fun deleteAttachment(){
         _edited.value = _edited.value?.copy(attachment = null)
+    }
+
+    fun save(type: AttachmentType?){
+        edited.value?.let {
+            viewModelScope.launch {
+                try {
+                    _state.value = FeedModelState(loading = true)
+                    repository.save(
+                        it.toEventRequest(), _attachFile.value?.uri?.let {
+                            MediaUpload(it.toFile())
+                        } , type
+                    )
+                    _edited.postValue(emptyEvent)
+                    _postCreated.postValue(Unit)
+                    _state.value = FeedModelState(idle = true)
+                }catch (e: java.lang.Exception){
+                    _state.value = FeedModelState(error = true)
+                }
+            }
+        }
     }
 
     fun edit(event: EventModel){

@@ -10,18 +10,24 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import ru.javacat.nework.data.AppDb
 import ru.javacat.nework.data.api.EventsApi
 import ru.javacat.nework.data.auth.AppAuth
 import ru.javacat.nework.data.dao.EventDao
 import ru.javacat.nework.data.dao.EventRemoteKeyDao
+import ru.javacat.nework.data.dto.Media
+import ru.javacat.nework.data.dto.MediaUpload
 import ru.javacat.nework.data.dto.request.EventCreateRequest
+import ru.javacat.nework.data.dto.response.Attachment
 import ru.javacat.nework.data.entity.EventEntity
 import ru.javacat.nework.data.entity.PostEntity
 import ru.javacat.nework.data.entity.toDto
 import ru.javacat.nework.data.mappers.toEventEntity
 import ru.javacat.nework.data.mappers.toEventModel
 import ru.javacat.nework.data.mappers.toModel
+import ru.javacat.nework.domain.model.AttachmentType
 import ru.javacat.nework.domain.model.EventModel
 import ru.javacat.nework.domain.model.PostModel
 import ru.javacat.nework.domain.repository.EventRemoteMediator
@@ -124,7 +130,33 @@ class EventRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun create(event: EventCreateRequest) {
-        TODO("Not yet implemented")
+    override suspend fun save(event: EventCreateRequest, upload: MediaUpload?, type: AttachmentType?) {
+        try {
+            val eventWithAttachment = upload?.let {
+                upload(it)
+            }?.let {
+                event.copy(attachment = type?.name?.let { type-> Attachment(it.url, type) })
+            }
+            eventsApi.create(eventWithAttachment?:event)
+        } catch (e:IOException){
+            throw NetworkError
+        }
+    }
+
+    override suspend fun upload(upload: MediaUpload): Media {
+        try {
+            val media = MultipartBody.Part.createFormData(
+                "file", upload.file.name, upload.file.asRequestBody()
+            )
+            val response =eventsApi.upload(media)
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+            return response.body() ?: throw ApiError(response.code(), response.message())
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
     }
 }

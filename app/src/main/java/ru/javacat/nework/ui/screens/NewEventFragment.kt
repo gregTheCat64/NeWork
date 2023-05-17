@@ -193,6 +193,23 @@ class NewEventFragment : Fragment() {
         binding.topAppBar.setOnMenuItemClickListener {menuItem->
             when(menuItem.itemId){
                 R.id.create->{
+                    val content = binding.eventEditText.text.toString()
+                    if (content.isNotEmpty()){
+                       eventViewModel.changeContent(content.trim())
+                    }
+                    val startDate = binding.dateEditText.text.toString()
+                    val startTime = binding.timeEditText.text.toString()
+                    if (startDate.isNotEmpty() && startTime.isNotEmpty()){
+                        val start = "$startDate $startTime:00"
+                        eventViewModel.setStartDateTime(start)
+                        Toast.makeText(requireContext(), "$start", Toast.LENGTH_SHORT).show()
+                    }
+                    val link = binding.linkEditText.text.toString()
+                    if (link.isNotEmpty()){
+                        eventViewModel.setLink(link.trim())
+                    }
+                    eventViewModel.save(choosenType)
+
                     true
                 }
                 else -> {false}
@@ -209,7 +226,10 @@ class NewEventFragment : Fragment() {
         }
 
         eventViewModel.state.observe(viewLifecycleOwner) {
-            //binding.isVisible = it.loading
+           binding.progress.isVisible = it.loading
+        }
+        eventViewModel.postCreated.observe(viewLifecycleOwner){
+            findNavController().navigateUp()
         }
 
         userViewModel.addedUsers.observe(viewLifecycleOwner){

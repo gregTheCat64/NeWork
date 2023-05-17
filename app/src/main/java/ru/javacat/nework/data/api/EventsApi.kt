@@ -1,7 +1,9 @@
 package ru.javacat.nework.data.api
 
+import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.*
+import ru.javacat.nework.data.dto.Media
 import ru.javacat.nework.data.dto.request.EventCreateRequest
 import ru.javacat.nework.data.dto.response.EventResponse
 import ru.javacat.nework.data.dto.response.PostResponse
@@ -44,6 +46,13 @@ interface EventsApi {
 
     @DELETE("events/{event_id}/participants")
     suspend fun removeParticipant(@Path("event_id") id: Long) :Response<EventResponse>
+
+    @POST("events")
+    suspend fun save(@Body eventCreateRequest: EventCreateRequest): Response<EventResponse>
+
+    @Multipart
+    @POST("media")
+    suspend fun upload(@Part media: MultipartBody.Part): Response<Media>
 
 
 
