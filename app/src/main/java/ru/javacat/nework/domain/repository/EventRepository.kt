@@ -13,12 +13,16 @@ import ru.javacat.nework.domain.model.EventModel
 interface EventRepository {
     val eventData: Flow<PagingData<EventModel>>
     suspend fun getAll()
+
+    suspend fun getLatest(count: Int)
     suspend fun getEventsByAuthorId(authorId: Long): List<EventModel>
     suspend fun updateEventsByAuthorId(authorId: Long):List<EventModel>?
     suspend fun getById(id: Long)
     suspend fun removeById(id: Long)
     suspend fun likeById(id: Long)
     suspend fun save(event: EventCreateRequest, upload: MediaUpload?, type: AttachmentType?)
+
+    suspend fun createParticipant(event: EventModel)
 
     suspend fun upload(upload: MediaUpload): Media
 

@@ -70,6 +70,7 @@ class EventRemoteMediator(
                                 )
                             )
                         )
+                        dao.clear()
                     }
 
                     LoadType.APPEND -> {

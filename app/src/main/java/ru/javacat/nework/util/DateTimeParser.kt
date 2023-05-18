@@ -21,3 +21,10 @@ fun String.toLocalDateTimeWhithoutZone(): LocalDateTime =
 fun LocalDateTime.asString(): String = this.let {
     format(DateTimeFormatter.ofPattern("dd-MM-yyyy в HH:mm"))
 }
+
+fun LocalDateTime.asOnlyDate(): String = this.let {
+    format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))
+}
+fun LocalDateTime.asOnlyTime(): String = this.let {
+    format(DateTimeFormatter.ofPattern("HH:mm"))
+}

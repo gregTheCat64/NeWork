@@ -55,6 +55,13 @@ class EventsFragment : Fragment() {
                viewModel.removeById(event.id)
             }
 
+            override fun onTakePartBtn(event: EventModel) {
+                if (appAuth.authStateFlow.value.id!=0L){
+                    viewModel.takePart(event)
+                }else showSignInDialog(this@EventsFragment)
+
+            }
+
             override fun onShare(event: EventModel) {
                 super.onShare(event)
             }

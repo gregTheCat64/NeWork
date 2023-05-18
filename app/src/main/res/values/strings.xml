@@ -43,4 +43,6 @@
     <string name="posts">записи</string>
     <string name="events">мероприятия</string>
     <string name="assign_Users">назначить</string>
+    <string name="Link">Ссылка</string>
+    <string name="online">Онлайн</string>
 </resources>

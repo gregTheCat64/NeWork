@@ -67,7 +67,6 @@ class NewPostFragment : Fragment() {
         var choosenType: AttachmentType? = null
         //postViewModel.edited.value?.let { initBindings(it,binding) }
 
-
         //*** Так можно добавить меню на appBar
 //        requireActivity().addMenuProvider(object : MenuProvider {
 //            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {

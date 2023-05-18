@@ -41,6 +41,22 @@ interface EventDao {
         """)
     suspend fun likeById(id: Long, likeOwners: List<Long>?)
 
+    @Query("""
+        UPDATE EventEntity SET
+        participantsIds = :participants,
+        participatedByMe = 1
+        WHERE id = :eventId
+    """)
+    suspend fun insertParticipant(eventId: Long, participants: List<Long>)
+
+    @Query("""
+        UPDATE EventEntity SET
+        participantsIds = :participants,
+        participatedByMe = 0
+        WHERE id = :eventId
+    """)
+    suspend fun removeParticipant(eventId: Long, participants: List<Long>)
+
     @Query("DELETE FROM EventEntity WHERE id = :id")
     suspend fun removeById(id: Long)
 

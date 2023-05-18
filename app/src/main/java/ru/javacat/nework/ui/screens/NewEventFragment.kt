@@ -25,6 +25,7 @@ import ru.javacat.nework.databinding.FragmentNewEventBinding
 import ru.javacat.nework.databinding.FragmentNewPostBinding
 import ru.javacat.nework.domain.model.AttachmentType
 import ru.javacat.nework.domain.model.EventModel
+import ru.javacat.nework.domain.model.EventType
 import ru.javacat.nework.domain.model.FeedModelState
 import ru.javacat.nework.domain.model.PostModel
 import ru.javacat.nework.domain.model.User
@@ -34,6 +35,8 @@ import ru.javacat.nework.ui.adapter.UsersAdapter
 import ru.javacat.nework.ui.viewmodels.EventViewModel
 import ru.javacat.nework.ui.viewmodels.UserViewModel
 import ru.javacat.nework.util.AndroidUtils
+import ru.javacat.nework.util.asOnlyDate
+import ru.javacat.nework.util.asOnlyTime
 import ru.javacat.nework.util.load
 import ru.javacat.nework.util.toFile
 
@@ -237,6 +240,7 @@ class NewEventFragment : Fragment() {
             binding.progress.isVisible = it.loading
         }
         eventViewModel.postCreated.observe(viewLifecycleOwner) {
+            eventViewModel.refresh()
             findNavController().navigateUp()
         }
 
@@ -251,15 +255,24 @@ class NewEventFragment : Fragment() {
         if (event.content.isNotEmpty() && binding.eventEditText.text.toString().isEmpty()) {
             binding.eventEditText.setText(event.content.trim())
         }
-        if (event.link != null && binding.linkEditText.text.toString().isEmpty()) {
-            binding.linkEditText.setText(event.link)
-        }
+
+        binding.onLineBtn.isChecked =
+            event.type == EventType.ONLINE
+
 
         if (event.datetime != null
             && binding.dateEditText.text.toString().isEmpty()
             && binding.timeEditText.text.toString().isEmpty()){
-            //binding.dateEditText.setText(event.datetime.toString())
-                    // todo: разделить время и дату
+            binding.dateEditText.setText(event.datetime.asOnlyDate())
+            binding.timeEditText.setText(event.datetime.asOnlyTime())
+        }
+
+        if (event.link != null && binding.linkEditText.text.toString().isEmpty()) {
+            binding.linkEditText.setText(event.link)
+        }
+
+        if (event.coords != null && binding.locationEditText.text.toString().isEmpty()){
+            binding.locationEditText.setText(event.coords.toString())
         }
 
         //binding.usersTextView.text = "Отмечены:"
@@ -268,26 +281,26 @@ class NewEventFragment : Fragment() {
             return
         } else {
             binding.attachmentContainer.visibility = View.VISIBLE
-            when (event.attachment!!.type) {
+            when (event.attachment.type) {
                 AttachmentType.IMAGE -> {
                     binding.photo.visibility = View.VISIBLE
                     binding.audioContainer.root.visibility = View.GONE
                     binding.videoContainer.root.visibility = View.GONE
-                    binding.photo.load(event.attachment?.url.toString())
+                    binding.photo.load(event.attachment.url)
                 }
 
                 AttachmentType.AUDIO -> {
                     binding.audioContainer.root.visibility = View.VISIBLE
                     binding.photo.visibility = View.GONE
                     binding.videoContainer.root.visibility = View.GONE
-                    binding.audioContainer.audioName.text = event.attachment?.url.toString()
+                    binding.audioContainer.audioName.text = event.attachment.url
                 }
 
                 AttachmentType.VIDEO -> {
                     binding.videoContainer.root.visibility = View.VISIBLE
                     binding.photo.visibility = View.GONE
                     binding.audioContainer.root.visibility = View.GONE
-                    binding.videoContainer.videoName.text = event.attachment?.url.toString()
+                    binding.videoContainer.videoName.text = event.attachment.url
                 }
 
                 else -> {

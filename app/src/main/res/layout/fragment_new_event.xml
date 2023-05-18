@@ -139,7 +139,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginStart="@dimen/dim8dp"
-                    android:text="Онлайн" />
+                    android:text="@string/online" />
             </RadioGroup>
 
             <LinearLayout
@@ -152,7 +152,7 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_weight="1"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -180,8 +180,6 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/dateEditText" />
 
-
-
             </LinearLayout>
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
@@ -192,7 +190,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/dim8dp"
-                    android:hint="Ссылка"
+                    android:hint="@string/Link"
                     android:inputType="textWebEditText"
                     android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="@+id/radio"

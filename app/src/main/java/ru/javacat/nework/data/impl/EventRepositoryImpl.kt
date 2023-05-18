@@ -79,6 +79,16 @@ class EventRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getLatest(count: Int) {
+        try {
+            val response = eventsApi.getLatest(count)
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
+            eventDao.insert(body.map { it.toEventEntity() })
+        } catch (e: IOException) {
+            throw  NetworkError
+        }
+    }
+
     override suspend fun getById(id: Long) {
         TODO("Not yet implemented")
     }
@@ -140,6 +150,21 @@ class EventRepositoryImpl @Inject constructor(
             eventsApi.create(eventWithAttachment?:event)
         } catch (e:IOException){
             throw NetworkError
+        }
+    }
+
+    override suspend fun createParticipant(event: EventModel) {
+        val myId = appAuth.authStateFlow.value.id
+        var participants = event.participantsIds
+//        val currentPost = eventDao.getById(eventId)
+        if (event.participatedByMe){
+            eventsApi.removeParticipant(event.id)
+            participants = participants.minus(myId)
+            eventDao.removeParticipant(event.id, participants)
+        } else {
+            eventsApi.createParticipant(event.id)
+            participants = participants.plus(myId)
+            eventDao.insertParticipant(event.id, participants)
         }
     }
 

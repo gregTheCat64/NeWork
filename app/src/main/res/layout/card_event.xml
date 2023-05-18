@@ -101,6 +101,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="@dimen/dim8dp">
+
                 <TextView
                     android:id="@+id/whenTextView"
                     android:layout_width="wrap_content"
@@ -183,6 +184,20 @@
                     android:text="@string/default_format"
                     app:layout_constraintStart_toEndOf="@+id/formatTextView"
                     app:layout_constraintTop_toTopOf="@+id/formatTextView" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/takePartBtn"
+                    style="@style/Widget.AppTheme.LikeCheckBox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="участвовать"
+                    android:checkable="true"
+                    android:layout_marginTop="@dimen/dim8dp"
+                    app:icon="@drawable/be_participate_btn_selector"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/speakersTextView" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
 

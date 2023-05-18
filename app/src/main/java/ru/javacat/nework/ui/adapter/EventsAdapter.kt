@@ -16,6 +16,7 @@ import ru.javacat.nework.R
 import ru.javacat.nework.databinding.CardEventBinding
 import ru.javacat.nework.domain.model.AttachmentType
 import ru.javacat.nework.domain.model.EventModel
+import ru.javacat.nework.domain.model.EventType
 import ru.javacat.nework.util.asString
 import ru.javacat.nework.util.load
 import ru.javacat.nework.util.loadAvatar
@@ -30,6 +31,8 @@ interface OnEventsListener {
     fun onParticipant(event: EventModel){}
     fun onUser(event: EventModel){}
     fun onImage(url: String){}
+
+    fun onTakePartBtn(event: EventModel){}
 }
 class EventsAdapter(
     private val onEventsListener: OnEventsListener
@@ -72,7 +75,10 @@ class EventViewHolder(
             published.text = event.published?.asString()
             content.text = event.content
             dateOfEvent.text = event.datetime?.asString()
-            locationOfEvent.text = event.coords.toString()
+            if(event.type == EventType.OFFLINE){
+                locationOfEvent.text = event.coords.toString()
+            } else{locationOfEvent.text = event.link.toString()}
+
             typeOfEvent.text = event.type.toString()
 
             //onUser:
@@ -94,10 +100,6 @@ class EventViewHolder(
                     event.users[it]?.name }.joinToString(", ")
             }
 
-            //participants:
-            if (event.participantsIds.isNotEmpty()) {
-                interactionPosts.mentioned.text = event.participantsIds.size.toString()
-            }
 
             //participants:
             if (event.participantsIds.isNotEmpty()) {
@@ -107,6 +109,17 @@ class EventViewHolder(
 
             interactionPosts.mentioned.setOnClickListener {
                 onEventsListener.onParticipant(event)
+            }
+
+            binding.takePartBtn.setOnClickListener {
+                onEventsListener.onTakePartBtn(event)
+            }
+            binding.takePartBtn.isChecked = event.participatedByMe
+
+            if (event.participatedByMe){
+                binding.takePartBtn.setText("Выйти")
+            } else {
+                binding.takePartBtn.setText("Участвовать")
             }
 
             //image

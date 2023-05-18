@@ -55,6 +55,8 @@ class EventViewModel @Inject constructor(
 
     val data: Flow<PagingData<EventModel>> = repository.eventData
 
+    val count = 5
+
     private val _userEvents = MutableLiveData<List<EventModel>>()
     val userEvents: LiveData<List<EventModel>>
         get() = _userEvents
@@ -95,7 +97,7 @@ class EventViewModel @Inject constructor(
 //        get() = _speakerAdded
 
     init {
-        //loadEvents()
+        loadEvents()
     }
 
     fun loadEvents() {
@@ -104,6 +106,18 @@ class EventViewModel @Inject constructor(
                 _state.value = FeedModelState(loading = true)
                 //repository.getAll()
                 _state.value = FeedModelState()
+            } catch (e: Exception) {
+                _state.value = FeedModelState(error = true)
+            }
+        }
+    }
+
+    fun refresh(){
+        viewModelScope.launch {
+            _state.value = FeedModelState(refreshing = true)
+            try {
+                repository.getLatest(count)
+                _state.value = FeedModelState(idle = true)
             } catch (e: Exception) {
                 _state.value = FeedModelState(error = true)
             }
@@ -190,6 +204,13 @@ class EventViewModel @Inject constructor(
 
     fun edit(event: EventModel){
         _edited.value = event
+    }
+
+    fun takePart(event: EventModel){
+        viewModelScope.launch {
+            repository.createParticipant(event)
+        }
+
     }
 
     fun clearEdit(){
