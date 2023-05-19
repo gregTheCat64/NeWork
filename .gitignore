@@ -13,6 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+maps.properties
+MapsApiKey
 
 HELP.md
 build/

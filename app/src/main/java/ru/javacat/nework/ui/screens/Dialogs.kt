@@ -16,6 +16,7 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import ru.javacat.nework.R
+import ru.javacat.nework.data.auth.AppAuth
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -95,6 +96,28 @@ fun showSignInDialog(fragment: Fragment) {
         .setMessage("Пожалуйста, авторизуйтесь")
         .setPositiveButton("Хорошо", listener)
         .setNegativeButton("Позже", listener)
+        .create()
+
+    dialog.show()
+}
+
+fun showSignOutDialog(appAuth: AppAuth, context: Context) {
+    val listener = DialogInterface.OnClickListener { _, which ->
+        when (which) {
+            DialogInterface.BUTTON_POSITIVE -> appAuth.removeAuth()
+            DialogInterface.BUTTON_NEGATIVE -> Toast.makeText(
+                context,
+                "ну и ладненько...",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+    val dialog = AlertDialog.Builder(context)
+        .setCancelable(false)
+        .setTitle("Внимание!")
+        .setMessage("Вы точно хотите выйти?")
+        .setPositiveButton("Уверен!", listener)
+        .setNegativeButton("Нет", listener)
         .create()
 
     dialog.show()

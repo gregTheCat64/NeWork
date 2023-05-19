@@ -188,6 +188,11 @@ class PostsFragment : Fragment() {
 
             override fun onCoords(post: PostModel) {
                 Toast.makeText(context, "${post.coords}", Toast.LENGTH_SHORT).show()
+                val coords = post.coords?.let { doubleArrayOf(it.latitude, it.longitude) }
+                println("cooords: ${coords.toString()}")
+                val intent = Intent(context, MapActivity::class.java)
+                intent.putExtra("LOCATION", coords)
+                startActivity(intent)
             }
         })
 
@@ -205,7 +210,7 @@ class PostsFragment : Fragment() {
                 }
                 .collectLatest {
                     adapter.submitData(it)
-                    binding.postsList.smoothScrollToPosition(0)
+                    //binding.postsList.smoothScrollToPosition(0)
 
                 }
         }

@@ -34,6 +34,7 @@ interface OnInteractionListener {
     fun onUser(post: PostModel) {}
     fun onMention(post: PostModel){}
     fun onCoords(post: PostModel){}
+
 }
 
 
@@ -178,6 +179,11 @@ class PostViewHolder(
 
             interactionPosts.shareBtn.setOnClickListener {
                 onInteractionListener.onShare(post)
+            }
+
+            //map
+            locationBtn.setOnClickListener {
+                onInteractionListener.onCoords(post)
             }
         }
     }

@@ -114,7 +114,7 @@ class AppActivity : AppCompatActivity() {
                             true
                         }
                         R.id.logout -> {
-                            showSignOutDialog()
+                            showSignOutDialog(appAuth, this@AppActivity)
                             true
                         }
                         R.id.profileBtn -> {
@@ -163,45 +163,45 @@ class AppActivity : AppCompatActivity() {
 //        menu.show()
 //    }
 
-    private fun showSignOutDialog() {
-        val listener = DialogInterface.OnClickListener { _, which ->
-            when (which) {
-                DialogInterface.BUTTON_POSITIVE -> appAuth.removeAuth()
-                DialogInterface.BUTTON_NEGATIVE -> Toast.makeText(
-                    this,
-                    "ну и ладненько...",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-        val dialog = AlertDialog.Builder(this)
-            .setCancelable(false)
-            .setTitle("Внимание!")
-            .setMessage("Вы точно хотите выйти?")
-            .setPositiveButton("Уверен!", listener)
-            .setNegativeButton("Нет", listener)
-            .create()
+//    private fun showSignOutDialog() {
+//        val listener = DialogInterface.OnClickListener { _, which ->
+//            when (which) {
+//                DialogInterface.BUTTON_POSITIVE -> appAuth.removeAuth()
+//                DialogInterface.BUTTON_NEGATIVE -> Toast.makeText(
+//                    this,
+//                    "ну и ладненько...",
+//                    Toast.LENGTH_SHORT
+//                ).show()
+//            }
+//        }
+//        val dialog = AlertDialog.Builder(this)
+//            .setCancelable(false)
+//            .setTitle("Внимание!")
+//            .setMessage("Вы точно хотите выйти?")
+//            .setPositiveButton("Уверен!", listener)
+//            .setNegativeButton("Нет", listener)
+//            .create()
+//
+//        dialog.show()
+//    }
 
-        dialog.show()
-    }
 
-
-    private fun checkGoogleApiAvailability() {
-        with(googleApiAvailability) {
-            val code = isGooglePlayServicesAvailable(this@AppActivity)
-            if (code == ConnectionResult.SUCCESS) {
-                return@with
-            }
-            if (isUserResolvableError(code)) {
-                getErrorDialog(this@AppActivity, code, 9000)?.show()
-                return
-            }
-            Toast.makeText(this@AppActivity, R.string.google_play_unavailable, Toast.LENGTH_LONG)
-                .show()
-        }
-
-        firebaseMessaging.token.addOnSuccessListener {
-            println(it)
-        }
-    }
+//    private fun checkGoogleApiAvailability() {
+//        with(googleApiAvailability) {
+//            val code = isGooglePlayServicesAvailable(this@AppActivity)
+//            if (code == ConnectionResult.SUCCESS) {
+//                return@with
+//            }
+//            if (isUserResolvableError(code)) {
+//                getErrorDialog(this@AppActivity, code, 9000)?.show()
+//                return
+//            }
+//            Toast.makeText(this@AppActivity, R.string.google_play_unavailable, Toast.LENGTH_LONG)
+//                .show()
+//        }
+//
+//        firebaseMessaging.token.addOnSuccessListener {
+//            println(it)
+//        }
+//    }
 }
