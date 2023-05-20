@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toFile
 import androidx.core.net.toUri
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
@@ -20,6 +21,7 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import ru.javacat.nework.R
 import ru.javacat.nework.databinding.FragmentNewPostBinding
+import ru.javacat.nework.domain.model.AttachModel
 import ru.javacat.nework.domain.model.AttachmentType
 import ru.javacat.nework.domain.model.FeedModelState
 import ru.javacat.nework.domain.model.PostModel
@@ -31,6 +33,7 @@ import ru.javacat.nework.ui.viewmodels.UserViewModel
 import ru.javacat.nework.util.AndroidUtils
 import ru.javacat.nework.util.StringArg
 import ru.javacat.nework.util.load
+import ru.javacat.nework.util.snack
 import ru.javacat.nework.util.toFile
 
 @AndroidEntryPoint
@@ -65,6 +68,10 @@ class NewPostFragment : Fragment() {
     ): View {
         val binding = FragmentNewPostBinding.inflate(inflater, container, false)
         var choosenType: AttachmentType? = null
+
+        println("oncreate!")
+        println("attach: ${postViewModel.attachFile}")
+        //snack("ONCREATE")
         //postViewModel.edited.value?.let { initBindings(it,binding) }
 
         //*** Так можно добавить меню на appBar
@@ -86,7 +93,7 @@ class NewPostFragment : Fragment() {
 //                }
 //        }, viewLifecycleOwner)
 
-            //pickers:
+        //pickers:
         val pickPhotoLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                 when (it.resultCode) {
@@ -100,9 +107,9 @@ class NewPostFragment : Fragment() {
 
                     Activity.RESULT_OK -> {
                         val uri: Uri? = it.data?.data
-                        println("file: ${uri?.toString()}")
-                        println("UPLOADING")
-                        postViewModel.changeAttach(uri, choosenType)
+                        postViewModel.setNewAttach(uri, choosenType)
+                        val attach = postViewModel.attachFile
+                        attach.value?.let { it1 -> refreshAttach(it1, binding) }
                     }
                 }
             }
@@ -113,7 +120,9 @@ class NewPostFragment : Fragment() {
                 when (it.resultCode) {
                     RESULT_OK -> {
                         val file = it.data?.data?.toFile(requireContext())
-                        postViewModel.changeAttach(file?.toUri(), choosenType)
+                        postViewModel.setNewAttach(file?.toUri(), choosenType)
+                        val attach = postViewModel.attachFile
+                        attach.value?.let { it1 -> refreshAttach(it1, binding) }
                     }
                 }
             }
@@ -122,7 +131,7 @@ class NewPostFragment : Fragment() {
         //listeners:
         binding.buttonPanel.takePhoto.setOnClickListener {
             //TODO вынести функцию
-            postViewModel.changeContent(binding.edit.text?.trim().toString())
+            //postViewModel.changeContent(binding.edit.text?.trim().toString())
             choosenType = AttachmentType.IMAGE
             ImagePicker.Builder(this)
                 .cameraOnly()
@@ -164,7 +173,7 @@ class NewPostFragment : Fragment() {
         }
 
         binding.mentionUsersBtn.setOnClickListener {
-           // postViewModel.changeContent(binding.edit.text?.trim().toString())
+            // postViewModel.changeContent(binding.edit.text?.trim().toString())
             setFragmentResultListener("IDS") { _, bundle ->
                 val result = bundle.getLongArray("IDS")
                 if (result != null) {
@@ -173,6 +182,8 @@ class NewPostFragment : Fragment() {
 //                    println("$added")
                     //postViewModel.edited.value?.mentionIds = result.toList()
                     postViewModel.setMentions(result.toList())
+                    val attach = postViewModel.attachFile
+                    attach.value?.let { it1 -> refreshAttach(it1, binding) }
                 }
             }
             findNavController().navigate(R.id.usersAddingFragment)
@@ -192,22 +203,25 @@ class NewPostFragment : Fragment() {
             findNavController().navigateUp()
         }
 
-        binding.topAppBar.setOnMenuItemClickListener {menuItem->
+        binding.topAppBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.create -> {
                     val link = binding.linkEditText.text.toString()
                     val content = binding.edit.text.toString()
-                    if (link.isNotEmpty()){
+                    if (link.isNotEmpty()) {
                         postViewModel.changeLink(link.trim())
                     }
-                    if (content.isNotEmpty()){
+                    if (content.isNotEmpty()) {
                         postViewModel.changeContent(binding.edit.text.toString())
                     }
                     postViewModel.save(choosenType)
                     AndroidUtils.hideKeyboard(requireView())
                     true
                 }
-                else -> {false}
+
+                else -> {
+                    false
+                }
             }
 
         }
@@ -240,9 +254,22 @@ class NewPostFragment : Fragment() {
             println("POST_IDS: ${post.mentionIds}")
             println("EDITED: ${postViewModel.edited.value}")
             userViewModel.getUsersById(post.mentionIds)
-            //postViewModel.setAddedUsersIds(post.mentionIds)
-            initBindings(post, binding)
+            val attach = postViewModel.attachFile
+
+            if (attach.value?.uri != null) {
+                attach.value?.let { it1 ->
+                    refreshAttach(it1, binding)
+                }
+            } else run {
+                initUI(post, binding)
+            }
+
         }
+
+
+//        postViewModel.attachFile.observe(viewLifecycleOwner){
+//            refreshAttach(it, binding)
+//        }
 
         postViewModel.state.observe(viewLifecycleOwner) {
             binding.progressBar.isVisible = it.loading
@@ -275,12 +302,12 @@ class NewPostFragment : Fragment() {
 //        return file
 //    }
 
-    private fun initBindings(post: PostModel, binding: FragmentNewPostBinding) {
-        if (post.content.isNotEmpty() && binding.edit.text.toString().isEmpty()){
+    private fun initUI(post: PostModel, binding: FragmentNewPostBinding) {
+        if (post.content.isNotEmpty() && binding.edit.text.toString().isEmpty()) {
             binding.edit.setText(post.content.trim())
         }
 
-        if(post.link != null && binding.linkEditText.text.toString().isEmpty()) {
+        if (post.link != null && binding.linkEditText.text.toString().isEmpty()) {
             binding.linkEditText.setText(post.link.toString().trim())
         }
         if (post.attachment == null) {
@@ -314,7 +341,41 @@ class NewPostFragment : Fragment() {
                     binding.attachmentContainer.visibility = View.GONE
                 }
             }
+        }
+    }
 
+    private fun refreshAttach(attach: AttachModel, binding: FragmentNewPostBinding) {
+        if (attach == null) {
+            binding.attachmentContainer.visibility = View.GONE
+            return
+        } else {
+            binding.attachmentContainer.visibility = View.VISIBLE
+            when (attach!!.type) {
+                AttachmentType.IMAGE -> {
+                    binding.photo.visibility = View.VISIBLE
+                    binding.audioContainer.root.visibility = View.GONE
+                    binding.videoContainer.root.visibility = View.GONE
+                    binding.photo.load(attach.uri.toString())
+                }
+
+                AttachmentType.AUDIO -> {
+                    binding.audioContainer.root.visibility = View.VISIBLE
+                    binding.photo.visibility = View.GONE
+                    binding.videoContainer.root.visibility = View.GONE
+                    binding.audioContainer.audioName.text = attach.uri?.toString()
+                }
+
+                AttachmentType.VIDEO -> {
+                    binding.videoContainer.root.visibility = View.VISIBLE
+                    binding.photo.visibility = View.GONE
+                    binding.audioContainer.root.visibility = View.GONE
+                    binding.videoContainer.videoName.text = attach.uri?.toString()
+                }
+
+                else -> {
+                    binding.attachmentContainer.visibility = View.GONE
+                }
+            }
         }
     }
 

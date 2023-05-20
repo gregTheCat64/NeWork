@@ -33,6 +33,8 @@ interface OnEventsListener {
     fun onImage(url: String){}
 
     fun onTakePartBtn(event: EventModel){}
+
+    fun onLocation(event: EventModel){}
 }
 class EventsAdapter(
     private val onEventsListener: OnEventsListener
@@ -78,6 +80,8 @@ class EventViewHolder(
             if(event.type == EventType.OFFLINE){
                 locationOfEvent.text = event.coords.toString()
             } else{locationOfEvent.text = event.link.toString()}
+
+            locationBtn.isVisible = event.coords != null
 
             typeOfEvent.text = event.type.toString()
 
@@ -151,6 +155,11 @@ class EventViewHolder(
                         attachLayout.videoPlayBtn.isVisible = true
                     }
                 }
+            }
+
+            //location
+            binding.locationBtn.setOnClickListener {
+                onEventsListener.onLocation(event)
             }
 
             menu.isVisible = event.ownedByMe

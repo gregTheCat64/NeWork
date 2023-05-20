@@ -17,6 +17,7 @@ import ru.javacat.nework.data.mappers.toEventRequest
 import ru.javacat.nework.domain.model.AttachModel
 import ru.javacat.nework.domain.model.AttachmentModel
 import ru.javacat.nework.domain.model.AttachmentType
+import ru.javacat.nework.domain.model.CoordinatesModel
 import ru.javacat.nework.domain.model.EventModel
 import ru.javacat.nework.domain.model.EventType
 import ru.javacat.nework.domain.model.FeedModelState
@@ -76,6 +77,10 @@ class EventViewModel @Inject constructor(
     private val _attachFile = MutableLiveData(noAttach)
     val attachFile: LiveData<AttachModel>
         get() = _attachFile
+
+    private val _point = MutableLiveData<DoubleArray>()
+    val point: LiveData<DoubleArray>
+        get() = _point
 
 
 //    //участники:
@@ -150,11 +155,7 @@ class EventViewModel @Inject constructor(
 
     fun changeAttach(uri: Uri?, type: AttachmentType?) {
         _state.value = FeedModelState(loading = true)
-        _edited.value = edited.value?.copy(attachment = type?.let {
-            AttachmentModel(uri.toString(),
-                it
-            )
-        })
+        _attachFile.value = AttachModel(uri, type)
         _state.value = FeedModelState(idle = true)
     }
 
@@ -174,12 +175,19 @@ class EventViewModel @Inject constructor(
         _edited.value = edited.value?.copy(speakerIds = list)
     }
 
+    fun setPoint(point: DoubleArray){
+
+        _point.value = point
+        _edited.value = edited.value?.copy(type = EventType.OFFLINE, coords = CoordinatesModel(point[0], point[1]))
+    }
+
     fun setParticipants(list: List<Long>){
         _edited.value = edited.value?.copy(participantsIds = list)
     }
 
     fun deleteAttachment(){
         _edited.value = _edited.value?.copy(attachment = null)
+        _attachFile.value = noAttach
     }
 
     fun save(type: AttachmentType?){
@@ -188,11 +196,12 @@ class EventViewModel @Inject constructor(
                 try {
                     _state.value = FeedModelState(loading = true)
                     repository.save(
-                        it.toEventRequest(), _attachFile.value?.uri?.let {
+                        it.toEventRequest(), attachFile.value?.uri?.let {
                             MediaUpload(it.toFile())
-                        } , type
+                        } , attachFile.value?.type
                     )
                     _edited.postValue(emptyEvent)
+                    _attachFile.postValue(noAttach)
                     _postCreated.postValue(Unit)
                     _state.value = FeedModelState(idle = true)
                 }catch (e: java.lang.Exception){

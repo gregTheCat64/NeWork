@@ -126,4 +126,8 @@
             app:argType="long"
             android:defaultValue="0L" />
     </fragment>
+    <fragment
+        android:id="@+id/mapsFragment"
+        android:name="ru.javacat.nework.ui.screens.MapsFragment"
+        android:label="MapsFragment" />
 </navigation>

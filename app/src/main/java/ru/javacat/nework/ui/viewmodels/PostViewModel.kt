@@ -81,6 +81,8 @@ class PostViewModel @Inject constructor(
         get() = _attachFile
 
 
+
+
     init {
         Log.i("MYTAG", "Init postViewModel")
         println("PHOTO: ${attachFile.value?.uri}")
@@ -137,21 +139,24 @@ class PostViewModel @Inject constructor(
 
     fun save(type: AttachmentType?) {
         println("Edited: ${edited.value}")
+
         edited.value?.let {
             viewModelScope.launch {
                 try {
                     _state.value = FeedModelState(loading = true)
                     //it.link = null
                     it.coords = coords.value
-                    postRepository.save(
-                        it.toPostRequest(), _attachFile.value?.uri?.let {
+                    println("${attachFile.value?.uri}")
+                    postRepository.create(
+                        it.toPostRequest(), attachFile.value?.uri?.let {
                             MediaUpload(it.toFile())
-                        }, type
+                        }, attachFile.value?.type
                     )
                     //_addedUsers.postValue(emptyList())
-                    _edited.postValue(empty)
                     _postCreated.postValue(Unit)
                     _state.value = FeedModelState(idle = true)
+                    _edited.postValue(empty)
+                    _attachFile.postValue(noAttach)
                 } catch (e: Exception) {
                     _state.value = FeedModelState(error = true)
                 }
@@ -160,15 +165,25 @@ class PostViewModel @Inject constructor(
 
     }
 
-    fun changeAttach(uri: Uri?, type: AttachmentType?) {
+    fun setAttach(uri: Uri?, type: AttachmentType?) {
         _state.value = FeedModelState(loading = true)
+       // _attachFile.value = AttachModel(uri, type)
         _edited.value = edited.value?.copy(attachment = type?.let {
             AttachmentModel(uri.toString(),
                 it
             )
         })
+
         _state.value = FeedModelState(idle = true)
     }
+
+    fun setNewAttach(uri: Uri?, type: AttachmentType?){
+        _state.value = FeedModelState(loading = true)
+        _attachFile.value = AttachModel(uri, type)
+        _state.value = FeedModelState(idle = true)
+    }
+
+
 
     fun changeContent(content: String) {
         val text = content.trim()
@@ -184,6 +199,7 @@ class PostViewModel @Inject constructor(
        // _attachFile.value = noAttach
         //_edited.value?.attachment = null //observer не срабатывает
         _edited.value = _edited.value?.copy(attachment = null) //срабатывает
+        _attachFile.value = noAttach
     }
 
     fun edit(post: PostModel) {

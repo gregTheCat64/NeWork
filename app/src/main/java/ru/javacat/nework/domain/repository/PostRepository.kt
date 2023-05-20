@@ -20,7 +20,9 @@ interface PostRepository {
     suspend fun updatePostsByAuthorId(authorId: Long):List<PostModel>?
     fun getNewerCount(id: Long): Flow<Int>
     suspend fun likeById(id: Long)
-    suspend fun save(post: PostRequest, upload: MediaUpload?, type: AttachmentType?)
+    suspend fun save(post: PostRequest)
+
+    suspend fun create(post: PostRequest, upload: MediaUpload?, type: AttachmentType?)
     suspend fun removeById(id: Long)
     suspend fun upload(upload: MediaUpload): Media
     }

@@ -21,6 +21,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.snackbar.Snackbar
+import com.yandex.mapkit.geometry.Point
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
@@ -33,6 +34,7 @@ import ru.javacat.nework.ui.adapter.OnInteractionListener
 import ru.javacat.nework.ui.adapter.PostsAdapter
 import ru.javacat.nework.ui.screens.NewPostFragment.Companion.textArg
 import ru.javacat.nework.ui.viewmodels.PostViewModel
+import java.io.Serializable
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import javax.inject.Inject
@@ -121,10 +123,9 @@ class PostsFragment : Fragment() {
             }
 
             override fun onEdit(post: PostModel) {
-                val contentToEdit = post.content
+                //val contentToEdit = post.content
                 postViewModel.edit(post)
-                findNavController().navigate(R.id.action_navigation_posts_to_newPostFragment,
-                    Bundle().apply { textArg = contentToEdit })
+                findNavController().navigate(R.id.newPostFragment)
 
             }
 
@@ -188,11 +189,12 @@ class PostsFragment : Fragment() {
 
             override fun onCoords(post: PostModel) {
                 Toast.makeText(context, "${post.coords}", Toast.LENGTH_SHORT).show()
-                val coords = post.coords?.let { doubleArrayOf(it.latitude, it.longitude) }
-                println("cooords: ${coords.toString()}")
-                val intent = Intent(context, MapActivity::class.java)
-                intent.putExtra("LOCATION", coords)
-                startActivity(intent)
+                val coords = post.coords
+                val bundle = Bundle()
+                if (coords != null) {
+                    bundle.putDoubleArray("POINT", doubleArrayOf(coords.latitude,coords.longitude))
+                }
+                findNavController().navigate(R.id.mapsFragment, bundle)
             }
         })
 
@@ -250,6 +252,7 @@ class PostsFragment : Fragment() {
                     .show()
             }
         }
+
 
 
 

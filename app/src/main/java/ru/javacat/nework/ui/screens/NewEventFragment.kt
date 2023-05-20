@@ -23,6 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import ru.javacat.nework.R
 import ru.javacat.nework.databinding.FragmentNewEventBinding
 import ru.javacat.nework.databinding.FragmentNewPostBinding
+import ru.javacat.nework.domain.model.AttachModel
 import ru.javacat.nework.domain.model.AttachmentType
 import ru.javacat.nework.domain.model.EventModel
 import ru.javacat.nework.domain.model.EventType
@@ -89,6 +90,8 @@ class NewEventFragment : Fragment() {
                     Activity.RESULT_OK -> {
                         val uri: Uri? = it.data?.data
                         eventViewModel.changeAttach(uri, choosenType)
+                        val attach = eventViewModel.attachFile
+                        attach.value?.let { it1 -> refreshAttach(it1, binding) }
                     }
                 }
             }
@@ -100,6 +103,8 @@ class NewEventFragment : Fragment() {
                     Activity.RESULT_OK -> {
                         val file = it.data?.data?.toFile(requireContext())
                         eventViewModel.changeAttach(file?.toUri(), choosenType)
+                        val attach = eventViewModel.attachFile
+                        attach.value?.let { it1 -> refreshAttach(it1, binding) }
                     }
                 }
             }
@@ -154,6 +159,8 @@ class NewEventFragment : Fragment() {
                 println("result: ${result.contentToString()}")
                 if (result != null) {
                     eventViewModel.setSpeakers(result.toList())
+                    val attach = eventViewModel.attachFile
+                    attach.value?.let { it1 -> refreshAttach(it1, binding) }
                 }
             }
             findNavController().navigate(R.id.usersAddingFragment)
@@ -185,6 +192,10 @@ class NewEventFragment : Fragment() {
         binding.clearPicBtn.setOnClickListener {
             choosenType = null
             eventViewModel.deleteAttachment()
+        }
+
+        binding.placeBtn.setOnClickListener {
+            findNavController().navigate(R.id.mapsFragment)
         }
 
         //appBar
@@ -233,7 +244,14 @@ class NewEventFragment : Fragment() {
 
         eventViewModel.edited.observe(viewLifecycleOwner) { event ->
             userViewModel.getUsersById(event.speakerIds)
-            initBindings(event, binding)
+            val attach = eventViewModel.attachFile
+
+            if (attach.value?.uri != null) {
+                refreshAttach(attach.value!!, binding)
+            } else{
+                initUI(event, binding)
+            }
+
         }
 
         eventViewModel.state.observe(viewLifecycleOwner) {
@@ -248,10 +266,14 @@ class NewEventFragment : Fragment() {
             speakerAdapter.submitList(it)
         }
 
+        eventViewModel.point.observe(viewLifecycleOwner) {
+            binding.locationEditText.setText("${it[0]}, ${it[1]}")
+        }
+
         return binding.root
     }
 
-    private fun initBindings(event: EventModel, binding: FragmentNewEventBinding) {
+    private fun initUI(event: EventModel, binding: FragmentNewEventBinding) {
         if (event.content.isNotEmpty() && binding.eventEditText.text.toString().isEmpty()) {
             binding.eventEditText.setText(event.content.trim())
         }
@@ -308,6 +330,41 @@ class NewEventFragment : Fragment() {
                 }
             }
 
+        }
+    }
+
+    private fun refreshAttach(attach: AttachModel, binding: FragmentNewEventBinding) {
+        if (attach == null) {
+            binding.attachmentContainer.visibility = View.GONE
+            return
+        } else {
+            binding.attachmentContainer.visibility = View.VISIBLE
+            when (attach!!.type) {
+                AttachmentType.IMAGE -> {
+                    binding.photo.visibility = View.VISIBLE
+                    binding.audioContainer.root.visibility = View.GONE
+                    binding.videoContainer.root.visibility = View.GONE
+                    binding.photo.load(attach.uri.toString())
+                }
+
+                AttachmentType.AUDIO -> {
+                    binding.audioContainer.root.visibility = View.VISIBLE
+                    binding.photo.visibility = View.GONE
+                    binding.videoContainer.root.visibility = View.GONE
+                    binding.audioContainer.audioName.text = attach.uri?.toString()
+                }
+
+                AttachmentType.VIDEO -> {
+                    binding.videoContainer.root.visibility = View.VISIBLE
+                    binding.photo.visibility = View.GONE
+                    binding.audioContainer.root.visibility = View.GONE
+                    binding.videoContainer.videoName.text = attach.uri?.toString()
+                }
+
+                else -> {
+                    binding.attachmentContainer.visibility = View.GONE
+                }
+            }
         }
     }
 

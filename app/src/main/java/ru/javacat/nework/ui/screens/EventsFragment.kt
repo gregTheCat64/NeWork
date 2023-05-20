@@ -90,6 +90,15 @@ class EventsFragment : Fragment() {
                     )
                 }.play()
             }
+
+            override fun onLocation(event: EventModel) {
+                val coords = event.coords
+                val bundle = Bundle()
+                if (coords != null) {
+                    bundle.putDoubleArray("POINT", doubleArrayOf(coords.latitude,coords.longitude))
+                }
+                findNavController().navigate(R.id.mapsFragment, bundle)
+            }
         }
         )
 
