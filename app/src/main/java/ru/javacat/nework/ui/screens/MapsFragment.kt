@@ -53,6 +53,7 @@ class MapsFragment : Fragment(R.layout.fragment_maps), InputListener {
         val userLocationLayer = mapKit.createUserLocationLayer(mapView.mapWindow)
         userLocationLayer.isVisible = true
         userLocationLayer.isHeadingEnabled = true
+
         val defaultLocation = arrayListOf(55.751574, 37.573856)
         val args = arguments
         val point = args?.getDoubleArray("POINT")

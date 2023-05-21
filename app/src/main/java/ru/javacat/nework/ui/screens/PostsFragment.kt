@@ -83,11 +83,11 @@ class PostsFragment : Fragment() {
                     val fusedLocationProviderClient = LocationServices
                         .getFusedLocationProviderClient(requireActivity())
 
-                    fusedLocationProviderClient.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, null).addOnSuccessListener {
-                        println("МЕСТО: $it")
-                    val latitude = it.latitude.toString().take(7).toDouble()
-                    val longitude = it.longitude.toString().take(7).toDouble()
-                        if (it != null) {
+                    fusedLocationProviderClient.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, null).addOnSuccessListener {location->
+                        println("МЕСТО: $location")
+                    val latitude = location.latitude.toString().take(7).toDouble()
+                    val longitude = location.longitude.toString().take(7).toDouble()
+                        if (location != null) {
                             Log.i("MY_LOCATION", latitude.toString())
                             postViewModel.setCoordinates(
                                 latitude, longitude
