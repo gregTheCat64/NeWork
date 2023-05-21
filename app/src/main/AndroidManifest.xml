@@ -36,10 +36,7 @@
         </activity>
         <activity android:name=".ui.screens.MapActivity"
             />
-        <service android:name="ru.javacat.nework.service.ForegroundOnlyLocationService"
-            android:enabled="true"
-            android:exported="false"
-            android:foregroundServiceType="location" />
+
     
     </application>
 

@@ -20,6 +20,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.google.android.material.snackbar.Snackbar
 import com.yandex.mapkit.geometry.Point
 import dagger.hilt.android.AndroidEntryPoint
@@ -82,17 +83,14 @@ class PostsFragment : Fragment() {
                     val fusedLocationProviderClient = LocationServices
                         .getFusedLocationProviderClient(requireActivity())
 
-                    fusedLocationProviderClient.lastLocation.addOnSuccessListener {
+                    fusedLocationProviderClient.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, null).addOnSuccessListener {
                         println("МЕСТО: $it")
-                        val df = DecimalFormat("#,######")
-                        df.roundingMode = RoundingMode.CEILING
-//                    val latitude = String.format("%.7g%n", it.latitude).toDouble()
-//                    val longitude = String.format("%.7g%n", it.longitude).toDouble()
+                    val latitude = it.latitude.toString().take(7).toDouble()
+                    val longitude = it.longitude.toString().take(7).toDouble()
                         if (it != null) {
-                            Log.i("MY_LOCATION", it.toString())
+                            Log.i("MY_LOCATION", latitude.toString())
                             postViewModel.setCoordinates(
-                                df.format(it.latitude).toDouble(),
-                                df.format(it.longitude).toDouble()
+                                latitude, longitude
                             )
                         }
 

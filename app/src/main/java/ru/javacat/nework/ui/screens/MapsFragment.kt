@@ -1,11 +1,14 @@
 package ru.javacat.nework.ui.screens
 
+import android.graphics.PointF
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKit
 import com.yandex.mapkit.MapKitFactory
@@ -15,6 +18,7 @@ import com.yandex.mapkit.map.InputListener
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.MapObjectCollection
 import com.yandex.mapkit.mapview.MapView
+import com.yandex.runtime.image.ImageProvider
 import dagger.hilt.android.AndroidEntryPoint
 import ru.javacat.nework.R
 import ru.javacat.nework.databinding.FragmentMapsBinding
@@ -67,7 +71,9 @@ class MapsFragment : Fragment(R.layout.fragment_maps), InputListener {
             Toast.makeText(requireContext(), "Выберите место", Toast.LENGTH_SHORT).show()
         }
 
-
+        binding.topAppBar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
     }
 
     override fun onMapTap(p0: Map, p1: Point) {
@@ -78,7 +84,7 @@ class MapsFragment : Fragment(R.layout.fragment_maps), InputListener {
 
     override fun onMapLongTap(p0: Map, p1: Point) {
         collection.clear()
-        collection.addPlacemark(p1)
+        collection.addPlacemark(p1).setIcon(ImageProvider.fromResource(context, R.drawable.ic_baseline_location_on_24))
         val lat = p1.latitude.toString().take(7).toDouble()
         val long = p1.longitude.toString().take(7).toDouble()
 
@@ -91,11 +97,18 @@ class MapsFragment : Fragment(R.layout.fragment_maps), InputListener {
     override fun onStart() {
         MapKitFactory.getInstance().onStart()
         super.onStart()
+        (activity as AppCompatActivity).supportActionBar!!.hide()
     }
 
     override fun onStop() {
         binding.mapview.onStop()
         MapKitFactory.getInstance().onStop()
         super.onStop()
+        (activity as AppCompatActivity).supportActionBar!!.show()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (activity as AppCompatActivity).supportActionBar!!.hide()
     }
 }

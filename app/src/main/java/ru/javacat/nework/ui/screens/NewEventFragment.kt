@@ -39,7 +39,9 @@ import ru.javacat.nework.util.AndroidUtils
 import ru.javacat.nework.util.asOnlyDate
 import ru.javacat.nework.util.asOnlyTime
 import ru.javacat.nework.util.load
+import ru.javacat.nework.util.snack
 import ru.javacat.nework.util.toFile
+import ru.javacat.nework.util.toast
 
 @AndroidEntryPoint
 class NewEventFragment : Fragment() {
@@ -174,19 +176,17 @@ class NewEventFragment : Fragment() {
             showTimePicker(parentFragmentManager, binding.timeEditText)
         }
 
-        binding.clearPicBtn.setOnClickListener {
-            eventViewModel.deleteAttachment()
-            AndroidUtils.hideKeyboard(requireView())
-        }
 
         binding.onLineBtn.setOnClickListener {
             binding.linkEditText.isVisible = true
             binding.locationGroup.isVisible = false
+            eventViewModel.setType(EventType.ONLINE)
         }
 
         binding.offLineBtn.setOnClickListener {
             binding.linkEditText.isVisible = false
             binding.locationGroup.isVisible = true
+            eventViewModel.setType(EventType.OFFLINE)
         }
 
         binding.clearPicBtn.setOnClickListener {
@@ -220,13 +220,14 @@ class NewEventFragment : Fragment() {
                         eventViewModel.changeContent(content.trim())
                         val start = "$startDate $startTime:00"
                         eventViewModel.setStartDateTime(start)
-                        Toast.makeText(requireContext(), start, Toast.LENGTH_SHORT).show()
+                        //Toast.makeText(requireContext(), start, Toast.LENGTH_SHORT).show()
 
                         val link = binding.linkEditText.text.toString()
                         if (link.isNotEmpty()) {
                             eventViewModel.setLink(link.trim())
                         }
-                        eventViewModel.save(choosenType)
+                        eventViewModel.save()
+                        AndroidUtils.hideKeyboard(requireView())
                     }
 
                     true
@@ -267,7 +268,11 @@ class NewEventFragment : Fragment() {
         }
 
         eventViewModel.point.observe(viewLifecycleOwner) {
-            binding.locationEditText.setText("${it[0]}, ${it[1]}")
+            if (it != null) {
+                val locationText = "${it[0]}, ${it[1]}"
+                binding.locationEditText.setText(locationText)
+            }
+
         }
 
         return binding.root
@@ -280,6 +285,14 @@ class NewEventFragment : Fragment() {
 
         binding.onLineBtn.isChecked =
             event.type == EventType.ONLINE
+
+        if (event.type == EventType.ONLINE){
+            binding.linkEditText.isVisible = true
+            binding.locationGroup.isVisible = false
+        } else {
+            binding.linkEditText.isVisible = false
+            binding.locationGroup.isVisible = true
+        }
 
 
         if (event.datetime != null
@@ -294,10 +307,11 @@ class NewEventFragment : Fragment() {
         }
 
         if (event.coords != null && binding.locationEditText.text.toString().isEmpty()){
+            //toast(event.coords.toString())
             binding.locationEditText.setText(event.coords.toString())
         }
 
-        //binding.usersTextView.text = "Отмечены:"
+
         if (event.attachment == null) {
             binding.attachmentContainer.visibility = View.GONE
             return
@@ -339,7 +353,7 @@ class NewEventFragment : Fragment() {
             return
         } else {
             binding.attachmentContainer.visibility = View.VISIBLE
-            when (attach!!.type) {
+            when (attach.type) {
                 AttachmentType.IMAGE -> {
                     binding.photo.visibility = View.VISIBLE
                     binding.audioContainer.root.visibility = View.GONE

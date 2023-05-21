@@ -102,6 +102,8 @@ class EventViewHolder(
             if (event.speakerIds.isNotEmpty()) {
                 speakers.text = event.speakerIds.map {
                     event.users[it]?.name }.joinToString(", ")
+            } else {
+                speakers.text = ""
             }
 
 

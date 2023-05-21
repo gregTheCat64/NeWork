@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.core.net.toFile
 import androidx.lifecycle.*
 import androidx.paging.PagingData
+import com.yandex.mapkit.geometry.Point
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -31,28 +32,20 @@ import javax.inject.Inject
 
 private val emptyEvent = EventModel(
     0, 0L, "", null,null, "",null,
-    null, null, EventType.ONLINE, emptyList(), false,
+    null, null, EventType.OFFLINE, emptyList(), false,
     emptyList(), emptyList(), false, null, null,
     false, emptyMap()
 )
 
 private val noAttach = AttachModel()
+private val noPoint = null
 
 
 @HiltViewModel
 class EventViewModel @Inject constructor(
     private val repository: EventRepository
 ) : ViewModel() {
-//    val data: LiveData<List<EventModel>> = auth
-//        .authStateFlow
-//        .flatMapLatest { (myId, _) ->
-//            repository.eventData
-//                .map { events ->
-//                    events.map {
-//                        it.copy(ownedByMe = it.authorId == myId)
-//                    }
-//                }
-//        }.asLiveData(Dispatchers.Default)
+
 
     val data: Flow<PagingData<EventModel>> = repository.eventData
 
@@ -78,28 +71,10 @@ class EventViewModel @Inject constructor(
     val attachFile: LiveData<AttachModel>
         get() = _attachFile
 
-    private val _point = MutableLiveData<DoubleArray>()
-    val point: LiveData<DoubleArray>
+    private val _point = MutableLiveData<DoubleArray?>()
+    val point: LiveData<DoubleArray?>
         get() = _point
 
-
-//    //участники:
-//    private val _participateIds = MutableLiveData(emptyList<Long>())
-//    val participateIds: LiveData<List<Long>>
-//        get() = _participateIds
-//
-//    private var _participateAdded = MutableLiveData<List<User>>()
-//    val participateAdded: LiveData<List<User>>
-//        get() = _participateAdded
-//
-//    //спикеры:
-//    private val _speakerIds = MutableLiveData(emptyList<Long>())
-//    val speakerIds: LiveData<List<Long>>
-//        get() = _speakerIds
-//
-//    private var _speakerAdded = MutableLiveData<String>()
-//    val speakerAdded: LiveData<String>
-//        get() = _speakerAdded
 
     init {
         loadEvents()
@@ -167,22 +142,19 @@ class EventViewModel @Inject constructor(
         _edited.value = edited.value?.copy(datetime = dateTime.toLocalDateTimeWhithoutZone())
     }
 
-    fun setLink(link: String){
-        _edited.value = edited.value?.copy(link = link)
-    }
-
     fun setSpeakers(list: List<Long>){
         _edited.value = edited.value?.copy(speakerIds = list)
     }
 
+    fun setType(type: EventType){
+        _edited.value = edited.value?.copy(type = type)
+    }
+    fun setLink(link: String){
+        _edited.value = edited.value?.copy(link = link)
+    }
     fun setPoint(point: DoubleArray){
-
         _point.value = point
         _edited.value = edited.value?.copy(type = EventType.OFFLINE, coords = CoordinatesModel(point[0], point[1]))
-    }
-
-    fun setParticipants(list: List<Long>){
-        _edited.value = edited.value?.copy(participantsIds = list)
     }
 
     fun deleteAttachment(){
@@ -190,7 +162,7 @@ class EventViewModel @Inject constructor(
         _attachFile.value = noAttach
     }
 
-    fun save(type: AttachmentType?){
+    fun save(){
         edited.value?.let {
             viewModelScope.launch {
                 try {
@@ -202,6 +174,7 @@ class EventViewModel @Inject constructor(
                     )
                     _edited.postValue(emptyEvent)
                     _attachFile.postValue(noAttach)
+                    _point.postValue(noPoint)
                     _postCreated.postValue(Unit)
                     _state.value = FeedModelState(idle = true)
                 }catch (e: java.lang.Exception){
@@ -236,22 +209,4 @@ class EventViewModel @Inject constructor(
         _state.value = state
     }
 
-
-
-
-//    fun setParticipantIds(list: List<Long>) {
-//        //_participateIds.value = list
-//    }
-//
-//    fun setSpeakerIds(list: List<Long>) {
-//        //_speakerIds.value = list
-//    }
-//
-//    fun setParticipantAdded(string: String) {
-//        //_participateAdded.value = string
-//    }
-//
-//    fun setSpeakerAdded(string: String) {
-//        //_speakerAdded.value = string
-//    }
 }
