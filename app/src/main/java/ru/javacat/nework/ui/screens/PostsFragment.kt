@@ -83,10 +83,13 @@ class PostsFragment : Fragment() {
                     val fusedLocationProviderClient = LocationServices
                         .getFusedLocationProviderClient(requireActivity())
 
-                    fusedLocationProviderClient.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, null).addOnSuccessListener {location->
+                    fusedLocationProviderClient.getCurrentLocation(
+                        Priority.PRIORITY_BALANCED_POWER_ACCURACY,
+                        null
+                    ).addOnSuccessListener { location ->
                         println("МЕСТО: $location")
-                    val latitude = location.latitude.toString().take(7).toDouble()
-                    val longitude = location.longitude.toString().take(7).toDouble()
+                        val latitude = location.latitude.toString().take(7).toDouble()
+                        val longitude = location.longitude.toString().take(7).toDouble()
                         if (location != null) {
                             Log.i("MY_LOCATION", latitude.toString())
                             postViewModel.setCoordinates(
@@ -190,7 +193,7 @@ class PostsFragment : Fragment() {
                 val coords = post.coords
                 val bundle = Bundle()
                 if (coords != null) {
-                    bundle.putDoubleArray("POINT", doubleArrayOf(coords.latitude,coords.longitude))
+                    bundle.putDoubleArray("POINT", doubleArrayOf(coords.latitude, coords.longitude))
                 }
                 findNavController().navigate(R.id.mapsFragment, bundle)
             }
@@ -220,8 +223,8 @@ class PostsFragment : Fragment() {
             adapter.loadStateFlow.collectLatest {
                 binding.swipeToRefresh.isRefreshing =
                     it.refresh is LoadState.Loading
-                        || it.append is LoadState.Loading
-                        || it.prepend is LoadState.Loading
+                            || it.append is LoadState.Loading
+                            || it.prepend is LoadState.Loading
             }
         }
 
@@ -254,7 +257,7 @@ class PostsFragment : Fragment() {
 
 
 
-        postViewModel.postCreated.observe(viewLifecycleOwner){
+        postViewModel.postCreated.observe(viewLifecycleOwner) {
             binding.postsList.smoothScrollToPosition(0)
         }
 
@@ -296,8 +299,6 @@ class PostsFragment : Fragment() {
 
         return binding.root
     }
-
-
 
 
 }

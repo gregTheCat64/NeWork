@@ -9,65 +9,78 @@
     android:layout_margin="@dimen/dim8dp"
     app:cardCornerRadius="@dimen/dim16dp"
     >
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp"
         >
 
-        <ImageView
-            android:id="@+id/avatar"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="@dimen/dim16dp"
-            android:src="@drawable/ic_baseline_account_circle_24"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <LinearLayout
-            android:id="@+id/eventHeader"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toEndOf="@+id/avatar"
-            app:layout_constraintTop_toTopOf="@+id/avatar"
-            android:orientation="vertical">
+            android:padding="@dimen/dim8dp"
+            android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/name"
+            <ImageView
+                android:id="@+id/avatar"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="@dimen/dim16dp"
+                android:src="@drawable/ic_baseline_account_circle_24"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                android:id="@+id/eventHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="4dp"
-                android:text="@string/default_name"
-                />
+                android:layout_weight="1"
+                app:layout_constraintStart_toEndOf="@+id/avatar"
+                app:layout_constraintTop_toTopOf="@+id/avatar"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/published"
+                <TextView
+                    android:id="@+id/name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/default_name"
+                    />
+
+                <TextView
+                    android:id="@+id/published"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/default_date"
+                    app:layout_constraintBottom_toBottomOf="@+id/avatar"
+                    app:layout_constraintStart_toEndOf="@+id/avatar" />
+
+        </LinearLayout>
+
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/menu"
+                style="@style/Widget.Material3.Button.IconButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginBottom="4dp"
-                android:text="@string/default_date"
-                app:layout_constraintBottom_toBottomOf="@+id/avatar"
-                app:layout_constraintStart_toEndOf="@+id/avatar" />
+                app:icon="@drawable/ic_baseline_more_vert_24"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/avatar" />
+
         </LinearLayout>
 
 
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/menu"
-            style="@style/Widget.Material3.Button.IconButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:icon="@drawable/ic_baseline_more_vert_24"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/avatar" />
+
 
         <TextView
             android:id="@+id/content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:padding="@dimen/dim16dp"
             android:lineSpacingMultiplier="1.5"
             android:text="@string/event_text"
             app:layout_constraintEnd_toEndOf="parent"
@@ -92,7 +105,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dim8dp"
             android:backgroundTint="#FEF6F3"
-            app:cardCornerRadius="@dimen/dim8dp"
+
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/content"
             >
@@ -194,18 +207,7 @@
                     app:layout_constraintStart_toEndOf="@+id/formatTextView"
                     app:layout_constraintTop_toTopOf="@+id/formatTextView" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/takePartBtn"
-                    style="@style/Widget.AppTheme.LikeCheckBox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dim8dp"
-                    android:checkable="true"
-                    android:text="участвовать"
-                    app:icon="@drawable/be_participate_btn_selector"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/speakersTextView" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
 
@@ -226,6 +228,6 @@
 
 
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
 </androidx.cardview.widget.CardView>

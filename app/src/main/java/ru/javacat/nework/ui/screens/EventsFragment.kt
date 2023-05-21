@@ -20,6 +20,7 @@ import ru.javacat.nework.mediaplayer.MediaLifecycleObserver
 import ru.javacat.nework.ui.adapter.EventsAdapter
 import ru.javacat.nework.ui.adapter.OnEventsListener
 import ru.javacat.nework.ui.viewmodels.EventViewModel
+import ru.javacat.nework.util.snack
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -58,6 +59,11 @@ class EventsFragment : Fragment() {
             override fun onTakePartBtn(event: EventModel) {
                 if (appAuth.authStateFlow.value.id!=0L){
                     viewModel.takePart(event)
+                    if (event.participatedByMe){
+                        snack("Вы вышли")
+                    } else{
+                        snack("Вы участвуете!")
+                    }
                 }else showSignInDialog(this@EventsFragment)
 
             }

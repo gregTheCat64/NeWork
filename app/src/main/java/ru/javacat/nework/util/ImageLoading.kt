@@ -9,10 +9,19 @@ import ru.javacat.nework.R
 fun ImageView.load(url: String, vararg transforms: BitmapTransformation = emptyArray()) =
     Glide.with(this)
         .load(url)
-        //.placeholder(R.drawable.ic_baseline_no_photography_24)
+        .placeholder(R.drawable.ic_baseline_no_photography_24)
+        .centerCrop()
         .timeout(10_000)
         .transform(*transforms)
         .into(this)
+
+fun ImageView.loadFull(url: String, vararg transforms: BitmapTransformation = emptyArray()) =
+    Glide.with(this)
+        .load(url)
+        .timeout(10_000)
+        .transform(*transforms)
+        .into(this)
+
 
 fun ImageView.loadCircleCrop(url: String, vararg transforms: BitmapTransformation = emptyArray()) =
     load(url, CircleCrop(), *transforms)

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.MediaController
 import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.paging.PagingData
 import androidx.paging.PagingDataAdapter
@@ -72,6 +73,7 @@ class EventViewHolder(
         } else {binding.attachLayout.root.visibility = View.GONE}
 
         binding.apply {
+            interactionPosts.takePartBtn.isVisible = true
             avatar.loadAvatar(event.authorAvatar.toString())
             name.text = event.author
             published.text = event.published?.asString()
@@ -117,15 +119,15 @@ class EventViewHolder(
                 onEventsListener.onParticipant(event)
             }
 
-            binding.takePartBtn.setOnClickListener {
+            binding.interactionPosts.takePartBtn.setOnClickListener {
                 onEventsListener.onTakePartBtn(event)
             }
-            binding.takePartBtn.isChecked = event.participatedByMe
+            binding.interactionPosts.takePartBtn.isChecked = event.participatedByMe
 
             if (event.participatedByMe){
-                binding.takePartBtn.setText("Выйти")
+                binding.interactionPosts.takePartBtn.setText("Out")
             } else {
-                binding.takePartBtn.setText("Участвовать")
+                binding.interactionPosts.takePartBtn.setText("In")
             }
 
             //image
@@ -165,6 +167,7 @@ class EventViewHolder(
             }
 
             menu.isVisible = event.ownedByMe
+
             menu.setOnClickListener {
                 PopupMenu(it.context, it).apply {
                     inflate(R.menu.options_post)

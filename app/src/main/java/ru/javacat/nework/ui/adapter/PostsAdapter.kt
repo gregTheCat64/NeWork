@@ -77,6 +77,7 @@ class PostViewHolder(
             published.text = post.published?.asString()
             content.text = post.content
             linkText.text = post.link
+            interactionPosts.takePartBtn.isVisible = false
 
             //likes:
             interactionPosts.likeBtn.isChecked = post.likedByMe //???
