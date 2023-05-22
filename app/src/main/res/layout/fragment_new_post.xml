@@ -31,33 +31,64 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
         >
+
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:padding="@dimen/dim16dp"
             app:layout_constraintBottom_toTopOf="@+id/buttonPanelLayout"
             app:layout_constraintTop_toTopOf="parent"
-            tools:layout_editor_absoluteX="16dp">
+            >
 
-            <com.google.android.material.textfield.TextInputLayout
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/locationLayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:orientation="horizontal">
 
-                <com.google.android.material.textfield.TextInputEditText
+                <TextView
+                    android:id="@+id/coordsTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dim8dp"
+                    android:layout_marginTop="@dimen/dim4dp"
+                    android:layout_weight="9"
+                    />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/clearLocationBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.AppTheme.IconButton"
+                    app:icon="@drawable/ic_baseline_close_24"
+                    />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+                <EditText
                     android:id="@+id/edit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:minHeight="@dimen/dim64dp"
                     android:hint="Напишите что-нибудь"
+                    android:padding="@dimen/dim8dp"
+                    android:background="@null"
+                    android:focusedByDefault="true"
                     android:inputType="textMultiLine" />
-            </com.google.android.material.textfield.TextInputLayout>
+
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/linkEditTextLayout"
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/linkEditText"
+                    android:layout_margin="@dimen/dim8dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Ссылка"
@@ -65,20 +96,11 @@
             </com.google.android.material.textfield.TextInputLayout>
 
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/mentionUsersBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Widget.Material3.Button.TextButton"
-                app:icon="@drawable/ic_baseline_alternate_email_24"
-                android:layout_gravity="end"
-                android:text="отметить"
-                />
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/addedUsersList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:padding="@dimen/dim8dp"
                 app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
                 app:spanCount="3" />
 
@@ -91,15 +113,14 @@
 
             <FrameLayout
                 android:id="@+id/attachmentContainer"
-                android:layout_marginTop="@dimen/dim16dp"
+                android:padding="@dimen/dim8dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <ImageView
                     android:id="@+id/photo"
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    />
+                    android:layout_height="200dp" />
 
                 <include
                     android:id="@+id/audioContainer"

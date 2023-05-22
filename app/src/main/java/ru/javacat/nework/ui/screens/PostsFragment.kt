@@ -92,7 +92,7 @@ class PostsFragment : Fragment() {
                         val longitude = location.longitude.toString().take(7).toDouble()
                         if (location != null) {
                             Log.i("MY_LOCATION", latitude.toString())
-                            postViewModel.setCoordinates(
+                            postViewModel.getCoordinates(
                                 latitude, longitude
                             )
                         }

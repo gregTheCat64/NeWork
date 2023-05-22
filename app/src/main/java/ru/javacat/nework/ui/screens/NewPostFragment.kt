@@ -69,6 +69,7 @@ class NewPostFragment : Fragment() {
         val binding = FragmentNewPostBinding.inflate(inflater, container, false)
         var choosenType: AttachmentType? = null
 
+        binding.edit.requestFocus()
         println("oncreate!")
         println("attach: ${postViewModel.attachFile}")
         //snack("ONCREATE")
@@ -141,6 +142,23 @@ class NewPostFragment : Fragment() {
                 }
         }
 
+        binding.buttonPanel.linkBtn.setOnClickListener {
+            binding.linkEditTextLayout.isVisible = true
+        }
+
+        binding.buttonPanel.addLocationBtn.setOnClickListener {
+            binding.locationLayout.isVisible = true
+            binding.coordsTextView.setText(postViewModel.coords.value.toString())
+            snack("Местоположение добавлено")
+            postViewModel.setCoordinates()
+        }
+
+        binding.clearLocationBtn.setOnClickListener {
+            binding.locationLayout.visibility = View.GONE
+            postViewModel.clearCoordinates()
+            snack("Местоположение удалено")
+        }
+
         binding.buttonPanel.pickPhoto.setOnClickListener {
             postViewModel.setState(FeedModelState(loading = true))
             //postViewModel.changeContent(binding.edit.text?.trim().toString())
@@ -172,7 +190,7 @@ class NewPostFragment : Fragment() {
             pickFileLauncher.launch(intent)
         }
 
-        binding.mentionUsersBtn.setOnClickListener {
+        binding.buttonPanel.addUsersBtn.setOnClickListener {
             // postViewModel.changeContent(binding.edit.text?.trim().toString())
             setFragmentResultListener("IDS") { _, bundle ->
                 val result = bundle.getLongArray("IDS")
@@ -224,6 +242,13 @@ class NewPostFragment : Fragment() {
                 }
             }
 
+        }
+
+        //bottomBar
+        binding.buttonPanel.moreIconsBtn.setOnClickListener {
+            it.visibility = View.GONE
+            binding.buttonPanel.videoBtn.isVisible = true
+            binding.buttonPanel.takePhoto.isVisible = true
         }
 
         //usersList:
@@ -308,8 +333,15 @@ class NewPostFragment : Fragment() {
         }
 
         if (post.link != null && binding.linkEditText.text.toString().isEmpty()) {
+            binding.linkEditTextLayout.isVisible = true
             binding.linkEditText.setText(post.link.toString().trim())
         }
+
+        if (post.coords != null && binding.coordsTextView.text.isEmpty()){
+            binding.coordsTextView.setText(post.coords.toString())
+            binding.locationLayout.isVisible = true
+        }
+
         if (post.attachment == null) {
             binding.attachmentContainer.visibility = View.GONE
             return

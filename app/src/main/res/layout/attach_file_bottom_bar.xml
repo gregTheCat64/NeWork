@@ -16,17 +16,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/description_select_photo"
-        android:padding="@dimen/dim16dp"
         app:icon="@drawable/ic_baseline_image_24" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/takePhoto"
-        style="@style/Widget.AppTheme.IconButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:contentDescription="@string/description_take_photo"
-        android:padding="@dimen/dim16dp"
-        app:icon="@drawable/ic_baseline_camera_alt_24" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/audio"
@@ -34,15 +24,51 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/description_take_photo"
-        android:padding="@dimen/dim16dp"
         app:icon="@drawable/ic_baseline_audiotrack_24" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/moreIconsBtn"
+        android:layout_width="32dp"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        style="@style/Widget.AppTheme.IconButton"
+        app:icon="@drawable/baseline_arrow_forward_ios_24"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/takePhoto"
+        style="@style/Widget.AppTheme.IconButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:contentDescription="@string/description_take_photo"
+        app:icon="@drawable/ic_baseline_camera_alt_24" />
+
+
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/videoBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/Widget.AppTheme.IconButton"
+        android:visibility="invisible"
         app:icon="@drawable/baseline_movie_24"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/linkBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Widget.AppTheme.IconButton"
+        app:icon="@drawable/baseline_language_24"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/addLocationBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Widget.AppTheme.IconButton"
+        app:icon="@drawable/ic_baseline_location_on_24"
         />
 
     <Button

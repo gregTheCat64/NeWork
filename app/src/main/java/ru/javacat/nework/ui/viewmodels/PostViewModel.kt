@@ -145,7 +145,6 @@ class PostViewModel @Inject constructor(
                 try {
                     _state.value = FeedModelState(loading = true)
                     //it.link = null
-                    it.coords = coords.value
                     println("${attachFile.value?.uri}")
                     postRepository.create(
                         it.toPostRequest(), attachFile.value?.uri?.let {
@@ -228,8 +227,16 @@ class PostViewModel @Inject constructor(
         _edited.value = edited.value?.copy(mentionIds = list)
     }
 
-    fun setCoordinates(lat: Double, long: Double) {
+    fun getCoordinates(lat: Double, long: Double){
         _coords.value = CoordinatesModel(lat, long)
+    }
+
+    fun setCoordinates() {
+        _edited.value = edited.value?.copy(coords = coords.value)
+    }
+
+    fun clearCoordinates(){
+        _edited.value = edited.value?.copy(coords = null)
     }
 
     fun setState(state: FeedModelState){

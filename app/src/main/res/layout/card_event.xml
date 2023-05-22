@@ -103,7 +103,7 @@
             android:id="@+id/eventInfoCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dim8dp"
+
             android:backgroundTint="#FEF6F3"
 
             app:layout_constraintStart_toStartOf="parent"
