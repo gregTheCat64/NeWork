@@ -188,6 +188,10 @@ class PostsFragment : Fragment() {
                 showUserListDialog(post.mentionIds, childFragmentManager)
             }
 
+            override fun onLiked(post: PostModel) {
+                post.likeOwnerIds?.let { showUserListDialog(it, childFragmentManager) }
+            }
+
             override fun onCoords(post: PostModel) {
                 Toast.makeText(context, "${post.coords}", Toast.LENGTH_SHORT).show()
                 val coords = post.coords
@@ -257,9 +261,9 @@ class PostsFragment : Fragment() {
 
 
 
-        postViewModel.postCreated.observe(viewLifecycleOwner) {
-            binding.postsList.smoothScrollToPosition(0)
-        }
+//        postViewModel.postCreated.observe(viewLifecycleOwner) {
+//            binding.postsList.smoothScrollToPosition(0)
+//        }
 
 //        viewModel.newerCount.observe(viewLifecycleOwner) { state ->
 //            println("НОВЫХ ПОСТОВ: $state штук!!!")
@@ -282,24 +286,15 @@ class PostsFragment : Fragment() {
 
         }
 
-        binding.addPostBtn.setOnClickListener {
-            if (appAuth.authStateFlow.value.token != null) {
-                findNavController().navigate(R.id.newPostFragment)
-            } else showSignInDialog(this)
-
-        }
-
-        binding.postListBtn.setOnClickListener {
-            binding.postsList.smoothScrollToPosition(0)
-        }
-
-        binding.eventsListBtn.setOnClickListener {
-            findNavController().navigate(R.id.events)
-        }
 
         return binding.root
     }
 
+    companion object {
+        @JvmStatic
+        fun newInstance() =
+            PostsFragment()
+    }
 
 }
 

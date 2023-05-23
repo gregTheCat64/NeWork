@@ -3,50 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_main"
-    app:startDestination="@id/posts">
+    app:startDestination="@id/viewPagerFragment">
 
-    <fragment
-        android:id="@+id/posts"
-        android:name="ru.javacat.nework.ui.screens.PostsFragment"
-        android:label="Посты"
-        tools:layout="@layout/fragment_posts" >
-        <action
-            android:id="@+id/action_navigation_posts_to_wallFragment"
-            app:destination="@id/wallFragment" />
-        <action
-            android:id="@+id/action_navigation_posts_to_newPostFragment"
-            app:destination="@id/newPostFragment" />
-        <action
-            android:id="@+id/action_navigation_posts_to_navigation_events"
-            app:destination="@id/events" />
-        <action
-            android:id="@+id/action_navigation_posts_to_registrationFragment"
-            app:destination="@id/registrationFragment" />
-        <action
-            android:id="@+id/action_navigation_posts_to_signInFragment"
-            app:destination="@id/signInFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/events"
-        android:name="ru.javacat.nework.ui.screens.EventsFragment"
-        android:label="Мероприятия"
-        tools:layout="@layout/fragment_events" >
-        <action
-            android:id="@+id/action_navigation_events_to_newEventFragment"
-            app:destination="@id/newEventFragment" />
-        <action
-            android:id="@+id/action_navigation_events_to_wallFragment"
-            app:destination="@id/wallFragment" />
-        <action
-            android:id="@+id/action_navigation_events_to_navigation_posts"
-            app:destination="@id/posts" />
-        <action
-            android:id="@+id/action_navigation_events_to_signInFragment"
-            app:destination="@id/signInFragment" />
-        <action
-            android:id="@+id/action_navigation_events_to_registrationFragment"
-            app:destination="@id/registrationFragment" />
-    </fragment>
     <fragment
         android:id="@+id/wallFragment"
         android:name="ru.javacat.nework.ui.screens.WallFragment"
@@ -80,6 +38,9 @@
         <action
             android:id="@+id/action_newEventFragment_to_usersAddingFragment"
             app:destination="@id/usersAddingFragment" />
+        <action
+            android:id="@+id/action_newEventFragment_to_mapsFragment"
+            app:destination="@id/mapsFragment" />
     </fragment>
     <fragment
         android:id="@+id/newJobFragment"
@@ -130,4 +91,24 @@
         android:id="@+id/mapsFragment"
         android:name="ru.javacat.nework.ui.screens.MapsFragment"
         android:label="MapsFragment" />
+    <fragment
+        android:id="@+id/viewPagerFragment"
+        android:name="ru.javacat.nework.ui.screens.ViewPagerFragment"
+        android:label="ViewPagerFragment" >
+        <action
+            android:id="@+id/action_viewPagerFragment_to_newPostFragment"
+            app:destination="@id/newPostFragment" />
+        <action
+            android:id="@+id/action_viewPagerFragment_to_newEventFragment"
+            app:destination="@id/newEventFragment" />
+        <action
+            android:id="@+id/action_viewPagerFragment_to_wallFragment"
+            app:destination="@id/wallFragment" />
+        <action
+            android:id="@+id/action_viewPagerFragment_to_mapsFragment"
+            app:destination="@id/mapsFragment" />
+        <action
+            android:id="@+id/action_viewPagerFragment_to_userListDialogFragment"
+            app:destination="@id/userListDialogFragment" />
+    </fragment>
 </navigation>

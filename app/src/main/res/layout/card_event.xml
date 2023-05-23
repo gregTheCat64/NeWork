@@ -104,7 +104,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
 
-            android:backgroundTint="#FEF6F3"
+            android:backgroundTint="@color/light_grey"
 
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/content"
@@ -158,12 +158,12 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/locationBtn"
-                    style="@style/Widget.Material3.Button.IconButton.Filled"
+                    style="@style/Widget.Material3.Button.IconButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:icon="@drawable/ic_baseline_location_on_24"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/speakersTextView"
@@ -220,12 +220,25 @@
             layout="@layout/interaction_posts_panel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dim8dp"
             app:layout_constraintTop_toBottomOf="@id/eventInfoCard"
             app:layout_constraintStart_toStartOf="parent"
             />
 
-
+        <TextView
+            android:id="@+id/likedList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/light_grey"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textColor="@color/grey"
+            android:paddingStart="@dimen/dim16dp"
+            android:paddingEnd="@dimen/dim16dp"
+            android:paddingTop="@dimen/dim8dp"
+            android:paddingBottom="@dimen/dim8dp"
+            android:visibility="visible"
+            app:layout_constraintTop_toBottomOf="@id/divider"
+            />
 
 
     </LinearLayout>

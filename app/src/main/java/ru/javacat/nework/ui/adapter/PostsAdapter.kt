@@ -33,6 +33,8 @@ interface OnInteractionListener {
     fun onImage(url: String) {}
     fun onUser(post: PostModel) {}
     fun onMention(post: PostModel){}
+
+    fun onLiked(post: PostModel){}
     fun onCoords(post: PostModel){}
 
 }
@@ -110,6 +112,10 @@ class PostViewHolder(
 
             interactionPosts.mentioned.setOnClickListener {
                 onInteractionListener.onMention(post)
+            }
+
+            likedList.setOnClickListener {
+                onInteractionListener.onLiked(post)
             }
 
             //image

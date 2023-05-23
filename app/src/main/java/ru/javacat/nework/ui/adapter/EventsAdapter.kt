@@ -31,6 +31,8 @@ interface OnEventsListener {
     fun onPlayAudio(event: EventModel){}
     fun onParticipant(event: EventModel){}
     fun onUser(event: EventModel){}
+
+    fun onLiked(event: EventModel){}
     fun onImage(url: String){}
 
     fun onTakePartBtn(event: EventModel){}
@@ -99,6 +101,18 @@ class EventViewHolder(
             //likes:
             interactionPosts.likeBtn.isChecked = event.likedByMe
             interactionPosts.likeBtn.text = "${event.likeOwnerIds?.size?: ""}"
+
+            //likeOwners:
+            if (event.likeOwnerIds?.size != 0){
+                likedList.visibility = View.VISIBLE
+                likedList.text = event.likeOwnerIds?.map {
+                    event.users[it]?.name
+                }?.joinToString(", ", "Оценили: ")
+            } else likedList.visibility = View.GONE
+
+            likedList.setOnClickListener {
+                onEventsListener.onLiked(event)
+            }
 
             //speakers:
             if (event.speakerIds.isNotEmpty()) {

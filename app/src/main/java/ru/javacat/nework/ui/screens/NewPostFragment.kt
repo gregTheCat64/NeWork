@@ -216,7 +216,7 @@ class NewPostFragment : Fragment() {
 
         //appBAR:
         binding.topAppBar.setNavigationOnClickListener {
-            postViewModel.clearEdit()
+            //postViewModel.clearEdit()
             AndroidUtils.hideKeyboard(requireView())
             findNavController().navigateUp()
         }
@@ -231,9 +231,11 @@ class NewPostFragment : Fragment() {
                     }
                     if (content.isNotEmpty()) {
                         postViewModel.changeContent(binding.edit.text.toString())
+                        postViewModel.save(choosenType)
+                        AndroidUtils.hideKeyboard(requireView())
+                    } else {
+                        snack("Поле сообщения не должно быть пустым")
                     }
-                    postViewModel.save(choosenType)
-                    AndroidUtils.hideKeyboard(requireView())
                     true
                 }
 
@@ -303,29 +305,7 @@ class NewPostFragment : Fragment() {
         return binding.root
     }
 
-//    private fun getRealPathFromUri(contentUri: Uri?): String?{
-//        val proj = arrayOf( MediaStore.Audio.Media.DATA)
-//        val loader = CursorLoader(requireContext(), contentUri!!, proj ,null,null,null)
-//        val cursor = loader.loadInBackground()
-//        val column_index = cursor?.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
-//        cursor?.moveToFirst()
-//        val result = column_index?.let { cursor.getString(it) }
-//        cursor?.close()
-//        return result
-//    }
 
-//    private fun getFileFromUri(contentResolver: ContentResolver, uri: Uri?, directory: File): File {
-//        val file =
-//            File.createTempFile("tmp", "@gree", directory)
-//        file.outputStream().use {
-//            if (uri != null) {
-//                val input = contentResolver.openInputStream(uri)
-//                input?.copyTo(it)
-//                input?.close()
-//            }
-//        }
-//        return file
-//    }
 
     private fun initUI(post: PostModel, binding: FragmentNewPostBinding) {
         if (post.content.isNotEmpty() && binding.edit.text.toString().isEmpty()) {
@@ -410,5 +390,28 @@ class NewPostFragment : Fragment() {
             }
         }
     }
-
 }
+
+//    private fun getRealPathFromUri(contentUri: Uri?): String?{
+//        val proj = arrayOf( MediaStore.Audio.Media.DATA)
+//        val loader = CursorLoader(requireContext(), contentUri!!, proj ,null,null,null)
+//        val cursor = loader.loadInBackground()
+//        val column_index = cursor?.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
+//        cursor?.moveToFirst()
+//        val result = column_index?.let { cursor.getString(it) }
+//        cursor?.close()
+//        return result
+//    }
+
+//    private fun getFileFromUri(contentResolver: ContentResolver, uri: Uri?, directory: File): File {
+//        val file =
+//            File.createTempFile("tmp", "@gree", directory)
+//        file.outputStream().use {
+//            if (uri != null) {
+//                val input = contentResolver.openInputStream(uri)
+//                input?.copyTo(it)
+//                input?.close()
+//            }
+//        }
+//        return file
+//    }

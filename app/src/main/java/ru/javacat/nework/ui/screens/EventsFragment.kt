@@ -83,6 +83,10 @@ class EventsFragment : Fragment() {
                 findNavController().navigate(R.id.wallFragment, bundle)
             }
 
+            override fun onLiked(event: EventModel) {
+                event.likeOwnerIds?.let { showUserListDialog(it, childFragmentManager) }
+            }
+
             override fun onImage(url: String) {
                 showImageDialog(url, childFragmentManager)
             }
@@ -141,20 +145,19 @@ class EventsFragment : Fragment() {
 //        }
 
 
-        binding.postListBtn.setOnClickListener {
-            findNavController().navigate(R.id.action_navigation_events_to_navigation_posts)
-        }
 
-        binding.eventsListBtn.setOnClickListener{
-            binding.eventsList.smoothScrollToPosition(0)
-        }
 
-        binding.newEventBtn.setOnClickListener {
-            findNavController().navigate(R.id.action_navigation_events_to_newEventFragment)
-        }
+
+            //binding.eventsList.smoothScrollToPosition(0)
+
 
         return binding.root
 
         
+    }
+    companion object {
+        @JvmStatic
+        fun newInstance() =
+            EventsFragment()
     }
 }

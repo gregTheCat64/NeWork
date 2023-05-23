@@ -8,35 +8,6 @@
     tools:context=".ui.screens.PostsFragment">
 
 
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <Button
-            android:id="@+id/postListBtn"
-            style="@style/Widget.AppCompat.TextButton.Checked"
-            android:layout_weight="1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/posts"
-            />
-
-
-
-        <Button
-            android:id="@+id/eventsListBtn"
-            style="@style/Widget.AppCompat.TextButton.UnChecked"
-            android:layout_weight="1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/events"
-            />
-
-    </LinearLayout>
-
-
     <View
         android:id="@+id/divider"
         android:layout_width="match_parent"
@@ -48,19 +19,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/addPostBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_margin="@dimen/dim8dp"
-            app:icon="@drawable/ic_baseline_add_24"
-            android:minHeight="@dimen/dim16dp"
-            android:text="@string/add_post"
-            style="@style/Widget.Material3.Button.OutlinedButton.Icon"
-            />
 
 
 

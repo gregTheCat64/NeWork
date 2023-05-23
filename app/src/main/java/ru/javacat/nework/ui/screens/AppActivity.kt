@@ -11,6 +11,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.TableLayout
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.view.menu.ActionMenuItemView
@@ -20,11 +21,14 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 import ru.javacat.nework.R
 import ru.javacat.nework.data.auth.AppAuth
 import ru.javacat.nework.databinding.ActivityAppBinding
+import ru.javacat.nework.databinding.FragmentPostsBinding
+import ru.javacat.nework.ui.adapter.ViewPagerAdapter
 import ru.javacat.nework.ui.screens.NewPostFragment.Companion.textArg
 import ru.javacat.nework.ui.viewmodels.AuthViewModel
 import ru.javacat.nework.ui.viewmodels.UserViewModel
@@ -32,6 +36,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class AppActivity : AppCompatActivity() {
+
 
     @Inject
     lateinit var appAuth: AppAuth
@@ -53,6 +58,10 @@ class AppActivity : AppCompatActivity() {
         val binding = ActivityAppBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+
+
+
+
         //***Так настраивается bottomNavigationBar
 //           navView = binding.navView
 //
@@ -66,25 +75,25 @@ class AppActivity : AppCompatActivity() {
 //        navView.setupWithNavController(navController)
 //           navView.isVisible = true
 
-        intent?.let {
-            if (it.action != Intent.ACTION_SEND) {
-                return@let
-            }
-
-            val text = it.getStringExtra(Intent.EXTRA_TEXT)
-            if (text?.isNotBlank() != true) {
-                return@let
-            }
-
-            intent.removeExtra(Intent.EXTRA_TEXT)
-            findNavController(R.id.nav_host_fragment)
-                .navigate(
-                    R.id.action_navigation_posts_to_newPostFragment,
-                    Bundle().apply {
-                        textArg = text
-                    }
-                )
-        }
+//        intent?.let {
+//            if (it.action != Intent.ACTION_SEND) {
+//                return@let
+//            }
+//
+//            val text = it.getStringExtra(Intent.EXTRA_TEXT)
+//            if (text?.isNotBlank() != true) {
+//                return@let
+//            }
+//
+//            intent.removeExtra(Intent.EXTRA_TEXT)
+//            findNavController(R.id.nav_host_fragment)
+//                .navigate(
+//                    R.id.action_navigation_posts_to_newPostFragment,
+//                    Bundle().apply {
+//                        textArg = text
+//                    }
+//                )
+//        }
 
 //        binding.settingsBtn.setOnClickListener {
 //            showMenu(it)
