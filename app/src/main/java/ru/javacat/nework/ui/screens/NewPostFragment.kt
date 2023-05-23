@@ -217,6 +217,14 @@ class NewPostFragment : Fragment() {
         //appBAR:
         binding.topAppBar.setNavigationOnClickListener {
             //postViewModel.clearEdit()
+            val link = binding.linkEditText.text.toString()
+            val content = binding.edit.text.toString()
+            if (link.isNotEmpty()) {
+                postViewModel.changeLink(link.trim())
+            }
+            if (content.isNotEmpty()) {
+                postViewModel.changeContent(binding.edit.text.toString())
+            }
             AndroidUtils.hideKeyboard(requireView())
             findNavController().navigateUp()
         }
