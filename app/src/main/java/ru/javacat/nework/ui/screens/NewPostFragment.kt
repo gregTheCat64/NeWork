@@ -143,6 +143,7 @@ class NewPostFragment : Fragment() {
 
         binding.buttonPanel.linkBtn.setOnClickListener {
             binding.linkEditTextLayout.isVisible = true
+            binding.linkEditTextLayout.requestFocus()
         }
 
         binding.buttonPanel.addLocationBtn.setOnClickListener {
