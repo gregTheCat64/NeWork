@@ -77,6 +77,12 @@ class NewEventFragment : Fragment() {
             }
         })
 
+        binding.buttonPanel.apply {
+            linkBtn.isVisible = false
+            addLocationBtn.isVisible = false
+            addUsersBtn.isVisible = false
+        }
+
         //pickers:
         val pickPhotoLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -153,6 +159,12 @@ class NewEventFragment : Fragment() {
                 .setAction(Intent.ACTION_GET_CONTENT)
             choosenType = AttachmentType.VIDEO
             pickFileLauncher.launch(intent)
+        }
+
+        binding.buttonPanel.moreIconsBtn.setOnClickListener {
+            it.visibility = View.GONE
+            binding.buttonPanel.videoBtn.isVisible = true
+            binding.buttonPanel.takePhoto.isVisible = true
         }
 
         binding.addSpeakerBtn.setOnClickListener {

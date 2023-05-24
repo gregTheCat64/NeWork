@@ -67,6 +67,10 @@ class PostViewModel @Inject constructor(
 //            .asLiveData(Dispatchers.Default)
 //    }
 
+    private val _isNewPost = MutableLiveData<Boolean>(true)
+    val isNewPost: LiveData<Boolean>
+        get() = _isNewPost
+
 
     private val _edited = MutableLiveData(empty)
     val edited: LiveData<PostModel>
@@ -161,7 +165,6 @@ class PostViewModel @Inject constructor(
                 }
             }
         }
-
     }
 
     fun setAttach(uri: Uri?, type: AttachmentType?) {
@@ -178,6 +181,7 @@ class PostViewModel @Inject constructor(
 
     fun setNewAttach(uri: Uri?, type: AttachmentType?){
         _state.value = FeedModelState(loading = true)
+        _edited.value = _edited.value?.copy(attachment = null)
         _attachFile.value = AttachModel(uri, type)
         _state.value = FeedModelState(idle = true)
     }
@@ -197,8 +201,9 @@ class PostViewModel @Inject constructor(
     fun deleteAttachment() {
        // _attachFile.value = noAttach
         //_edited.value?.attachment = null //observer не срабатывает
-        _edited.value = _edited.value?.copy(attachment = null) //срабатывает
         _attachFile.value = noAttach
+        _edited.value = _edited.value?.copy(attachment = null) //срабатывает
+
     }
 
     fun edit(post: PostModel) {
@@ -241,6 +246,14 @@ class PostViewModel @Inject constructor(
 
     fun setState(state: FeedModelState){
         _state.value = state
+    }
+
+    fun setNew(){
+        _isNewPost.value = true
+    }
+
+    fun setOld(){
+        _isNewPost.value = false
     }
 
 

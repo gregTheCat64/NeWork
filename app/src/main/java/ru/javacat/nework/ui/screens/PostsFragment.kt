@@ -124,7 +124,8 @@ class PostsFragment : Fragment() {
             }
 
             override fun onEdit(post: PostModel) {
-                //val contentToEdit = post.content
+                //удаляем картинку из лайвдаты если она там есть
+                postViewModel.deleteAttachment()
                 postViewModel.edit(post)
                 findNavController().navigate(R.id.newPostFragment)
 

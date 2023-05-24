@@ -5,6 +5,7 @@ import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -26,6 +27,7 @@ import ru.javacat.nework.domain.model.AttachmentType
 import ru.javacat.nework.domain.model.FeedModelState
 import ru.javacat.nework.domain.model.PostModel
 import ru.javacat.nework.domain.model.User
+import ru.javacat.nework.domain.model.toAttachModel
 import ru.javacat.nework.ui.adapter.OnUserListener
 import ru.javacat.nework.ui.adapter.UsersAdapter
 import ru.javacat.nework.ui.viewmodels.PostViewModel
@@ -68,10 +70,9 @@ class NewPostFragment : Fragment() {
     ): View {
         val binding = FragmentNewPostBinding.inflate(inflater, container, false)
         var choosenType: AttachmentType? = null
-
+        Log.i("NEWPOST", "createView")
         binding.edit.requestFocus()
-        println("oncreate!")
-        println("attach: ${postViewModel.attachFile}")
+
         //snack("ONCREATE")
         //postViewModel.edited.value?.let { initBindings(it,binding) }
 
@@ -131,8 +132,6 @@ class NewPostFragment : Fragment() {
 
         //listeners:
         binding.buttonPanel.takePhoto.setOnClickListener {
-            //TODO вынести функцию
-            //postViewModel.changeContent(binding.edit.text?.trim().toString())
             choosenType = AttachmentType.IMAGE
             ImagePicker.Builder(this)
                 .cameraOnly()
@@ -161,7 +160,6 @@ class NewPostFragment : Fragment() {
 
         binding.buttonPanel.pickPhoto.setOnClickListener {
             postViewModel.setState(FeedModelState(loading = true))
-            //postViewModel.changeContent(binding.edit.text?.trim().toString())
             choosenType = AttachmentType.IMAGE
             ImagePicker.Builder(this)
                 .galleryOnly()
@@ -173,7 +171,6 @@ class NewPostFragment : Fragment() {
         }
 
         binding.buttonPanel.audio.setOnClickListener {
-            //postViewModel.changeContent(binding.edit.text?.trim().toString())
             val intent = Intent()
                 .setType("audio/*")
                 .setAction(Intent.ACTION_GET_CONTENT)
@@ -182,7 +179,6 @@ class NewPostFragment : Fragment() {
         }
 
         binding.buttonPanel.videoBtn.setOnClickListener {
-            //postViewModel.changeContent(binding.edit.text?.trim().toString())
             val intent = Intent()
                 .setType("video/*")
                 .setAction(Intent.ACTION_GET_CONTENT)
@@ -191,17 +187,13 @@ class NewPostFragment : Fragment() {
         }
 
         binding.buttonPanel.addUsersBtn.setOnClickListener {
-            // postViewModel.changeContent(binding.edit.text?.trim().toString())
             setFragmentResultListener("IDS") { _, bundle ->
                 val result = bundle.getLongArray("IDS")
                 if (result != null) {
-//                    userViewModel.getUsersById(result.toList())
-//                    val added = userViewModel.addedUsers.value
-//                    println("$added")
-                    //postViewModel.edited.value?.mentionIds = result.toList()
                     postViewModel.setMentions(result.toList())
-                    val attach = postViewModel.attachFile
-                    attach.value?.let { it1 -> refreshAttach(it1, binding) }
+                    postViewModel.changeLink(binding.linkEditText.text.toString())
+//                    val attach = postViewModel.attachFile
+//                    attach.value?.let { it1 -> refreshAttach(it1, binding) }
                 }
             }
             findNavController().navigate(R.id.usersAddingFragment)
@@ -216,15 +208,24 @@ class NewPostFragment : Fragment() {
 
         //appBAR:
         binding.topAppBar.setNavigationOnClickListener {
-            //postViewModel.clearEdit()
-            val link = binding.linkEditText.text.toString()
-            val content = binding.edit.text.toString()
-            if (link.isNotEmpty()) {
-                postViewModel.changeLink(link.trim())
+            //проверим, новый ли это пост или редактирование старого
+            val id = postViewModel.edited.value?.id
+            if (id != 0L) {
+                //если редактировали, очищаем лайвдаты, чтобы они не добавлялись
+                //в новом посте
+                postViewModel.clearEdit()
+            } else {
+                //если новый - оставляем данные, на случай возврата к созданию поста
+                val link = binding.linkEditText.text.toString()
+                val content = binding.edit.text.toString()
+                if (link.isNotEmpty()) {
+                    postViewModel.changeLink(link.trim())
+                }
+                if (content.isNotEmpty()) {
+                    postViewModel.changeContent(binding.edit.text.toString())
+                }
             }
-            if (content.isNotEmpty()) {
-                postViewModel.changeContent(binding.edit.text.toString())
-            }
+
             AndroidUtils.hideKeyboard(requireView())
             findNavController().navigateUp()
         }
@@ -286,91 +287,54 @@ class NewPostFragment : Fragment() {
         }
 
         postViewModel.edited.observe(viewLifecycleOwner) { post ->
-            println("POST_IDS: ${post.mentionIds}")
-            println("EDITED: ${postViewModel.edited.value}")
             userViewModel.getUsersById(post.mentionIds)
             val attach = postViewModel.attachFile
 
-            if (attach.value?.uri != null) {
-                attach.value?.let { it1 ->
-                    refreshAttach(it1, binding)
-                }
-            } else run {
-                initUI(post, binding)
-            }
-
+            initUI(post, attach.value, binding)
         }
-
-
-//        postViewModel.attachFile.observe(viewLifecycleOwner){
-//            refreshAttach(it, binding)
-//        }
 
         postViewModel.state.observe(viewLifecycleOwner) {
             binding.progressBar.isVisible = it.loading
         }
 
+        //добавить очищение вью по кнопке назад, если пост не новый!!!
+
         return binding.root
     }
 
+    private fun initUI(post: PostModel, attach: AttachModel?, binding: FragmentNewPostBinding) {
+        Log.i("NEWPOST", "initUI")
+        Log.i("NEWPOST", "post: $post")
+        Log.i("NEWPOST", "attach: ${attach?.type}")
+
+        if (post.attachment != null) {
+            refreshAttach(post.attachment?.toAttachModel(), binding)
+        } else refreshAttach(attach, binding)
+            //вот тут смотреть
 
 
-    private fun initUI(post: PostModel, binding: FragmentNewPostBinding) {
         if (post.content.isNotEmpty() && binding.edit.text.toString().isEmpty()) {
             binding.edit.setText(post.content.trim())
         }
 
-        if (post.link != null && binding.linkEditText.text.toString().isEmpty()) {
+        if (post.link != null) {
             binding.linkEditTextLayout.isVisible = true
             binding.linkEditText.setText(post.link.toString().trim())
-        }
+        } //else binding.linkEditTextLayout.isVisible = false
 
-        if (post.coords != null && binding.coordsTextView.text.isEmpty()){
+        if (post.coords != null && binding.coordsTextView.text.isEmpty()) {
             binding.coordsTextView.setText(post.coords.toString())
             binding.locationLayout.isVisible = true
         }
 
-        if (post.attachment == null) {
-            binding.attachmentContainer.visibility = View.GONE
-            return
-        } else {
-            binding.attachmentContainer.visibility = View.VISIBLE
-            when (post.attachment!!.type) {
-                AttachmentType.IMAGE -> {
-                    binding.photo.visibility = View.VISIBLE
-                    binding.audioContainer.root.visibility = View.GONE
-                    binding.videoContainer.root.visibility = View.GONE
-                    binding.photo.load(post.attachment?.url.toString())
-                }
 
-                AttachmentType.AUDIO -> {
-                    binding.audioContainer.root.visibility = View.VISIBLE
-                    binding.photo.visibility = View.GONE
-                    binding.videoContainer.root.visibility = View.GONE
-                    binding.audioContainer.audioName.text = post.attachment?.url.toString()
-                }
 
-                AttachmentType.VIDEO -> {
-                    binding.videoContainer.root.visibility = View.VISIBLE
-                    binding.photo.visibility = View.GONE
-                    binding.audioContainer.root.visibility = View.GONE
-                    binding.videoContainer.videoName.text = post.attachment?.url.toString()
-                }
-
-                else -> {
-                    binding.attachmentContainer.visibility = View.GONE
-                }
-            }
-        }
     }
 
-    private fun refreshAttach(attach: AttachModel, binding: FragmentNewPostBinding) {
-        if (attach == null) {
-            binding.attachmentContainer.visibility = View.GONE
-            return
-        } else {
+    private fun refreshAttach(attach: AttachModel?, binding: FragmentNewPostBinding) {
+        if (attach != null) {
             binding.attachmentContainer.visibility = View.VISIBLE
-            when (attach!!.type) {
+            when (attach.type) {
                 AttachmentType.IMAGE -> {
                     binding.photo.visibility = View.VISIBLE
                     binding.audioContainer.root.visibility = View.GONE
