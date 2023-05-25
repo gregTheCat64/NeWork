@@ -9,6 +9,7 @@ import android.widget.MediaController
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.core.view.isVisible
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -59,6 +60,8 @@ class PostViewHolder(
     private val binding: CardPostBinding,
     private val onInteractionListener: OnInteractionListener
 ) : RecyclerView.ViewHolder(binding.root) {
+
+    //val player = ExoPlayer.Builder(this.binding).build()
     fun bind(post: PostModel) {
         if (post.attachment != null) {
             binding.attachLayout.root.visibility = View.VISIBLE
@@ -67,6 +70,7 @@ class PostViewHolder(
                     binding.attachLayout.attachImage.load(post.attachment!!.url)
                 }
                 AttachmentType.VIDEO -> {
+                    binding.attachLayout.attachVideo.load(post.attachment!!.url)
                 }
                 AttachmentType.AUDIO -> {
                 }
@@ -137,22 +141,26 @@ class PostViewHolder(
             //video
             attachLayout.videoGroup.isVisible = post.attachment?.type == AttachmentType.VIDEO
             attachLayout.videoPlayBtn.setOnClickListener {
-                attachLayout.videoPlayBtn.isVisible = false
-
-                attachLayout.attachVideo.apply {
-                    setMediaController(MediaController(context))
-                    setVideoURI(
-                        Uri.parse(post.attachment?.url)
-                    )
-                    setOnPreparedListener {
-                        start()
-                    }
-                    setOnCompletionListener {
-                        stopPlayback()
-                        attachLayout.videoPlayBtn.isVisible = true
-                    }
-                }
+                onInteractionListener.onPlayVideo(post)
             }
+
+//            attachLayout.videoPlayBtn.setOnClickListener {
+//                attachLayout.videoPlayBtn.isVisible = false
+//
+//                attachLayout.attachVideo.apply {
+//                    setMediaController(MediaController(context))
+//                    setVideoURI(
+//                        Uri.parse(post.attachment?.url)
+//                    )
+//                    setOnPreparedListener {
+//                        start()
+//                    }
+//                    setOnCompletionListener {
+//                        stopPlayback()
+//                        attachLayout.videoPlayBtn.isVisible = true
+//                    }
+//                }
+//            }
 
             //onUserTouch
             postInfoHeader.setOnClickListener {

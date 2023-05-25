@@ -46,7 +46,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="4dp"
-                    android:textColor="@color/black"
+                    android:textStyle="bold"
                     android:text="John Doe"
                     />
 
@@ -170,14 +170,13 @@
             android:layout_height="wrap_content"
             android:background="@color/light_grey"
             android:maxLines="1"
-            android:text="lalalal"
             android:ellipsize="end"
             android:textColor="@color/grey"
             android:paddingStart="@dimen/dim16dp"
             android:paddingEnd="@dimen/dim16dp"
             android:paddingTop="@dimen/dim8dp"
             android:paddingBottom="@dimen/dim8dp"
-            android:visibility="visible"
+            android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@id/divider"
             />
     </LinearLayout>

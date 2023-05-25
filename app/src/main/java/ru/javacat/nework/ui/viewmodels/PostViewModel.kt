@@ -167,17 +167,7 @@ class PostViewModel @Inject constructor(
         }
     }
 
-    fun setAttach(uri: Uri?, type: AttachmentType?) {
-        _state.value = FeedModelState(loading = true)
-       // _attachFile.value = AttachModel(uri, type)
-        _edited.value = edited.value?.copy(attachment = type?.let {
-            AttachmentModel(uri.toString(),
-                it
-            )
-        })
 
-        _state.value = FeedModelState(idle = true)
-    }
 
     fun setNewAttach(uri: Uri?, type: AttachmentType?){
         _state.value = FeedModelState(loading = true)
@@ -213,8 +203,8 @@ class PostViewModel @Inject constructor(
     }
 
     fun clearEdit(){
+        _attachFile.value = noAttach
         _edited.value = empty
-        //_addedUsers.value = emptyList()
     }
 
 

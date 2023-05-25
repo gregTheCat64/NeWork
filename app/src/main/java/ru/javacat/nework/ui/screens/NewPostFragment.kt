@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toFile
@@ -37,6 +38,7 @@ import ru.javacat.nework.util.StringArg
 import ru.javacat.nework.util.load
 import ru.javacat.nework.util.snack
 import ru.javacat.nework.util.toFile
+import ru.javacat.nework.util.toast
 
 @AndroidEntryPoint
 class NewPostFragment : Fragment() {
@@ -70,6 +72,7 @@ class NewPostFragment : Fragment() {
     ): View {
         val binding = FragmentNewPostBinding.inflate(inflater, container, false)
         var choosenType: AttachmentType? = null
+        var postChanged = false
         Log.i("NEWPOST", "createView")
         binding.edit.requestFocus()
 
@@ -95,7 +98,8 @@ class NewPostFragment : Fragment() {
 //                }
 //        }, viewLifecycleOwner)
 
-        //pickers:
+        //pickers
+        //photo
         val pickPhotoLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                 when (it.resultCode) {
@@ -116,7 +120,7 @@ class NewPostFragment : Fragment() {
                 }
             }
 
-        //media:
+        //otherMedia:
         val pickFileLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                 when (it.resultCode) {
@@ -130,7 +134,7 @@ class NewPostFragment : Fragment() {
             }
 
 
-        //listeners:
+        //mediaInterAction listeners
         binding.buttonPanel.takePhoto.setOnClickListener {
             choosenType = AttachmentType.IMAGE
             ImagePicker.Builder(this)
@@ -193,13 +197,10 @@ class NewPostFragment : Fragment() {
                 if (result != null) {
                     postViewModel.setMentions(result.toList())
                     postViewModel.changeLink(binding.linkEditText.text.toString())
-//                    val attach = postViewModel.attachFile
-//                    attach.value?.let { it1 -> refreshAttach(it1, binding) }
                 }
             }
             findNavController().navigate(R.id.usersAddingFragment)
         }
-
 
 
         binding.clearPicBtn.setOnClickListener {
@@ -207,56 +208,8 @@ class NewPostFragment : Fragment() {
             postViewModel.deleteAttachment()
         }
 
-        //appBAR:
-        binding.topAppBar.setNavigationOnClickListener {
-            //проверим, новый ли это пост или редактирование старого
-            val id = postViewModel.edited.value?.id
-            if (id != 0L) {
-                //если редактировали, очищаем лайвдаты, чтобы они не добавлялись
-                //в новом посте
-                postViewModel.clearEdit()
-            } else {
-                //если новый - оставляем данные, на случай возврата к созданию поста
-                val link = binding.linkEditText.text.toString()
-                val content = binding.edit.text.toString()
-                if (link.isNotEmpty()) {
-                    postViewModel.changeLink(link.trim())
-                }
-                if (content.isNotEmpty()) {
-                    postViewModel.changeContent(binding.edit.text.toString())
-                }
-            }
 
-            AndroidUtils.hideKeyboard(requireView())
-            findNavController().navigateUp()
-        }
-
-        binding.topAppBar.setOnMenuItemClickListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.create -> {
-                    val link = binding.linkEditText.text.toString()
-                    val content = binding.edit.text.toString()
-                    if (link.isNotEmpty()) {
-                        postViewModel.changeLink(link.trim())
-                    }
-                    if (content.isNotEmpty()) {
-                        postViewModel.changeContent(binding.edit.text.toString())
-                        postViewModel.save(choosenType)
-                        AndroidUtils.hideKeyboard(requireView())
-                    } else {
-                        snack("Поле сообщения не должно быть пустым")
-                    }
-                    true
-                }
-
-                else -> {
-                    false
-                }
-            }
-
-        }
-
-        //bottomBar
+        //moreBtn
         binding.buttonPanel.moreIconsBtn.setOnClickListener {
             it.visibility = View.GONE
             binding.buttonPanel.videoBtn.isVisible = true
@@ -290,7 +243,7 @@ class NewPostFragment : Fragment() {
         postViewModel.edited.observe(viewLifecycleOwner) { post ->
             userViewModel.getUsersById(post.mentionIds)
             val attach = postViewModel.attachFile
-
+            //toast("$postChanged")
             initUI(post, attach.value, binding)
         }
 
@@ -298,7 +251,71 @@ class NewPostFragment : Fragment() {
             binding.progressBar.isVisible = it.loading
         }
 
-        //добавить очищение вью по кнопке назад, если пост не новый!!!
+        //navigation
+        binding.topAppBar.setNavigationOnClickListener {
+            postViewModel.clearEdit()
+            findNavController().navigateUp()
+        }
+
+        binding.topAppBar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.create -> {
+                    val link = binding.linkEditText.text.toString()
+                    val content = binding.edit.text.toString()
+                    if (link.isNotEmpty()) {
+                        postViewModel.changeLink(link.trim())
+                    }
+                    if (content.isNotEmpty()) {
+                        postViewModel.changeContent(binding.edit.text.toString())
+                        postViewModel.save(choosenType)
+                        AndroidUtils.hideKeyboard(requireView())
+                    } else {
+                        snack("Поле сообщения не должно быть пустым")
+                    }
+                    true
+                }
+
+                else -> {
+                    false
+                }
+            }
+
+        }
+
+        //кнопка НАЗАД
+        val callback = requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            //проверим, новый ли это пост или редактирование старого
+            val id = postViewModel.edited.value?.id
+            if (id != 0L) {
+                //если редактировали, очищаем лайвдаты, чтобы они не добавлялись
+                //в новом посте
+                postViewModel.clearEdit()
+            } else {
+                //если новый - оставляем данные, на случай возврата к созданию поста
+                val link = binding.linkEditText.text.toString()
+                val content = binding.edit.text.toString()
+                if (link.isNotEmpty()) {
+                    postChanged = true
+                    postViewModel.changeLink(link.trim())
+                }
+                if (content.isNotEmpty()) {
+                    postChanged = true
+                    postViewModel.changeContent(content)
+                }
+                if (link.isNotEmpty() ||
+                    content.isNotEmpty() ||
+                    postViewModel.edited.value?.coords != null ||
+                    postViewModel.attachFile.value?.uri != null ||
+                    postViewModel.userPosts.value?.size != null
+                ) {
+                    toast("Черновик сохранён")
+                }
+
+            }
+            AndroidUtils.hideKeyboard(requireView())
+            findNavController().navigateUp()
+
+        }
 
         return binding.root
     }
@@ -311,7 +328,7 @@ class NewPostFragment : Fragment() {
         if (post.attachment != null) {
             refreshAttach(post.attachment?.toAttachModel(), binding)
         } else refreshAttach(attach, binding)
-            //вот тут смотреть
+        //вот тут смотреть
 
 
         if (post.content.isNotEmpty() && binding.edit.text.toString().isEmpty()) {
@@ -327,7 +344,6 @@ class NewPostFragment : Fragment() {
             binding.coordsTextView.setText(post.coords.toString())
             binding.locationLayout.isVisible = true
         }
-
 
 
     }

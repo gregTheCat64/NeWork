@@ -43,6 +43,7 @@
                     android:id="@+id/name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textStyle="bold"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="4dp"
                     android:text="@string/default_name"
@@ -54,6 +55,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginBottom="4dp"
+
                     android:text="@string/default_date"
                     app:layout_constraintBottom_toBottomOf="@+id/avatar"
                     app:layout_constraintStart_toEndOf="@+id/avatar" />
@@ -122,7 +124,6 @@
                     android:layout_marginTop="@dimen/dim8dp"
                     android:text="Когда:"
                     android:layout_marginStart="8dp"
-                    android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     />
@@ -134,7 +135,6 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginStart="8dp"
                     android:text="Где:"
-                    android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/whenTextView" />
 
@@ -142,6 +142,7 @@
                     android:id="@+id/dateOfEvent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textStyle="bold"
                     android:text="@string/default_date_of_event"
                     android:layout_marginStart="@dimen/dim16dp"
                     app:layout_constraintStart_toEndOf="@+id/whenTextView"
@@ -169,7 +170,6 @@
                     android:id="@+id/speakersTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textStyle="bold"
                     android:text="Спикеры:"
                     android:layout_marginTop="@dimen/dim8dp"
                     app:layout_constraintStart_toStartOf="@+id/formatTextView"
@@ -181,6 +181,7 @@
                     android:layout_height="wrap_content"
                     android:inputType="textMultiLine"
                     android:layout_marginStart="@dimen/dim16dp"
+                    android:textStyle="bold"
                     app:layout_constraintTop_toTopOf="@id/speakersTextView"
                     app:layout_constraintStart_toEndOf="@id/speakersTextView"
                     />
@@ -195,7 +196,6 @@
                     android:layout_marginTop="@dimen/dim8dp"
                     android:layout_marginStart="8dp"
                     android:text="@string/format"
-                    android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/locationOfEvent" />
                 <TextView
@@ -203,6 +203,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/dim16dp"
+                    android:textStyle="bold"
                     android:text="@string/default_format"
                     app:layout_constraintStart_toEndOf="@+id/formatTextView"
                     app:layout_constraintTop_toTopOf="@+id/formatTextView" />

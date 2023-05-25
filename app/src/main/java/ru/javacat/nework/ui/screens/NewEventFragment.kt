@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
@@ -31,6 +32,7 @@ import ru.javacat.nework.domain.model.FeedModelState
 import ru.javacat.nework.domain.model.PostModel
 import ru.javacat.nework.domain.model.User
 import ru.javacat.nework.domain.model.UsersType
+import ru.javacat.nework.domain.model.toAttachModel
 import ru.javacat.nework.ui.adapter.OnUserListener
 import ru.javacat.nework.ui.adapter.UsersAdapter
 import ru.javacat.nework.ui.viewmodels.EventViewModel
@@ -97,7 +99,7 @@ class NewEventFragment : Fragment() {
 
                     Activity.RESULT_OK -> {
                         val uri: Uri? = it.data?.data
-                        eventViewModel.changeAttach(uri, choosenType)
+                        eventViewModel.setNewAttach(uri, choosenType)
                         val attach = eventViewModel.attachFile
                         attach.value?.let { it1 -> refreshAttach(it1, binding) }
                     }
@@ -110,7 +112,7 @@ class NewEventFragment : Fragment() {
                 when (it.resultCode) {
                     Activity.RESULT_OK -> {
                         val file = it.data?.data?.toFile(requireContext())
-                        eventViewModel.changeAttach(file?.toUri(), choosenType)
+                        eventViewModel.setNewAttach(file?.toUri(), choosenType)
                         val attach = eventViewModel.attachFile
                         attach.value?.let { it1 -> refreshAttach(it1, binding) }
                     }
@@ -210,7 +212,7 @@ class NewEventFragment : Fragment() {
             findNavController().navigate(R.id.mapsFragment)
         }
 
-        //appBar
+        //Навигация
         binding.topAppBar.setNavigationOnClickListener {
             eventViewModel.clearEdit()
             AndroidUtils.hideKeyboard(requireView())
@@ -232,7 +234,6 @@ class NewEventFragment : Fragment() {
                         eventViewModel.changeContent(content.trim())
                         val start = "$startDate $startTime:00"
                         eventViewModel.setStartDateTime(start)
-                        //Toast.makeText(requireContext(), start, Toast.LENGTH_SHORT).show()
 
                         val link = binding.linkEditText.text.toString()
                         if (link.isNotEmpty()) {
@@ -241,14 +242,41 @@ class NewEventFragment : Fragment() {
                         eventViewModel.save()
                         AndroidUtils.hideKeyboard(requireView())
                     }
-
                     true
                 }
-
                 else -> {
                     false
                 }
             }
+        }
+
+        //кнопка НАЗАД
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner){
+            val id = eventViewModel.edited.value?.id
+            if (id != 0L){
+                eventViewModel.clearEdit()
+            }else {
+                val content = binding.eventEditText.text.toString()
+                val link = binding.linkEditText.text.toString()
+                val startDate = binding.dateEditText.text.toString()
+                val startTime = binding.timeEditText.text.toString()
+
+                if (startDate.isNotEmpty() && startTime.isNotEmpty()){
+                    val start = "$startDate $startTime:00"
+                    eventViewModel.setStartDateTime(start)
+                }
+
+                if (link.isNotEmpty()){
+                    eventViewModel.setLink(link.trim())
+                }
+                if (content.isNotEmpty()) {
+                    eventViewModel.changeContent(content)
+                }
+                toast("Черновик сохранён")
+
+            }
+            findNavController().navigateUp()
+
         }
 
         //lists:
@@ -259,11 +287,7 @@ class NewEventFragment : Fragment() {
             userViewModel.getUsersById(event.speakerIds)
             val attach = eventViewModel.attachFile
 
-            if (attach.value?.uri != null) {
-                refreshAttach(attach.value!!, binding)
-            } else{
-                initUI(event, binding)
-            }
+           initUI(event, attach.value, binding)
 
         }
 
@@ -284,13 +308,12 @@ class NewEventFragment : Fragment() {
                 val locationText = "${it[0]}, ${it[1]}"
                 binding.locationEditText.setText(locationText)
             }
-
         }
 
         return binding.root
     }
 
-    private fun initUI(event: EventModel, binding: FragmentNewEventBinding) {
+    private fun initUI(event: EventModel, attach: AttachModel?, binding: FragmentNewEventBinding) {
         if (event.content.isNotEmpty() && binding.eventEditText.text.toString().isEmpty()) {
             binding.eventEditText.setText(event.content.trim())
         }
@@ -323,43 +346,12 @@ class NewEventFragment : Fragment() {
             binding.locationEditText.setText(event.coords.toString())
         }
 
-
-        if (event.attachment == null) {
-            binding.attachmentContainer.visibility = View.GONE
-            return
-        } else {
-            binding.attachmentContainer.visibility = View.VISIBLE
-            when (event.attachment.type) {
-                AttachmentType.IMAGE -> {
-                    binding.photo.visibility = View.VISIBLE
-                    binding.audioContainer.root.visibility = View.GONE
-                    binding.videoContainer.root.visibility = View.GONE
-                    binding.photo.load(event.attachment.url)
-                }
-
-                AttachmentType.AUDIO -> {
-                    binding.audioContainer.root.visibility = View.VISIBLE
-                    binding.photo.visibility = View.GONE
-                    binding.videoContainer.root.visibility = View.GONE
-                    binding.audioContainer.audioName.text = event.attachment.url
-                }
-
-                AttachmentType.VIDEO -> {
-                    binding.videoContainer.root.visibility = View.VISIBLE
-                    binding.photo.visibility = View.GONE
-                    binding.audioContainer.root.visibility = View.GONE
-                    binding.videoContainer.videoName.text = event.attachment.url
-                }
-
-                else -> {
-                    binding.attachmentContainer.visibility = View.GONE
-                }
-            }
-
-        }
+        if (event.attachment != null) {
+            refreshAttach(event.attachment.toAttachModel(), binding)
+        } else refreshAttach(attach, binding)
     }
 
-    private fun refreshAttach(attach: AttachModel, binding: FragmentNewEventBinding) {
+    private fun refreshAttach(attach: AttachModel?, binding: FragmentNewEventBinding) {
         if (attach == null) {
             binding.attachmentContainer.visibility = View.GONE
             return

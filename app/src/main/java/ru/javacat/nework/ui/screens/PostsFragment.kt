@@ -17,6 +17,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import com.google.android.gms.location.LocationServices
@@ -48,6 +50,8 @@ class PostsFragment : Fragment() {
     private val postViewModel: PostViewModel by activityViewModels()
 
     private val mediaObserver = MediaLifecycleObserver()
+
+
 
 
     private val requestPermissionLauncher =
@@ -173,6 +177,13 @@ class PostsFragment : Fragment() {
 //                    post.playBtnPressed = false
 //                    it.stop()
 //                }
+            }
+
+            override fun onPlayVideo(post: PostModel) {
+                val bundle = Bundle()
+                bundle.putString("URL", post.attachment?.url)
+                findNavController().navigate(R.id.videoPlayerFragment, bundle)
+
             }
 
             override fun onUser(post: PostModel) {

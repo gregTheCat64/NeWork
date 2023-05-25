@@ -97,21 +97,22 @@ class UserPostsViewHolder(
             //video
             attachLayout.videoGroup.isVisible = post.attachment?.type == AttachmentType.VIDEO
             attachLayout.videoPlayBtn.setOnClickListener {
-                attachLayout.videoPlayBtn.isVisible = false
-
-                attachLayout.attachVideo.apply {
-                    setMediaController(MediaController(context))
-                    setVideoURI(
-                        Uri.parse(post.attachment?.url)
-                    )
-                    setOnPreparedListener {
-                        start()
-                    }
-                    setOnCompletionListener {
-                        stopPlayback()
-                        attachLayout.videoPlayBtn.isVisible = true
-                    }
-                }
+                //attachLayout.videoPlayBtn.isVisible = false
+                onInteractionListener.onPlayVideo(post)
+//                attachLayout.attachVideo.apply {
+//
+//                    setMediaController(MediaController(context))
+//                    setVideoURI(
+//                        Uri.parse(post.attachment?.url)
+//                    )
+//                    setOnPreparedListener {
+//                        start()
+//                    }
+//                    setOnCompletionListener {
+//                        stopPlayback()
+//                        attachLayout.videoPlayBtn.isVisible = true
+//                    }
+//                }
             }
 
             //onUserTouch

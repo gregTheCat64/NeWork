@@ -124,12 +124,11 @@ class EventViewModel @Inject constructor(
 
     fun likeById(id: Long) {
         viewModelScope.launch { repository.likeById(id) }
-
-
     }
 
-    fun changeAttach(uri: Uri?, type: AttachmentType?) {
+    fun setNewAttach(uri: Uri?, type: AttachmentType?){
         _state.value = FeedModelState(loading = true)
+        _edited.value = _edited.value?.copy(attachment = null)
         _attachFile.value = AttachModel(uri, type)
         _state.value = FeedModelState(idle = true)
     }
@@ -192,10 +191,11 @@ class EventViewModel @Inject constructor(
         viewModelScope.launch {
             repository.createParticipant(event)
         }
-
     }
 
     fun clearEdit(){
+        _attachFile.value = noAttach
+        _point.value = noPoint
         _edited.value = emptyEvent
     }
 

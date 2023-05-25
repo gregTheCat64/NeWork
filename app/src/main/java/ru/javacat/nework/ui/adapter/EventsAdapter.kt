@@ -29,6 +29,8 @@ interface OnEventsListener {
     fun onRemove(event: EventModel) {}
     fun onShare(event: EventModel) {}
     fun onPlayAudio(event: EventModel){}
+
+    fun onPlayVideo(event: EventModel){}
     fun onParticipant(event: EventModel){}
     fun onUser(event: EventModel){}
 
@@ -66,7 +68,7 @@ class EventViewHolder(
                     binding.attachLayout.attachImage.load(event.attachment.url)
                 }
                 AttachmentType.VIDEO -> {
-
+                    binding.attachLayout.attachVideo.load(event.attachment!!.url)
                 }
                 AttachmentType.AUDIO -> {
 
@@ -158,20 +160,21 @@ class EventViewHolder(
             //video
             attachLayout.videoGroup.isVisible = event.attachment?.type == AttachmentType.VIDEO
             attachLayout.videoPlayBtn.setOnClickListener {
-                attachLayout.videoPlayBtn.isVisible = false
+               onEventsListener.onPlayVideo(event)
 
                 attachLayout.attachVideo.apply {
-                    setMediaController(MediaController(context))
-                    setVideoURI(
-                        Uri.parse(event.attachment?.url)
-                    )
-                    setOnPreparedListener {
-                        start()
-                    }
-                    setOnCompletionListener {
-                        stopPlayback()
-                        attachLayout.videoPlayBtn.isVisible = true
-                    }
+
+//                    setMediaController(MediaController(context))
+//                    setVideoURI(
+//                        Uri.parse(event.attachment?.url)
+//                    )
+//                    setOnPreparedListener {
+//                        start()
+//                    }
+//                    setOnCompletionListener {
+//                        stopPlayback()
+//                        attachLayout.videoPlayBtn.isVisible = true
+//                    }
                 }
             }
 
