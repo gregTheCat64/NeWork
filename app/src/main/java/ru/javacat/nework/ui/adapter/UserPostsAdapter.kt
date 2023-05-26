@@ -98,7 +98,7 @@ class UserPostsViewHolder(
             attachLayout.videoGroup.isVisible = post.attachment?.type == AttachmentType.VIDEO
             attachLayout.videoPlayBtn.setOnClickListener {
                 //attachLayout.videoPlayBtn.isVisible = false
-                onInteractionListener.onPlayVideo(post)
+                onInteractionListener.onPlayVideo(post.attachment?.url.toString())
 //                attachLayout.attachVideo.apply {
 //
 //                    setMediaController(MediaController(context))

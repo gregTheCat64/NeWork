@@ -5,25 +5,38 @@ import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.SeekBar
 import android.widget.TableLayout
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.view.menu.ActionMenuItemView
 import androidx.core.net.toUri
 import androidx.core.view.MenuProvider
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.common.Timeline
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.findNavController
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import ru.javacat.nework.R
 import ru.javacat.nework.data.auth.AppAuth
 import ru.javacat.nework.databinding.ActivityAppBinding
@@ -33,6 +46,7 @@ import ru.javacat.nework.ui.screens.NewPostFragment.Companion.textArg
 import ru.javacat.nework.ui.viewmodels.AuthViewModel
 import ru.javacat.nework.ui.viewmodels.UserViewModel
 import javax.inject.Inject
+import kotlin.math.round
 
 @AndroidEntryPoint
 class AppActivity : AppCompatActivity() {
@@ -47,19 +61,50 @@ class AppActivity : AppCompatActivity() {
     @Inject
     lateinit var googleApiAvailability: GoogleApiAvailability
 
+    var duration = 0L
+
     val viewModel: AuthViewModel by viewModels()
     val userViewModel: UserViewModel by viewModels()
+
+    private lateinit var player: ExoPlayer
+    private lateinit var binding: ActivityAppBinding
 
     //private val postViewModel: PostViewModel by viewModels()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val binding = ActivityAppBinding.inflate(layoutInflater)
+        binding = ActivityAppBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        player = ExoPlayer.Builder(this).build()
 
+        val audioBar = findViewById<View>(R.id.audioBar)
+        val barPlayBtn = findViewById<Button>(R.id.barPlayBtn)
+        val barSeekBar = findViewById<SeekBar>(R.id.barSeekBar)
 
+        barPlayBtn.setOnClickListener {
+            if (player.isPlaying){
+                player.pause()
+            } else player.play()
+        }
+
+        barSeekBar.setOnSeekBarChangeListener(object :SeekBar.OnSeekBarChangeListener{
+
+            private var mprogress = 0
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser) mprogress = progress
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                seekBar?.progress = mprogress
+                player.seekTo((mprogress.toLong()*duration)/100)
+            }
+        })
 
 
         //***Так настраивается bottomNavigationBar
@@ -145,9 +190,49 @@ class AppActivity : AppCompatActivity() {
                 currentMenuProvider = this
             })
         }
+    }
+
+    fun playAudio(url: String){
+
+        val mediaItem = MediaItem.fromUri(url)
 
 
+        player.clearMediaItems()
+        player.setMediaItem(mediaItem)
+        player.prepare()
 
+        player.play()
+
+        val scope = CoroutineScope(Dispatchers.Main)
+
+        player.addListener(object : Player.Listener {
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                super.onPlaybackStateChanged(playbackState)
+                Log.i("MYSTATE", playbackState.toString())
+                binding.audioBar.root.isVisible = true
+                    //playbackState == Player.STATE_READY
+
+                scope.launch {
+                    while (playbackState == Player.STATE_READY) {
+                        val position = player.currentPosition
+                        val positionInSec = round(position.toDouble()/1000).toInt()
+                        duration  = player.contentDuration
+                        val durationInSec = round(duration.toDouble()/1000).toInt()
+                        binding.audioBar.barSeekBar.progress = calculateProgress(position, duration)
+                        binding.audioBar.barPlayBtn.text = "$positionInSec/$durationInSec"
+                        Log.i("POS", position.toString())
+                        delay(1000)
+                    }
+                }
+                //scope.cancel()
+                //duration = 0L
+            }
+        })
+
+    }
+
+    fun calculateProgress(position:Long, duration: Long): Int {
+        return ((position.toDouble()/duration.toDouble())*100).toInt()
     }
 
 //    private fun showMenu(view: View) {
@@ -215,4 +300,6 @@ class AppActivity : AppCompatActivity() {
 //            println(it)
 //        }
 //    }
+
 }
+

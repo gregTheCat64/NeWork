@@ -76,16 +76,13 @@ class EventsFragment : Fragment() {
                 showUserListDialog(event.participantsIds, childFragmentManager)
             }
 
-            override fun onPlayVideo(event: EventModel) {
-                val bundle = Bundle()
-                bundle.putString("URL", event.attachment?.url)
-                findNavController().navigate(R.id.videoPlayerFragment, bundle)
+            override fun onPlayVideo(url: String) {
+                showVideoDialog(url, childFragmentManager)
             }
 
             override fun onUser(event: EventModel) {
                 val bundle = Bundle()
                 bundle.putLong("userID", event.authorId)
-                //val action = PostsFragmentDirections.actionNavigationPostsToWallFragment(post.authorId)
                 findNavController().navigate(R.id.wallFragment, bundle)
             }
 

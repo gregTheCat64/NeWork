@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.LinearLayoutCompat
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -34,7 +35,7 @@
 
     <FrameLayout
         android:id="@+id/videoGroup"
-        android:visibility="gone"
+        android:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -54,13 +55,13 @@
             android:id="@+id/videoPlayBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+            style="@style/Widget.Material3.Button.IconButton.Outlined"
             android:layout_gravity="center"
             app:layout_constraintTop_toTopOf="@id/attachVideo"
             app:layout_constraintStart_toStartOf="@id/attachVideo"
             app:layout_constraintEnd_toEndOf="@id/attachVideo"
             app:layout_constraintBottom_toBottomOf="@id/attachVideo"
-            android:text="Воспроизвести"
+
             app:icon="@drawable/ic_baseline_play_circle_24"
             />
     </FrameLayout>

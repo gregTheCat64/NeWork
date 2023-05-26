@@ -31,6 +31,14 @@ fun showImageDialog(url:String,fm: FragmentManager) {
     dialog.show(fm,"")
 }
 
+fun showVideoDialog(url: String, fm: FragmentManager){
+    val dialog = VideoPlayerFragment()
+    val dialogBundle = Bundle()
+    dialogBundle.putString("URL", url)
+    dialog.arguments = dialogBundle
+    dialog.show(fm, "")
+}
+
 fun showUserListDialog(ids: List<Long>, fm: FragmentManager){
     val userListDialog = UserListDialogFragment()
     val bundle = Bundle()

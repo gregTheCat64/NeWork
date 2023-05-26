@@ -128,8 +128,8 @@ class WallFragment : Fragment() {
                 }
             }
 
-            override fun onPlayVideo(post: PostModel) {
-                super.onPlayVideo(post)
+            override fun onPlayVideo(url: String) {
+                showVideoDialog(url, childFragmentManager)
             }
 
             override fun onImage(url: String) {

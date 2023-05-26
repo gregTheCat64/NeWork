@@ -30,7 +30,7 @@ interface OnEventsListener {
     fun onShare(event: EventModel) {}
     fun onPlayAudio(event: EventModel){}
 
-    fun onPlayVideo(event: EventModel){}
+    fun onPlayVideo(url: String){}
     fun onParticipant(event: EventModel){}
     fun onUser(event: EventModel){}
 
@@ -160,7 +160,7 @@ class EventViewHolder(
             //video
             attachLayout.videoGroup.isVisible = event.attachment?.type == AttachmentType.VIDEO
             attachLayout.videoPlayBtn.setOnClickListener {
-               onEventsListener.onPlayVideo(event)
+               onEventsListener.onPlayVideo(event.attachment?.url.toString())
 
                 attachLayout.attachVideo.apply {
 

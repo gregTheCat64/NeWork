@@ -30,7 +30,7 @@ interface OnInteractionListener {
     fun onShare(post: PostModel) {}
     fun onResave(post: PostModel) {}
     fun onPlayAudio(post: PostModel) {}
-    fun onPlayVideo(post: PostModel) {}
+    fun onPlayVideo(url: String) {}
     fun onImage(url: String) {}
     fun onUser(post: PostModel) {}
     fun onMention(post: PostModel){}
@@ -141,7 +141,7 @@ class PostViewHolder(
             //video
             attachLayout.videoGroup.isVisible = post.attachment?.type == AttachmentType.VIDEO
             attachLayout.videoPlayBtn.setOnClickListener {
-                onInteractionListener.onPlayVideo(post)
+                onInteractionListener.onPlayVideo(post.attachment?.url.toString())
             }
 
 //            attachLayout.videoPlayBtn.setOnClickListener {

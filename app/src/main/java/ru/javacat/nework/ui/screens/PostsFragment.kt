@@ -8,6 +8,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.SeekBar
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -18,7 +20,11 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.common.Timeline
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerControlView
+import androidx.media3.ui.PlayerView
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import com.google.android.gms.location.LocationServices
@@ -53,7 +59,6 @@ class PostsFragment : Fragment() {
 
 
 
-
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
@@ -72,8 +77,12 @@ class PostsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentPostsBinding.inflate(inflater, container, false)
+        //val audioBar = activity?.findViewById<PlayerControlView>(R.id.audioBar)
+//
 
+        //audioBar?.player = player
         //postViewModel.refresh()
+
 
         //Доступ к локации:
         lifecycle.coroutineScope.launchWhenCreated {
@@ -157,16 +166,19 @@ class PostsFragment : Fragment() {
             }
 
             override fun onPlayAudio(post: PostModel) {
-                post.playBtnPressed = !post.playBtnPressed
-                mediaObserver.apply {
-                    if (!mediaPlayer!!.isPlaying) {
-                        mediaPlayer?.reset()
-                        mediaPlayer?.setDataSource(post.attachment?.url)
-                        this.play()
-                    } else {
-                        mediaPlayer!!.pause()
-                    }
-                }
+                (requireActivity() as AppActivity).playAudio(post.attachment?.url.toString())
+
+                //showVideoDialog(post.attachment?.url.toString(), childFragmentManager)
+//                post.playBtnPressed = !post.playBtnPressed
+//                mediaObserver.apply {
+//                    if (!mediaPlayer!!.isPlaying) {
+//                        mediaPlayer?.reset()
+//                        mediaPlayer?.setDataSource(post.attachment?.url)
+//                        this.play()
+//                    } else {
+//                        mediaPlayer!!.pause()
+//                    }
+//                }
 
 
 //                val audioPlayer = MediaPlayer.create(context, post.attachment?.url.toString().toUri())
@@ -179,10 +191,11 @@ class PostsFragment : Fragment() {
 //                }
             }
 
-            override fun onPlayVideo(post: PostModel) {
-                val bundle = Bundle()
-                bundle.putString("URL", post.attachment?.url)
-                findNavController().navigate(R.id.videoPlayerFragment, bundle)
+            override fun onPlayVideo(url: String) {
+                showVideoDialog(url, childFragmentManager)
+//                val bundle = Bundle()
+//                bundle.putString("URL", post.attachment?.url)
+//                findNavController().navigate(R.id.videoPlayerFragment, bundle)
 
             }
 
