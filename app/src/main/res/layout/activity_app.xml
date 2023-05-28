@@ -1,50 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
+    android:background="@color/color_primary"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.screens.AppActivity">
 
-<!--    <com.google.android.material.appbar.AppBarLayout-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        >-->
 
-<!--        <com.google.android.material.appbar.MaterialToolbar-->
-<!--            android:id="@+id/topAppBar"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="?attr/actionBarSize"-->
-<!--            app:title="NeWork"-->
-<!--            app:menu="@menu/menu_main"-->
-<!--            style="@style/Widget.MaterialComponents.Toolbar.Primary"-->
-<!--            />-->
-<!--    </com.google.android.material.appbar.AppBarLayout>-->
-
-    <include
-        android:id="@+id/audioBar"
-        layout="@layout/audio_bar"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        />
-
-
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/nav_host_fragment"
-        android:name="androidx.navigation.fragment.NavHostFragment"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:defaultNavHost="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/audioBar"
-        app:navGraph="@navigation/nav_main" />
+        app:layout_scrollFlags="scroll|snap"
+        android:orientation="vertical"
+        >
+        <include
+            android:id="@+id/topAppBar"
+            layout="@layout/app_bar"
+            />
+
+        <include
+            android:id="@+id/audioBar"
+            layout="@layout/audio_bar"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/nav_host_fragment"
+                android:name="androidx.navigation.fragment.NavHostFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:backgroundTint="@color/color_primary"
+                app:defaultNavHost="true"
+                app:navGraph="@navigation/nav_main" />
+
+
+
+    </LinearLayout>
+
+
+<!--        <com.google.android.material.appbar.AppBarLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:layout_scrollFlags="scroll|snap"-->
+<!--            >-->
+
+<!--            <com.google.android.material.appbar.MaterialToolbar-->
+<!--                android:id="@+id/topAppBar"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="?attr/actionBarSize"-->
+<!--                app:layout_scrollFlags="scroll|snap"-->
+<!--                app:title="NeWork"-->
+<!--                app:menu="@menu/menu_main"-->
+<!--                style="@style/Widget.MaterialComponents.Toolbar.Primary"-->
+<!--                />-->
+<!--        </com.google.android.material.appbar.AppBarLayout>-->
 
 
 
 
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

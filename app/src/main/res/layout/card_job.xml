@@ -5,6 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_margin="@dimen/dim8dp"
+    app:cardCornerRadius="@dimen/dim16dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
 
@@ -13,7 +14,7 @@
     <TableLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="@dimen/dim8dp"
+        android:padding="@dimen/dim16dp"
         android:layout_marginEnd="@dimen/dim8dp"
         >
 
@@ -21,6 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:layout_gravity="top"
             android:backgroundTint="@color/color_primary"
             >
             <TextView

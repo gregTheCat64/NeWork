@@ -45,4 +45,6 @@
     <string name="assign_Users">назначить</string>
     <string name="Link">Ссылка</string>
     <string name="online">Онлайн</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="sign_in">Sign In</string>
 </resources>

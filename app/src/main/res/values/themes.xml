@@ -1,8 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.NeWork" parent="Theme.Material3.DayNight">
+    <style name="Theme.NeWork" parent="Theme.Material3.Light.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">#FF5722</item>
+        <item name="colorPrimary">#02433D</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
@@ -10,9 +10,9 @@
         <item name="colorSecondaryVariant">@color/teal_700</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor">#76130C</item>
+        <item name="android:statusBarColor">#02433D</item>
                 <!-- Customize your theme here. -->
-        <item name="android:colorPrimary">#FF5722</item>
+        <item name="android:colorPrimary">#02433D</item>
 
     </style>
 
@@ -43,13 +43,16 @@
          <item name="android:inset">12dp</item>
         <item name="android:minWidth">@dimen/icon_button_min_size</item>
         <item name="android:minHeight">@dimen/icon_button_min_size</item>
-
+    </style>
+    
+    <style name="SeekBar" parent="Widget.AppCompat.SeekBar">
+        <item name="colorAccent">@color/white</item>
     </style>
 
     <style name="TextAppearance.AppCompat.WhiteCaption" parent="TextAppearance.AppCompat.Caption">
         <item name="android:textColor">@color/white</item>
         <item name="tint">@color/white</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">22sp</item>
     </style>
 
     <style name="Widget.AppCompat.TextButton.Checked" parent="Widget.Material3.Button.TextButton">

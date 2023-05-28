@@ -12,6 +12,7 @@ import android.widget.Button
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -43,6 +44,7 @@ import ru.javacat.nework.ui.adapter.OnInteractionListener
 import ru.javacat.nework.ui.adapter.PostsAdapter
 import ru.javacat.nework.ui.screens.NewPostFragment.Companion.textArg
 import ru.javacat.nework.ui.viewmodels.PostViewModel
+import ru.javacat.nework.ui.viewmodels.UserViewModel
 import java.io.Serializable
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -54,7 +56,7 @@ class PostsFragment : Fragment() {
 
 
     private val postViewModel: PostViewModel by activityViewModels()
-
+    val userViewModel: UserViewModel by viewModels()
     private val mediaObserver = MediaLifecycleObserver()
 
 

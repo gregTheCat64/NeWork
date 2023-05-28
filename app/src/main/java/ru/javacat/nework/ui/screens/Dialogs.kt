@@ -112,7 +112,9 @@ fun showSignInDialog(fragment: Fragment) {
 fun showSignOutDialog(appAuth: AppAuth, context: Context) {
     val listener = DialogInterface.OnClickListener { _, which ->
         when (which) {
-            DialogInterface.BUTTON_POSITIVE -> appAuth.removeAuth()
+            DialogInterface.BUTTON_POSITIVE -> {
+                appAuth.removeAuth()
+            }
             DialogInterface.BUTTON_NEGATIVE -> Toast.makeText(
                 context,
                 "ну и ладненько...",

@@ -117,15 +117,7 @@ class WallFragment : Fragment() {
 
             override fun onPlayAudio(post: PostModel) {
                 post.playBtnPressed = !post.playBtnPressed
-                mediaObserver.apply {
-                    if (!mediaPlayer!!.isPlaying) {
-                        mediaPlayer?.reset()
-                        mediaPlayer?.setDataSource(post.attachment?.url)
-                        this.play()
-                    } else {
-                        mediaPlayer!!.pause()
-                    }
-                }
+                (requireActivity() as AppActivity).playAudio(post.attachment?.url.toString())
             }
 
             override fun onPlayVideo(url: String) {

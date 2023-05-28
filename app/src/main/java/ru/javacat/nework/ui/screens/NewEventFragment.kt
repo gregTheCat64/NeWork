@@ -19,6 +19,7 @@ import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.github.dhaval2404.imagepicker.ImagePicker
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import ru.javacat.nework.R
@@ -51,20 +52,20 @@ class NewEventFragment : Fragment() {
     private val eventViewModel: EventViewModel by activityViewModels()
     private val userViewModel: UserViewModel by activityViewModels()
 
-    override fun onStart() {
-        super.onStart()
-        (activity as AppCompatActivity).supportActionBar!!.hide()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        (activity as AppCompatActivity).supportActionBar!!.show()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        (activity as AppCompatActivity).supportActionBar!!.hide()
-    }
+//    override fun onStart() {
+//        super.onStart()
+//        (activity as AppCompatActivity).findViewById<MaterialToolbar>(R.id.topAppBar)!!.visibility = View.GONE
+//    }
+//
+//    override fun onStop() {
+//        super.onStop()
+//        (activity as AppCompatActivity).findViewById<MaterialToolbar>(R.id.topAppBar)!!.visibility = View.VISIBLE
+//    }
+//
+//    override fun onResume() {
+//        super.onResume()
+//        (activity as AppCompatActivity).findViewById<MaterialToolbar>(R.id.topAppBar)!!.visibility = View.GONE
+//    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

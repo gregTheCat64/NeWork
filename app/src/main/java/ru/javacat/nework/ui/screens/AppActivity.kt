@@ -1,11 +1,9 @@
 package ru.javacat.nework.ui.screens
 
-import android.app.AlertDialog
-import android.content.DialogInterface
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
+import android.view.ContextMenu
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -13,38 +11,31 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.SeekBar
-import android.widget.TableLayout
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.appcompat.view.menu.ActionMenuItemView
-import androidx.core.net.toUri
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
-import androidx.media3.common.Timeline
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.findNavController
-import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
-import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ru.javacat.nework.R
 import ru.javacat.nework.data.auth.AppAuth
 import ru.javacat.nework.databinding.ActivityAppBinding
-import ru.javacat.nework.databinding.FragmentPostsBinding
-import ru.javacat.nework.ui.adapter.ViewPagerAdapter
-import ru.javacat.nework.ui.screens.NewPostFragment.Companion.textArg
 import ru.javacat.nework.ui.viewmodels.AuthViewModel
 import ru.javacat.nework.ui.viewmodels.UserViewModel
+import ru.javacat.nework.util.load
+import ru.javacat.nework.util.loadAvatar
+import ru.javacat.nework.util.loadCircleCrop
 import javax.inject.Inject
 import kotlin.math.round
 
@@ -77,20 +68,37 @@ class AppActivity : AppCompatActivity() {
         binding = ActivityAppBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        //player
         player = ExoPlayer.Builder(this).build()
 
         val audioBar = findViewById<View>(R.id.audioBar)
         val barPlayBtn = findViewById<Button>(R.id.barPlayBtn)
         val barSeekBar = findViewById<SeekBar>(R.id.barSeekBar)
+        val barCloseBtn = findViewById<Button>(R.id.barCloseBtn)
+        val profileBtn = findViewById<View>(R.id.profileBtn)
+        val avatarImage = findViewById<ImageView>(R.id.appBarImage)
+        //val mainMenu = findViewById<MenuItem>(R.id.authorized)
+
+        avatarImage.setOnClickListener {
+            var authorized = viewModel.authorized
+            if (authorized){
+                showAuthorizedMenu(it)
+            } else showMenu(it)
+        }
 
         barPlayBtn.setOnClickListener {
-            if (player.isPlaying){
+            if (player.isPlaying) {
                 player.pause()
             } else player.play()
         }
 
-        barSeekBar.setOnSeekBarChangeListener(object :SeekBar.OnSeekBarChangeListener{
+        barCloseBtn.setOnClickListener {
+            player.stop()
+            audioBar.isVisible = false
+        }
 
+        //seekBar
+        barSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             private var mprogress = 0
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) mprogress = progress
@@ -102,101 +110,35 @@ class AppActivity : AppCompatActivity() {
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
                 seekBar?.progress = mprogress
-                player.seekTo((mprogress.toLong()*duration)/100)
+                player.seekTo((mprogress.toLong() * duration) / 100)
             }
         })
 
 
-        //***Так настраивается bottomNavigationBar
-//           navView = binding.navView
-//
-        // val navController = findNavController(R.id.nav_host_fragment)
-//
-//        val appBarConfiguration = AppBarConfiguration(setOf(
-//            R.id.navigation_posts,
-//            R.id.navigation_events
-//        ))
-//        setupActionBarWithNavController(navController, appBarConfiguration)
-//        navView.setupWithNavController(navController)
-//           navView.isVisible = true
 
-//        intent?.let {
-//            if (it.action != Intent.ACTION_SEND) {
-//                return@let
-//            }
-//
-//            val text = it.getStringExtra(Intent.EXTRA_TEXT)
-//            if (text?.isNotBlank() != true) {
-//                return@let
-//            }
-//
-//            intent.removeExtra(Intent.EXTRA_TEXT)
-//            findNavController(R.id.nav_host_fragment)
-//                .navigate(
-//                    R.id.action_navigation_posts_to_newPostFragment,
-//                    Bundle().apply {
-//                        textArg = text
-//                    }
-//                )
-//        }
-
-//        binding.settingsBtn.setOnClickListener {
-//            showMenu(it)
-//        }
-
-        //checkGoogleApiAvailability()
-
-
-        var currentMenuProvider: MenuProvider? = null
+        //menu:
         viewModel.data.observe(this) {
-            currentMenuProvider?.also(::removeMenuProvider)
+            val id = appAuth.getId()
+            userViewModel.getUserById(id)
+            //Toast.makeText(this, "$id", Toast.LENGTH_SHORT).show()
+        }
 
-            addMenuProvider(object : MenuProvider {
-                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                    menuInflater.inflate(R.menu.menu_main, menu)
+        userViewModel.user.observe(this){user->
+            //Toast.makeText(this, "observer", Toast.LENGTH_SHORT).show()
+                user.avatar.let {
                     val authorized = viewModel.authorized
-                    menu.setGroupVisible(R.id.authorized, authorized)
-                    menu.setGroupVisible(R.id.unAuthorized, !authorized)
+                    if (authorized){
+                        avatarImage.loadAvatar(it.toString())
+                    } else
+                        avatarImage.setImageDrawable(resources.getDrawable(R.drawable.baseline_account_circle_36))
                 }
-
-                override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
-                    when (menuItem.itemId) {
-                        R.id.signIn -> {
-                            findNavController(R.id.nav_host_fragment).navigate(R.id.signInFragment)
-                            true
-                        }
-                        R.id.signUp -> {
-                            findNavController(R.id.nav_host_fragment).navigate(R.id.registrationFragment)
-                            true
-                        }
-                        R.id.logout -> {
-                            showSignOutDialog(appAuth, this@AppActivity)
-                            true
-                        }
-                        R.id.profileBtn -> {
-                            if (appAuth.getId()!=0L){
-                                val id = appAuth.getId()
-                                val bundle = Bundle()
-                                bundle.putLong("userID", id)
-                                //val action = PostsFragmentDirections.actionNavigationPostsToWallFragment(id)
-                                findNavController(R.id.nav_host_fragment).navigate(R.id.wallFragment, bundle)
-                            } else findNavController(R.id.nav_host_fragment).navigate(R.id.signInFragment)
-                            true
-                        }
-                        else -> false
-                    }
-
-            }.apply {
-                currentMenuProvider = this
-            })
         }
     }
 
-    fun playAudio(url: String){
+
+    fun playAudio(url: String) {
 
         val mediaItem = MediaItem.fromUri(url)
-
-
         player.clearMediaItems()
         player.setMediaItem(mediaItem)
         player.prepare()
@@ -210,16 +152,16 @@ class AppActivity : AppCompatActivity() {
                 super.onPlaybackStateChanged(playbackState)
                 Log.i("MYSTATE", playbackState.toString())
                 binding.audioBar.root.isVisible = true
-                    //playbackState == Player.STATE_READY
+                //playbackState == Player.STATE_READY
 
                 scope.launch {
                     while (playbackState == Player.STATE_READY) {
                         val position = player.currentPosition
-                        val positionInSec = round(position.toDouble()/1000).toInt()
-                        duration  = player.contentDuration
-                        val durationInSec = round(duration.toDouble()/1000).toInt()
+                        val positionInSec = round(position.toDouble() / 1000).toInt()
+                        duration = player.contentDuration
+                        val durationInSec = round(duration.toDouble() / 1000).toInt()
                         binding.audioBar.barSeekBar.progress = calculateProgress(position, duration)
-                        binding.audioBar.barPlayBtn.text = "$positionInSec/$durationInSec"
+                        //binding.audioBar.barPlayBtn.text = "$positionInSec/$durationInSec"
                         Log.i("POS", position.toString())
                         delay(1000)
                     }
@@ -231,33 +173,59 @@ class AppActivity : AppCompatActivity() {
 
     }
 
-    fun calculateProgress(position:Long, duration: Long): Int {
-        return ((position.toDouble()/duration.toDouble())*100).toInt()
+    fun calculateProgress(position: Long, duration: Long): Int {
+        return ((position.toDouble() / duration.toDouble()) * 100).toInt()
     }
 
-//    private fun showMenu(view: View) {
-//        val menu = PopupMenu(this, view)
-//        menu.inflate(R.menu.menu_main)
-//        menu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener {item->
-//            when (item.itemId){
-//                R.id.signIn -> {
-//                    findNavController(R.id.nav_host_fragment).navigate(R.id.signInFragment)
-//                    true
-//                }
-//                R.id.signUp -> {
-//                    findNavController(R.id.nav_host_fragment).navigate(R.id.registrationFragment)
-//                    true
-//                }
-//                R.id.logout -> {
-//                    showSignOutDialog()
-//                    true
-//                }
-//                else -> {Toast.makeText(this, "lala", Toast.LENGTH_SHORT).show()}
-//            }
-//            true
-//        })
-//        menu.show()
-//    }
+    private fun showMenu(view: View) {
+        val menu = PopupMenu(this, view)
+        menu.inflate(R.menu.menu_main)
+        menu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener {item->
+            when (item.itemId){
+                R.id.signIn -> {
+                    findNavController(R.id.nav_host_fragment).navigate(R.id.signInFragment)
+                    true
+                }
+                R.id.signUp -> {
+                    findNavController(R.id.nav_host_fragment).navigate(R.id.registrationFragment)
+                    true
+                }
+
+                else -> {Toast.makeText(this, "lala", Toast.LENGTH_SHORT).show()}
+            }
+            true
+        })
+        menu.show()
+    }
+
+    private fun showAuthorizedMenu(view: View) {
+        val menu = PopupMenu(this, view)
+        menu.inflate(R.menu.menu_by_authorized)
+        menu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener {item->
+            when (item.itemId){
+                R.id.logout -> {
+                    showSignOutDialog(appAuth, this)
+                    true
+                }
+                R.id.profileBtn -> {
+                    if (appAuth.getId() != 0L) {
+                        val id = appAuth.getId()
+                        val bundle = Bundle()
+                        bundle.putLong("userID", id)
+                        findNavController(R.id.nav_host_fragment).navigate(
+                            R.id.wallFragment,
+                            bundle
+                        )
+                    } else findNavController(R.id.nav_host_fragment).navigate(R.id.signInFragment)
+                    true
+                }
+                else -> {Toast.makeText(this, "lala", Toast.LENGTH_SHORT).show()}
+            }
+            true
+        })
+        menu.show()
+    }
+
 
 //    private fun showSignOutDialog() {
 //        val listener = DialogInterface.OnClickListener { _, which ->

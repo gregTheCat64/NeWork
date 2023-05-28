@@ -23,6 +23,7 @@ class UserViewModel @Inject constructor(
 
 ) : ViewModel() {
     private val userData = repository.userData
+    val anon: User = User(0L,"","","")
 
     val users = userData.asLiveData()
 
@@ -54,6 +55,9 @@ class UserViewModel @Inject constructor(
     fun getUserById(id: Long) {
         viewModelScope.launch {
             try {
+                if (id == 0L){
+                    _user.postValue(anon)
+                } else
                 _user.postValue(repository.getById(id))
             } catch (e: Exception){
                 e.printStackTrace()

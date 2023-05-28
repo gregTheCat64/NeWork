@@ -13,8 +13,10 @@ import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.appbar.MaterialToolbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.*
+import ru.javacat.nework.R
 import ru.javacat.nework.databinding.FragmentUsersAddingBinding
 import ru.javacat.nework.domain.model.User
 import ru.javacat.nework.domain.model.UsersType
@@ -33,17 +35,17 @@ class UsersAddingFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        (activity as AppCompatActivity).supportActionBar!!.hide()
+        (activity as AppCompatActivity).findViewById<MaterialToolbar>(R.id.topAppBar)!!.visibility = View.GONE
     }
 
     override fun onStop() {
         super.onStop()
-        (activity as AppCompatActivity).supportActionBar!!.show()
+        (activity as AppCompatActivity).findViewById<MaterialToolbar>(R.id.topAppBar)!!.visibility = View.VISIBLE
     }
 
     override fun onResume() {
         super.onResume()
-        (activity as AppCompatActivity).supportActionBar!!.hide()
+        (activity as AppCompatActivity).findViewById<MaterialToolbar>(R.id.topAppBar)!!.visibility = View.GONE
     }
 
     override fun onCreateView(
