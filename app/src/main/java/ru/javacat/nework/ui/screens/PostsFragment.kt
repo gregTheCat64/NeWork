@@ -28,6 +28,7 @@ import androidx.media3.ui.PlayerControlView
 import androidx.media3.ui.PlayerView
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.material.snackbar.Snackbar
@@ -231,6 +232,9 @@ class PostsFragment : Fragment() {
         })
 
         binding.postsList.adapter = adapter
+
+        val mAnimator = binding.postsList.itemAnimator as SimpleItemAnimator
+        mAnimator.supportsChangeAnimations = false
 
         lifecycleScope.launchWhenCreated {
             postViewModel.data

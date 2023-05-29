@@ -9,6 +9,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
+import androidx.recyclerview.widget.SimpleItemAnimator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
@@ -32,6 +33,8 @@ class EventsFragment : Fragment() {
     lateinit var appAuth: AppAuth
 
 
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -39,6 +42,9 @@ class EventsFragment : Fragment() {
         val binding = FragmentEventsBinding.inflate(inflater, container, false)
 
         lifecycle.addObserver(mediaObserver)
+
+        val mAnimator = binding.eventsList.itemAnimator as SimpleItemAnimator
+        mAnimator.supportsChangeAnimations = false
 
         val adapter = EventsAdapter(object : OnEventsListener{
             override fun onLike(event: EventModel) {
