@@ -1,21 +1,21 @@
 <resources>
     <string name="app_name">NeWork</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="coala_text">Коала — это небольшой зверек. Длина взрослого самца около 80 см, а весит он приблизительно 15 кг. Самки немного меньше. Шерстка коал обычно серого цвета, с вкраплениями белого и иногда черного тона. Уши достаточно крупные, а глаза, наоборот, небольшие. Нос выпуклый, черного цвета. Конечности коалы полностью приспособлены для лазания по деревьям. На передних лапах у них пять пальцев — два находятся немного в стороне (как большие пальцы у людей).</string>
-    <string name="event_text">Крупнейшая в стране конференция по тестированию ПО от JUG Ru Group. Подходит не только для QA-инженеров, но и для пишущих тесты разработчиков, тимлидов и директоров по качеству. Мероприятие больше ориентировано на технологии, чем на процессы и методологии. Программный комитет состоит из экспертов в области тестирования, которые тщательно проверяют каждый доклад. Среди тем — нагрузочное тестирование, тестирование мобильных приложений, безопасность, автоматизация тестирования и много другое.</string>
-    <string name="default_name">John Doe</string>
-    <string name="default_date">21 февраля 2023</string>
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
+    <string name="coala_text" translatable="false">Коала — это небольшой зверек. Длина взрослого самца около 80 см, а весит он приблизительно 15 кг. Самки немного меньше. Шерстка коал обычно серого цвета, с вкраплениями белого и иногда черного тона. Уши достаточно крупные, а глаза, наоборот, небольшие. Нос выпуклый, черного цвета. Конечности коалы полностью приспособлены для лазания по деревьям. На передних лапах у них пять пальцев — два находятся немного в стороне (как большие пальцы у людей).</string>
+    <string name="event_text" translatable="false">Крупнейшая в стране конференция по тестированию ПО от JUG Ru Group. Подходит не только для QA-инженеров, но и для пишущих тесты разработчиков, тимлидов и директоров по качеству. Мероприятие больше ориентировано на технологии, чем на процессы и методологии. Программный комитет состоит из экспертов в области тестирования, которые тщательно проверяют каждый доклад. Среди тем — нагрузочное тестирование, тестирование мобильных приложений, безопасность, автоматизация тестирования и много другое.</string>
+    <string name="default_name" translatable="false">John Doe</string>
+    <string name="default_date" translatable="false">21 февраля 2023</string>
     <string name="Date">Дата:</string>
-    <string name="Location">Местоположение</string>
-    <string name="default_date_of_event">16 апреля 2023</string>
+    <string name="Location">Местоположение:</string>
+    <string name="default_date_of_event" translatable="false">16 апреля 2023</string>
     <string name="default_city">г. Москва</string>
     <string name="format">Формат:</string>
     <string name="default_format">Онлайн</string>
-    <string name="def_likes">33</string>
-    <string name="google_com">google.com</string>
-    <string name="mob_developer">Мобильный разработчик</string>
-    <string name="google_inc">Google Inc.</string>
+    <string name="def_likes" translatable="false">33</string>
+    <string name="google_com" translatable="false">google.com</string>
+    <string name="mob_developer" translatable="false">Мобильный разработчик</string>
+    <string name="google_inc" translatable="false">Google Inc.</string>
     <string name="web_site">Сайт:</string>
     <string name="start_job">Дата начала:</string>
     <string name="end_job">Дата окончания:</string>
@@ -24,14 +24,16 @@
     <string name="remove">Удалить</string>
     <string name="description_select_photo">Выбрать фото</string>
     <string name="description_take_photo">Сделать снимок</string>
-    <string name="Posts">Посты</string>
+    <string name="Posts">Записи</string>
+    <string name="Me">Я</string>
+    <string name="Liked">Оценили: </string>
     <string name="add_post">Добавить запись</string>
     <string name="menu_edit">Редактировать</string>
     <string name="menu_remove">Удалить</string>
     <string name="liked">лайкнут</string>
-    <string name="channel_remote_name">Server notifications</string>
-    <string name="channel_remote_description">Notifications from remote server</string>
-    <string name="notification_user_liked">User %1$s liked %2$s\'s post</string>
+    <string name="channel_remote_name" translatable="false">Server notifications</string>
+    <string name="channel_remote_description" translatable="false">Notifications from remote server</string>
+    <string name="notification_user_liked" translatable="false">User %1$s liked %2$s\'s post</string>
     <string name="google_play_unavailable">Службы гугл недоступны на устройстве</string>
     <string name="Profile">Профиль</string>
     <string name="save">Сохранить</string>
@@ -39,12 +41,17 @@
     <string name="error_loading">Ошибка загрузки</string>
     <string name="retry_loading">Повторить</string>
     <string name="chooser_share_post">Поделиться записью</string>
-    <string name="notification_new_post">%1$s published new post</string>
+    <string name="chooser_link">Открыть ссылку</string>
+    <string name="notification_new_post" translatable="false">%1$s published new post</string>
     <string name="posts">записи</string>
     <string name="events">мероприятия</string>
     <string name="assign_Users">назначить</string>
     <string name="Link">Ссылка</string>
     <string name="online">Онлайн</string>
-    <string name="sign_up">Sign Up</string>
-    <string name="sign_in">Sign In</string>
+    <string name="sign_up">Зарегистрироваться</string>
+    <string name="lorem" translatable="false">\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\"</string>
+    <string name="sign_in">Войти</string>
+    <string name="When">Когда:</string>
+    <string name="Where">Где:</string>
+    <string name="Speakers">Спикеры:</string>
 </resources>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NeWork</string>
+    <string name="Date">Date:</string>
+    <string name="Location">Location:</string>
+    <string name="default_city">Moscow</string>
+    <string name="format">Format:</string>
+    <string name="default_format">Online</string>
+    <string name="web_site">Web:</string>
+    <string name="start_job">Start:</string>
+    <string name="end_job">End:</string>
+    <string name="position">Duty:</string>
+    <string name="job">Job:</string>
+    <string name="remove">Remove</string>
+    <string name="description_select_photo">Pick a photo</string>
+    <string name="description_take_photo">Take a shot</string>
+    <string name="Posts">Posts</string>
+    <string name="Me">Me</string>
+    <string name="add_post">Add a post</string>
+    <string name="menu_edit">Edit</string>
+    <string name="menu_remove">Remove</string>
+    <string name="liked">Liked</string>
+    <string name="google_play_unavailable">Google Play Services Unavailable</string>
+    <string name="Profile">Profile</string>
+    <string name="save">Save</string>
+    <string name="empty_posts">No posts here yet. Create a new one!</string>
+    <string name="error_loading">Error of loading</string>
+    <string name="retry_loading">Retry to load</string>
+    <string name="chooser_share_post">Share a post</string>
+    <string name="posts">posts</string>
+    <string name="events">events</string>
+    <string name="assign_Users">assign</string>
+    <string name="Link">Link</string>
+    <string name="online">Online</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="sign_in">Sign In</string>
+    <string name="Liked">Liked</string>
+</resources>

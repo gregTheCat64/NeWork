@@ -1,7 +1,9 @@
 package ru.javacat.nework.ui.adapter
 
 
+import android.app.Application
 import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +15,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import dagger.hilt.android.qualifiers.ApplicationContext
 import ru.javacat.nework.R
 import ru.javacat.nework.databinding.CardPostBinding
 import ru.javacat.nework.domain.model.AttachmentType
@@ -38,6 +41,8 @@ interface OnInteractionListener {
     fun onLiked(post: PostModel){}
     fun onCoords(post: PostModel){}
 
+    fun onLink(url: String) {}
+
 }
 
 
@@ -53,15 +58,16 @@ class PostsAdapter(
         val post = getItem(position) ?: return
         holder.bind(post)
     }
-
 }
+
 
 class PostViewHolder(
     private val binding: CardPostBinding,
     private val onInteractionListener: OnInteractionListener
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    //val player = ExoPlayer.Builder(this.binding).build()
+    val  str = binding.root.resources.getString(R.string.Me)
+
     fun bind(post: PostModel) {
         if (post.attachment != null) {
             binding.attachLayout.root.visibility = View.VISIBLE
@@ -84,15 +90,19 @@ class PostViewHolder(
             content.text = post.content
             linkText.text = post.link
             interactionPosts.takePartBtn.isVisible = false
+            interactionPosts.mentioned.setIconResource(R.drawable.baseline_alternate_email_24)
+
 
             //likes:
             interactionPosts.likeBtn.isChecked = post.likedByMe //???
             interactionPosts.likeBtn.text = "${post.likeOwnerIds?.size ?: ""}"
             if (post.likeOwnerIds?.size != 0){
                 likedList.visibility = View.VISIBLE
+
                 likedList.text = post.likeOwnerIds?.map{
-                    post.users[it]?.name
-                }?.joinToString (", ", "Оценили: ")
+                    if (post.users[it]?.name != null) {post.users[it]?.name} else
+                        binding.root.resources.getString(R.string.Me)
+                }?.joinToString (", ", binding.root.resources.getString(R.string.Liked)+" ")
             } else likedList.visibility = View.GONE
 
             //coords:
@@ -144,23 +154,6 @@ class PostViewHolder(
                 onInteractionListener.onPlayVideo(post.attachment?.url.toString())
             }
 
-//            attachLayout.videoPlayBtn.setOnClickListener {
-//                attachLayout.videoPlayBtn.isVisible = false
-//
-//                attachLayout.attachVideo.apply {
-//                    setMediaController(MediaController(context))
-//                    setVideoURI(
-//                        Uri.parse(post.attachment?.url)
-//                    )
-//                    setOnPreparedListener {
-//                        start()
-//                    }
-//                    setOnCompletionListener {
-//                        stopPlayback()
-//                        attachLayout.videoPlayBtn.isVisible = true
-//                    }
-//                }
-//            }
 
             //onUserTouch
             postInfoHeader.setOnClickListener {
@@ -199,6 +192,11 @@ class PostViewHolder(
             //map
             locationBtn.setOnClickListener {
                 onInteractionListener.onCoords(post)
+            }
+
+            //link
+            linkText.setOnClickListener {
+                onInteractionListener.onLink(post.link.toString())
             }
         }
     }

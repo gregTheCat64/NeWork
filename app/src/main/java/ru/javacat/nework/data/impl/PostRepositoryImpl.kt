@@ -24,6 +24,7 @@ import ru.javacat.nework.data.mappers.toEventEntity
 import ru.javacat.nework.data.mappers.toModel
 import ru.javacat.nework.domain.model.AttachmentType
 import ru.javacat.nework.domain.model.PostModel
+import ru.javacat.nework.domain.model.User
 import ru.javacat.nework.domain.repository.PostRemoteMediator
 import ru.javacat.nework.domain.repository.PostRepository
 import ru.javacat.nework.error.ApiError
@@ -169,19 +170,23 @@ class PostRepositoryImpl @Inject constructor(
 
     override suspend fun likeById(id: Long) {
         val authorId = appAuth.authStateFlow.value.id
-        val  currentPost = postDao.getById(id)
-        var likeOwners = currentPost.likeOwnerIds
+        val currentPost = postDao.getById(id)
+        var likeOwnersIdList = currentPost.likeOwnerIds
         if (currentPost.likedByMe == true) {
-            likeOwners = likeOwners?.minusElement(authorId)
-            //currentPost.likedByMe = false
-            //postDao.insert(currentPost)
-            postDao.likeById(id, likeOwners)
+            likeOwnersIdList = likeOwnersIdList?.minusElement(authorId)
+//            currentPost.likedByMe = false
+//            postDao.insert(currentPost)
+//            if (userList != null) {
+                postDao.likeById(id, likeOwnersIdList)
+//            }
             postsApi.dislikeById(id)
         } else {
-            likeOwners = likeOwners?.plusElement(authorId)
+            likeOwnersIdList = likeOwnersIdList?.plusElement(authorId)
             //currentPost.likedByMe = true
             //postDao.insert(currentPost)
-            postDao.likeById(id, likeOwners)
+//            if (userList != null) {
+                postDao.likeById(id, likeOwnersIdList)
+//            }
             postsApi.likeById(id)
         }
         }

@@ -8,6 +8,7 @@ import ru.javacat.nework.domain.model.AttachmentModel
 import ru.javacat.nework.domain.model.AttachmentType
 import ru.javacat.nework.domain.model.CoordinatesModel
 import ru.javacat.nework.domain.model.PostModel
+import ru.javacat.nework.domain.model.User
 import ru.javacat.nework.util.asString
 import ru.javacat.nework.util.toLocalDateTime
 
@@ -92,6 +93,7 @@ data class CoordinatesEmbeddable(
         }
     }
 }
+
 
 
 fun List<PostEntity>.toDto(): List<PostModel> = map(PostEntity::toDto)

@@ -18,6 +18,7 @@ import ru.javacat.nework.databinding.CardEventBinding
 import ru.javacat.nework.domain.model.AttachmentType
 import ru.javacat.nework.domain.model.EventModel
 import ru.javacat.nework.domain.model.EventType
+import ru.javacat.nework.domain.model.User
 import ru.javacat.nework.util.asString
 import ru.javacat.nework.util.load
 import ru.javacat.nework.util.loadAvatar
@@ -31,7 +32,7 @@ interface OnEventsListener {
     fun onPlayAudio(event: EventModel){}
 
     fun onPlayVideo(url: String){}
-    fun onParticipant(event: EventModel){}
+    fun onParticipant(ids: List<Long>){}
     fun onUser(event: EventModel){}
 
     fun onLiked(event: EventModel){}
@@ -40,6 +41,8 @@ interface OnEventsListener {
     fun onTakePartBtn(event: EventModel){}
 
     fun onLocation(event: EventModel){}
+
+    fun onLink(url: String){}
 }
 class EventsAdapter(
     private val onEventsListener: OnEventsListener
@@ -83,9 +86,11 @@ class EventViewHolder(
             published.text = event.published?.asString()
             content.text = event.content
             dateOfEvent.text = event.datetime?.asString()
-            if(event.type == EventType.OFFLINE){
-                locationOfEvent.text = event.coords.toString()
-            } else{locationOfEvent.text = event.link.toString()}
+            interactionPosts.mentioned.setIconResource(R.drawable.ic_baseline_people_24)
+            if(event.link != null){
+                locationOfEvent.isVisible = true
+                locationOfEvent.text = event.link.toString()
+            } else{ locationOfEvent.isVisible = false}
 
             locationBtn.isVisible = event.coords != null
 
@@ -100,6 +105,8 @@ class EventViewHolder(
             }
 
 
+
+
             //likes:
             interactionPosts.likeBtn.isChecked = event.likedByMe
             interactionPosts.likeBtn.text = "${event.likeOwnerIds?.size?: ""}"
@@ -108,8 +115,9 @@ class EventViewHolder(
             if (event.likeOwnerIds?.size != 0){
                 likedList.visibility = View.VISIBLE
                 likedList.text = event.likeOwnerIds?.map {
-                    event.users[it]?.name
-                }?.joinToString(", ", "Оценили: ")
+                    if (event.users[it]?.name != null) {event.users[it]?.name} else
+                        binding.root.resources.getString(R.string.Me)
+                }?.joinToString(", ", binding.root.resources.getString(R.string.Liked)+" ")
             } else likedList.visibility = View.GONE
 
             likedList.setOnClickListener {
@@ -118,10 +126,14 @@ class EventViewHolder(
 
             //speakers:
             if (event.speakerIds.isNotEmpty()) {
+                binding.speakersLayout.isVisible = true
                 speakers.text = event.speakerIds.map {
                     event.users[it]?.name }.joinToString(", ")
             } else {
-                speakers.text = ""
+                binding.speakersLayout.isVisible = false
+            }
+            binding.speakers.setOnClickListener {
+                onEventsListener.onParticipant(event.speakerIds)
             }
 
 
@@ -132,7 +144,7 @@ class EventViewHolder(
             } else  interactionPosts.mentioned.visibility = View.GONE
 
             interactionPosts.mentioned.setOnClickListener {
-                onEventsListener.onParticipant(event)
+                onEventsListener.onParticipant(event.participantsIds)
             }
 
             binding.interactionPosts.takePartBtn.setOnClickListener {
@@ -211,6 +223,10 @@ class EventViewHolder(
 
             interactionPosts.shareBtn.setOnClickListener {
                 onEventsListener.onShare(event)
+            }
+
+            locationOfEvent.setOnClickListener {
+                onEventsListener.onLink(event.link.toString())
             }
         }
     }

@@ -8,6 +8,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 import ru.javacat.nework.data.entity.PostEntity
+import ru.javacat.nework.domain.model.User
 
 @Dao
 interface PostDao {
@@ -36,8 +37,8 @@ interface PostDao {
     suspend fun insert(post: PostEntity)
 
 
-    @Query("UPDATE PostEntity SET content = :content WHERE id = :id")
-    suspend fun updateContentById(id: Long, content: String)
+//    @Query("UPDATE PostEntity SET content = :content WHERE id = :id")
+//    suspend fun updateContentById(id: Long, content: String)
 
 //    suspend fun save(post: PostEntity) =
 //        if (post.id == 0L) insert(post) else updateContentById(post.id, post.content)

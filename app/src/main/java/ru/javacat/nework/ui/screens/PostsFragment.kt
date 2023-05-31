@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -46,6 +47,7 @@ import ru.javacat.nework.ui.adapter.PostsAdapter
 import ru.javacat.nework.ui.screens.NewPostFragment.Companion.textArg
 import ru.javacat.nework.ui.viewmodels.PostViewModel
 import ru.javacat.nework.ui.viewmodels.UserViewModel
+import ru.javacat.nework.util.asString
 import java.io.Serializable
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -58,8 +60,7 @@ class PostsFragment : Fragment() {
 
     private val postViewModel: PostViewModel by activityViewModels()
     val userViewModel: UserViewModel by viewModels()
-    private val mediaObserver = MediaLifecycleObserver()
-
+    //private val mediaObserver = MediaLifecycleObserver()
 
 
     private val requestPermissionLauncher =
@@ -129,12 +130,13 @@ class PostsFragment : Fragment() {
             }
         }
 
-        lifecycle.addObserver(mediaObserver)
+        //lifecycle.addObserver(mediaObserver)
 
 
         val adapter = PostsAdapter(object : OnInteractionListener {
             override fun onLike(post: PostModel) {
-                if (appAuth.authStateFlow.value.id != 0L) {
+                val myId = appAuth.authStateFlow.value.id
+                if (myId != 0L) {
                     postViewModel.likeById(post.id)
                 } else showSignInDialog(this@PostsFragment)
             }
@@ -154,7 +156,21 @@ class PostsFragment : Fragment() {
             override fun onShare(post: PostModel) {
                 val intent = Intent().apply {
                     action = Intent.ACTION_SEND
-                    putExtra(Intent.EXTRA_TEXT, post.content)
+
+                    val author = post.author
+                    val content = post.content
+                    val attach = post.attachment?.url ?: ""
+                    val link = post.link ?: ""
+                    val published = post.published?.asString()
+
+                    val msg = "$author пишет:\n" +
+                            "$content \n" +
+                            "$attach \n" +
+                            "$link\n" +
+                            "$published" +
+                            "отправлено из NeWork App.\n"
+
+                    putExtra(Intent.EXTRA_TEXT, msg)
                     type = "text/plain"
                 }
 
@@ -171,27 +187,6 @@ class PostsFragment : Fragment() {
             override fun onPlayAudio(post: PostModel) {
                 (requireActivity() as AppActivity).playAudio(post.attachment?.url.toString())
 
-                //showVideoDialog(post.attachment?.url.toString(), childFragmentManager)
-//                post.playBtnPressed = !post.playBtnPressed
-//                mediaObserver.apply {
-//                    if (!mediaPlayer!!.isPlaying) {
-//                        mediaPlayer?.reset()
-//                        mediaPlayer?.setDataSource(post.attachment?.url)
-//                        this.play()
-//                    } else {
-//                        mediaPlayer!!.pause()
-//                    }
-//                }
-
-
-//                val audioPlayer = MediaPlayer.create(context, post.attachment?.url.toString().toUri())
-//                audioPlayer.setOnPreparedListener{
-//                    it.start()
-//                }
-//                audioPlayer.setOnCompletionListener {
-//                    post.playBtnPressed = false
-//                    it.stop()
-//                }
             }
 
             override fun onPlayVideo(url: String) {
@@ -221,13 +216,23 @@ class PostsFragment : Fragment() {
             }
 
             override fun onCoords(post: PostModel) {
-                Toast.makeText(context, "${post.coords}", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(context, "${post.coords}", Toast.LENGTH_SHORT).show()
                 val coords = post.coords
                 val bundle = Bundle()
                 if (coords != null) {
                     bundle.putDoubleArray("POINT", doubleArrayOf(coords.latitude, coords.longitude))
                 }
                 findNavController().navigate(R.id.mapsFragment, bundle)
+            }
+
+            override fun onLink(url: String) {
+                val intent = Intent().apply {
+                    action = Intent.ACTION_VIEW
+                    this.data = url.toUri()
+                }
+                val shareIntent =
+                    Intent.createChooser(intent, getString(R.string.chooser_link))
+                startActivity(shareIntent)
             }
         })
 
@@ -288,8 +293,6 @@ class PostsFragment : Fragment() {
                     .show()
             }
         }
-
-
 
 
 //        postViewModel.postCreated.observe(viewLifecycleOwner) {

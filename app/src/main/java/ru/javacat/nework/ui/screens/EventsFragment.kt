@@ -1,10 +1,12 @@
 package ru.javacat.nework.ui.screens
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -21,6 +23,7 @@ import ru.javacat.nework.mediaplayer.MediaLifecycleObserver
 import ru.javacat.nework.ui.adapter.EventsAdapter
 import ru.javacat.nework.ui.adapter.OnEventsListener
 import ru.javacat.nework.ui.viewmodels.EventViewModel
+import ru.javacat.nework.util.asString
 import ru.javacat.nework.util.snack
 import javax.inject.Inject
 
@@ -75,11 +78,36 @@ class EventsFragment : Fragment() {
             }
 
             override fun onShare(event: EventModel) {
-                super.onShare(event)
+                val intent = Intent().apply {
+                    action = Intent.ACTION_SEND
+
+                    val author = event.author
+                    val content = event.content
+                    val attach = event.attachment?.url?:""
+                    val date = event.datetime?.asString()
+                    val link = event.link?:""
+                    val format = event.type.name
+
+                    val msg =
+                            "$author делится мероприятием:\n" +
+                            "$content \n" +
+                            "начало в $date \n"+
+                            "формат мероприятия: $format"+
+                            "$attach \n"+
+                            "$link\n"+
+                            "отправлено из NeWork App.\n"
+
+                    putExtra(Intent.EXTRA_TEXT, msg)
+                    type = "text/plain"
+                }
+
+                val shareIntent =
+                    Intent.createChooser(intent, getString(R.string.chooser_share_post))
+                startActivity(shareIntent)
             }
 
-            override fun onParticipant(event: EventModel) {
-                showUserListDialog(event.participantsIds, childFragmentManager)
+            override fun onParticipant(ids: List<Long>) {
+                showUserListDialog(ids, childFragmentManager)
             }
 
             override fun onPlayVideo(url: String) {
@@ -117,6 +145,16 @@ class EventsFragment : Fragment() {
                     bundle.putDoubleArray("POINT", doubleArrayOf(coords.latitude,coords.longitude))
                 }
                 findNavController().navigate(R.id.mapsFragment, bundle)
+            }
+
+            override fun onLink(url: String) {
+                val intent = Intent().apply {
+                    action = Intent.ACTION_VIEW
+                    this.data = url.toUri()
+                }
+                val shareIntent =
+                    Intent.createChooser(intent, getString(R.string.chooser_link))
+                startActivity(shareIntent)
             }
         }
         )

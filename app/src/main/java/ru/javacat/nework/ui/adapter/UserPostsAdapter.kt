@@ -63,6 +63,14 @@ class UserPostsViewHolder(
             //likes:
             interactionPosts.likeBtn.isChecked = post.likedByMe //???
             interactionPosts.likeBtn.text = "${post.likeOwnerIds?.size ?: ""}"
+            if (post.likeOwnerIds?.size != 0){
+                likedList.visibility = View.VISIBLE
+
+                likedList.text = post.likeOwnerIds?.map{
+                    if (post.users[it]?.name != null) {post.users[it]?.name} else
+                        binding.root.resources.getString(R.string.Me)
+                }?.joinToString (", ", binding.root.resources.getString(R.string.Liked)+" ")
+            } else likedList.visibility = View.GONE
 
             //coords:
             if (post.coords != null) {
@@ -97,22 +105,8 @@ class UserPostsViewHolder(
             //video
             attachLayout.videoGroup.isVisible = post.attachment?.type == AttachmentType.VIDEO
             attachLayout.videoPlayBtn.setOnClickListener {
-                //attachLayout.videoPlayBtn.isVisible = false
                 onInteractionListener.onPlayVideo(post.attachment?.url.toString())
-//                attachLayout.attachVideo.apply {
-//
-//                    setMediaController(MediaController(context))
-//                    setVideoURI(
-//                        Uri.parse(post.attachment?.url)
-//                    )
-//                    setOnPreparedListener {
-//                        start()
-//                    }
-//                    setOnCompletionListener {
-//                        stopPlayback()
-//                        attachLayout.videoPlayBtn.isVisible = true
-//                    }
-//                }
+
             }
 
             //onUserTouch

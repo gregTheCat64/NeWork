@@ -9,6 +9,7 @@ import ru.javacat.nework.data.dto.MediaUpload
 import ru.javacat.nework.data.dto.request.PostRequest
 import ru.javacat.nework.domain.model.AttachmentType
 import ru.javacat.nework.domain.model.PostModel
+import ru.javacat.nework.domain.model.User
 
 
 interface PostRepository {

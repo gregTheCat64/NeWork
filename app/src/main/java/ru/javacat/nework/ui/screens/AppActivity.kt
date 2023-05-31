@@ -120,11 +120,9 @@ class AppActivity : AppCompatActivity() {
         viewModel.data.observe(this) {
             val id = appAuth.getId()
             userViewModel.getUserById(id)
-            //Toast.makeText(this, "$id", Toast.LENGTH_SHORT).show()
         }
 
         userViewModel.user.observe(this){user->
-            //Toast.makeText(this, "observer", Toast.LENGTH_SHORT).show()
                 user.avatar.let {
                     val authorized = viewModel.authorized
                     if (authorized){
@@ -184,11 +182,11 @@ class AppActivity : AppCompatActivity() {
             when (item.itemId){
                 R.id.signIn -> {
                     findNavController(R.id.nav_host_fragment).navigate(R.id.signInFragment)
-                    true
+
                 }
                 R.id.signUp -> {
                     findNavController(R.id.nav_host_fragment).navigate(R.id.registrationFragment)
-                    true
+
                 }
 
                 else -> {Toast.makeText(this, "lala", Toast.LENGTH_SHORT).show()}
@@ -205,7 +203,7 @@ class AppActivity : AppCompatActivity() {
             when (item.itemId){
                 R.id.logout -> {
                     showSignOutDialog(appAuth, this)
-                    true
+
                 }
                 R.id.profileBtn -> {
                     if (appAuth.getId() != 0L) {
@@ -217,7 +215,7 @@ class AppActivity : AppCompatActivity() {
                             bundle
                         )
                     } else findNavController(R.id.nav_host_fragment).navigate(R.id.signInFragment)
-                    true
+
                 }
                 else -> {Toast.makeText(this, "lala", Toast.LENGTH_SHORT).show()}
             }

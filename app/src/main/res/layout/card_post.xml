@@ -136,7 +136,8 @@
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:text="www.google.com"
-                android:textStyle="bold" />
+                android:textColor="@color/color_primary"
+                android:textStyle="italic" />
 
 
         </LinearLayout>

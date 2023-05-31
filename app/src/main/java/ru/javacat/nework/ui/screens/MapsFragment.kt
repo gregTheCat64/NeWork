@@ -98,18 +98,18 @@ class MapsFragment : Fragment(R.layout.fragment_maps), InputListener {
     override fun onStart() {
         MapKitFactory.getInstance().onStart()
         super.onStart()
-        (activity as AppCompatActivity).supportActionBar!!.hide()
+        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
     }
 
     override fun onStop() {
         binding.mapview.onStop()
         MapKitFactory.getInstance().onStop()
         super.onStop()
-        (activity as AppCompatActivity).supportActionBar!!.show()
+        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.VISIBLE
     }
 
     override fun onResume() {
         super.onResume()
-        (activity as AppCompatActivity).supportActionBar!!.hide()
+        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
     }
 }

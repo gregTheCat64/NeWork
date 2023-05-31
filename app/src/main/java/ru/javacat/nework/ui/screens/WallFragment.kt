@@ -1,5 +1,6 @@
 package ru.javacat.nework.ui.screens
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -21,13 +22,14 @@ import ru.javacat.nework.domain.model.PostModel
 import ru.javacat.nework.mediaplayer.MediaLifecycleObserver
 import ru.javacat.nework.ui.adapter.*
 import ru.javacat.nework.ui.viewmodels.*
+import ru.javacat.nework.util.asString
 import ru.javacat.nework.util.loadCircleCrop
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class WallFragment : Fragment() {
     private val userViewModel: UserViewModel by viewModels()
-    private val postViewModel: PostViewModel by viewModels()
+    private val postViewModel: PostViewModel by activityViewModels()
     private val eventViewModel: EventViewModel by viewModels()
     private val jobsViewModel: JobsViewModel by viewModels()
 
@@ -100,7 +102,9 @@ class WallFragment : Fragment() {
             }
 
             override fun onEdit(post: PostModel) {
-                super.onEdit(post)
+                postViewModel.deleteAttachment()
+                postViewModel.edit(post)
+                findNavController().navigate(R.id.newPostFragment)
             }
 
             override fun onRemove(post: PostModel) {
@@ -108,7 +112,29 @@ class WallFragment : Fragment() {
             }
 
             override fun onShare(post: PostModel) {
-                super.onShare(post)
+                val intent = Intent().apply {
+                    action = Intent.ACTION_SEND
+
+                    val author = post.author
+                    val content = post.content
+                    val attach = post.attachment?.url ?: ""
+                    val link = post.link ?: ""
+                    val published = post.published?.asString()
+
+                    val msg = "$author пишет:\n" +
+                            "$content \n" +
+                            "$attach \n" +
+                            "$link\n" +
+                            "$published" +
+                            "отправлено из NeWork App.\n"
+
+                    putExtra(Intent.EXTRA_TEXT, msg)
+                    type = "text/plain"
+                }
+
+                val shareIntent =
+                    Intent.createChooser(intent, getString(R.string.chooser_share_post))
+                startActivity(shareIntent)
             }
 
             override fun onResave(post: PostModel) {
@@ -129,7 +155,9 @@ class WallFragment : Fragment() {
             }
 
             override fun onUser(post: PostModel) {
-                super.onUser(post)
+                val bundle = Bundle()
+                bundle.putLong("userID", post.authorId)
+                findNavController().navigate(R.id.wallFragment, bundle)
             }
 
             override fun onMention(post: PostModel) {
@@ -137,7 +165,12 @@ class WallFragment : Fragment() {
             }
 
             override fun onCoords(post: PostModel) {
-                super.onCoords(post)
+                val coords = post.coords
+                val bundle = Bundle()
+                if (coords != null) {
+                    bundle.putDoubleArray("POINT", doubleArrayOf(coords.latitude, coords.longitude))
+                }
+                findNavController().navigate(R.id.mapsFragment, bundle)
             }
         })
 

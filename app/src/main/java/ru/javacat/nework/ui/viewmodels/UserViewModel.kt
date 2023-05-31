@@ -57,19 +57,22 @@ class UserViewModel @Inject constructor(
             try {
                 if (id == 0L){
                     _user.postValue(anon)
-                } else
-                _user.postValue(repository.getById(id))
+                } else{
+                    _user.postValue(repository.getById(id))
+                }
             } catch (e: Exception){
                 e.printStackTrace()
             }
         }
     }
 
-    fun getUsersById(list: List<Long>) {
-        viewModelScope.launch {
+    fun getUsersById(list: List<Long>): List<User>? {
+          viewModelScope.launch {
             val users = repository.getUsersById(list)
             _addedUsers.postValue(users as List<User>?)
+
         }
+        return _addedUsers.value
     }
 
     fun getSpeakersById(list: List<Long>) {
