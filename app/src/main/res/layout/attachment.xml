@@ -7,14 +7,10 @@
     android:layout_height="wrap_content">
 
 
-
     <ImageView
         android:id="@+id/attachImage"
         android:layout_width="match_parent"
         android:layout_height="280dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="@dimen/dim8dp"
         android:visibility="visible"
         />
@@ -24,14 +20,12 @@
         style="@style/Widget.Material3.Button.OutlinedButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:checkable="true"
         android:layout_gravity="center_horizontal"
         android:text="Аудиозапись"
         android:visibility="visible"
-        app:icon="@drawable/ic_play_btn_selector"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_marginBottom="@dimen/dim8dp"
+        app:icon="@drawable/baseline_audio_file_24"
+         />
 
     <FrameLayout
         android:id="@+id/videoGroup"
@@ -43,9 +37,6 @@
             android:id="@+id/attachVideo"
             android:layout_width="match_parent"
             android:layout_height="220dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="@dimen/dim8dp"
             />
 
@@ -55,13 +46,8 @@
             android:id="@+id/videoPlayBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/Widget.Material3.Button.IconButton.Outlined"
+            style="@style/Widget.Material3.Button.IconButton.Filled"
             android:layout_gravity="center"
-            app:layout_constraintTop_toTopOf="@id/attachVideo"
-            app:layout_constraintStart_toStartOf="@id/attachVideo"
-            app:layout_constraintEnd_toEndOf="@id/attachVideo"
-            app:layout_constraintBottom_toBottomOf="@id/attachVideo"
-
             app:icon="@drawable/ic_baseline_play_circle_24"
             />
     </FrameLayout>

@@ -48,6 +48,7 @@ import ru.javacat.nework.ui.screens.NewPostFragment.Companion.textArg
 import ru.javacat.nework.ui.viewmodels.PostViewModel
 import ru.javacat.nework.ui.viewmodels.UserViewModel
 import ru.javacat.nework.util.asString
+import ru.javacat.nework.util.snack
 import java.io.Serializable
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -81,11 +82,7 @@ class PostsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentPostsBinding.inflate(inflater, container, false)
-        //val audioBar = activity?.findViewById<PlayerControlView>(R.id.audioBar)
-//
 
-        //audioBar?.player = player
-        //postViewModel.refresh()
 
 
         //Доступ к локации:
@@ -185,15 +182,22 @@ class PostsFragment : Fragment() {
             }
 
             override fun onPlayAudio(post: PostModel) {
+                post.playBtnPressed = !post.playBtnPressed
+                //snack(post.playBtnPressed.toString())
                 (requireActivity() as AppActivity).playAudio(post.attachment?.url.toString())
+//                if (!post.playBtnPressed){
+//                    (requireActivity() as AppActivity).stopAudio()
+//                } else {
+//                    (requireActivity() as AppActivity).playAudio(post.attachment?.url.toString())
+//                }
 
             }
 
             override fun onPlayVideo(url: String) {
-                showVideoDialog(url, childFragmentManager)
-//                val bundle = Bundle()
-//                bundle.putString("URL", post.attachment?.url)
-//                findNavController().navigate(R.id.videoPlayerFragment, bundle)
+                //showVideoDialog(url, childFragmentManager)
+                val bundle = Bundle()
+                bundle.putString("URL", url)
+                findNavController().navigate(R.id.videoPlayerFragment, bundle)
 
             }
 

@@ -153,9 +153,9 @@ class EventViewHolder(
             binding.interactionPosts.takePartBtn.isChecked = event.participatedByMe
 
             if (event.participatedByMe){
-                binding.interactionPosts.takePartBtn.setText("Out")
+                binding.interactionPosts.takePartBtn.text = "Out"
             } else {
-                binding.interactionPosts.takePartBtn.setText("In")
+                binding.interactionPosts.takePartBtn.text = "In"
             }
 
             //image
@@ -165,6 +165,7 @@ class EventViewHolder(
             }
             // audio:
             attachLayout.attachAudio.isVisible = event.attachment?.type == AttachmentType.AUDIO
+            attachLayout.attachAudio.isChecked = event.playBtnPressed
             attachLayout.attachAudio.setOnClickListener {
                 onEventsListener.onPlayAudio(event)
             }

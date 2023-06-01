@@ -111,7 +111,9 @@ class EventsFragment : Fragment() {
             }
 
             override fun onPlayVideo(url: String) {
-                showVideoDialog(url, childFragmentManager)
+                val bundle = Bundle()
+                bundle.putString("URL", url)
+                findNavController().navigate(R.id.videoPlayerFragment, bundle)
             }
 
             override fun onUser(event: EventModel) {
@@ -129,13 +131,12 @@ class EventsFragment : Fragment() {
             }
 
             override fun onPlayAudio(event: EventModel) {
-                mediaObserver.apply {
-                    mediaPlayer?.reset()
-                    mediaPlayer?.setDataSource(
-
-                        event.attachment?.url
-                    )
-                }.play()
+                if (event.playBtnPressed){
+                    (requireActivity() as AppActivity).stopAudio()
+                } else {
+                    (requireActivity() as AppActivity).playAudio(event.attachment?.url.toString())
+                }
+                //event.playBtnPressed = !event.playBtnPressed
             }
 
             override fun onLocation(event: EventModel) {
@@ -190,9 +191,6 @@ class EventsFragment : Fragment() {
 //            binding.swipeToRefresh.isRefreshing = it.refreshing
 //                    || it.loading
 //        }
-
-
-
 
 
             //binding.eventsList.smoothScrollToPosition(0)

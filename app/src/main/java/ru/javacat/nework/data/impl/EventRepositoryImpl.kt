@@ -42,9 +42,9 @@ import javax.inject.Inject
 class EventRepositoryImpl @Inject constructor(
     private val eventDao: EventDao,
     private val eventsApi: EventsApi,
-    eventRemoteKeyDao: EventRemoteKeyDao,
+    private val eventRemoteKeyDao: EventRemoteKeyDao,
     private val appAuth: AppAuth,
-    appDb: AppDb
+    private val appDb: AppDb
 ) : EventRepository {
     //    override val eventData = eventDao.getAll()
 //        .map(List<EventEntity>::toDto)
@@ -79,6 +79,21 @@ class EventRepositoryImpl @Inject constructor(
         }
     }
 
+    @OptIn(ExperimentalPagingApi::class)
+    override suspend fun getUserEvents(id: Long): Flow<PagingData<EventModel>> {
+        return Pager(
+            config = PagingConfig(pageSize = 5),
+            pagingSourceFactory = { eventDao.getWallPagingSource(id) },
+            remoteMediator = EventRemoteMediator(
+                eventsApi,
+                eventDao,
+                eventRemoteKeyDao,
+                appDb
+            )
+        ).flow
+            .map { it.map(EventEntity::toDto) }
+    }
+
     override suspend fun getLatest(count: Int) {
         try {
             val response = eventsApi.getLatest(count)
@@ -93,26 +108,26 @@ class EventRepositoryImpl @Inject constructor(
         TODO("Not yet implemented")
     }
 
-    override suspend fun getEventsByAuthorId(authorId: Long): List<EventModel> {
-        val daoResult = eventDao.getByAuthorId(authorId)
-        return daoResult.toDto()
-    }
-
-    override suspend fun updateEventsByAuthorId(authorId: Long): List<EventModel>? {
-        try {
-            val response = eventsApi.getAll().body()?.filter {
-                it.authorId == authorId
-            }
-            if (response != null) {
-                eventDao.insert(response.map { it.toEventEntity() })
-            }
-            return response?.map { it.toEventModel() }
-        } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
-        }
-    }
+//    override suspend fun getEventsByAuthorId(authorId: Long): List<EventModel> {
+//        val daoResult = eventDao.getByAuthorId(authorId)
+//        return daoResult.toDto()
+//    }
+//
+//    override suspend fun updateEventsByAuthorId(authorId: Long): List<EventModel>? {
+//        try {
+//            val response = eventsApi.getAll().body()?.filter {
+//                it.authorId == authorId
+//            }
+//            if (response != null) {
+//                eventDao.insert(response.map { it.toEventEntity() })
+//            }
+//            return response?.map { it.toEventModel() }
+//        } catch (e: IOException) {
+//            throw NetworkError
+//        } catch (e: Exception) {
+//            throw UnknownError
+//        }
+//    }
 
     override suspend fun removeById(id: Long) {
         try {

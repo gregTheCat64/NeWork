@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -15,6 +16,21 @@ import ru.javacat.nework.util.AndroidUtils
 import ru.javacat.nework.ui.viewmodels.SignInViewModel
 
 class SignInFragment: Fragment() {
+
+    override fun onStart() {
+        super.onStart()
+        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
+    }
+
+    override fun onStop() {
+        super.onStop()
+        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.VISIBLE
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
+    }
     companion object {
         fun newInstance() = SignInFragment()
     }

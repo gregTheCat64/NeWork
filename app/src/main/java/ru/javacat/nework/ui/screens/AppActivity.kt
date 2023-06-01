@@ -1,12 +1,7 @@
 package ru.javacat.nework.ui.screens
 
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
-import android.view.ContextMenu
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
@@ -15,7 +10,6 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
-import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -33,11 +27,8 @@ import ru.javacat.nework.data.auth.AppAuth
 import ru.javacat.nework.databinding.ActivityAppBinding
 import ru.javacat.nework.ui.viewmodels.AuthViewModel
 import ru.javacat.nework.ui.viewmodels.UserViewModel
-import ru.javacat.nework.util.load
 import ru.javacat.nework.util.loadAvatar
-import ru.javacat.nework.util.loadCircleCrop
 import javax.inject.Inject
-import kotlin.math.round
 
 @AndroidEntryPoint
 class AppActivity : AppCompatActivity() {
@@ -155,9 +146,9 @@ class AppActivity : AppCompatActivity() {
                 scope.launch {
                     while (playbackState == Player.STATE_READY) {
                         val position = player.currentPosition
-                        val positionInSec = round(position.toDouble() / 1000).toInt()
+                        //val positionInSec = round(position.toDouble() / 1000).toInt()
                         duration = player.contentDuration
-                        val durationInSec = round(duration.toDouble() / 1000).toInt()
+                        //val durationInSec = round(duration.toDouble() / 1000).toInt()
                         binding.audioBar.barSeekBar.progress = calculateProgress(position, duration)
                         //binding.audioBar.barPlayBtn.text = "$positionInSec/$durationInSec"
                         Log.i("POS", position.toString())
@@ -168,7 +159,10 @@ class AppActivity : AppCompatActivity() {
                 //duration = 0L
             }
         })
+    }
 
+    fun stopAudio(){
+        player.pause()
     }
 
     fun calculateProgress(position: Long, duration: Long): Int {

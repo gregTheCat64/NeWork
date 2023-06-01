@@ -14,9 +14,11 @@ interface EventRepository {
     val eventData: Flow<PagingData<EventModel>>
     suspend fun getAll()
 
+    suspend fun getUserEvents(id: Long): Flow<PagingData<EventModel>>
+
     suspend fun getLatest(count: Int)
-    suspend fun getEventsByAuthorId(authorId: Long): List<EventModel>
-    suspend fun updateEventsByAuthorId(authorId: Long):List<EventModel>?
+//    suspend fun getEventsByAuthorId(authorId: Long): List<EventModel>
+//    suspend fun updateEventsByAuthorId(authorId: Long):List<EventModel>?
     suspend fun getById(id: Long)
     suspend fun removeById(id: Long)
     suspend fun likeById(id: Long)

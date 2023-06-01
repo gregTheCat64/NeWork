@@ -51,20 +51,20 @@ class NewPostFragment : Fragment() {
     private val postViewModel: PostViewModel by activityViewModels()
     private val userViewModel: UserViewModel by activityViewModels()
 
-//    override fun onStart() {
-//        super.onStart()
-//        (activity as AppCompatActivity).findViewById<MaterialToolbar>(R.id.topAppBar)!!.visibility = View.GONE
-//    }
-//
-//    override fun onStop() {
-//        super.onStop()
-//        (activity as AppCompatActivity).findViewById<MaterialToolbar>(R.id.topAppBar)!!.visibility = View.VISIBLE
-//    }
-//
-//    override fun onResume() {
-//        super.onResume()
-//        (activity as AppCompatActivity).findViewById<MaterialToolbar>(R.id.topAppBar)!!.visibility = View.GONE
-//    }
+    override fun onStart() {
+        super.onStart()
+        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
+    }
+
+    override fun onStop() {
+        super.onStop()
+        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.VISIBLE
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
+    }
 
 
     override fun onCreateView(

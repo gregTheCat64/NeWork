@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toFile
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -14,6 +15,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.android.material.snackbar.Snackbar
+import ru.javacat.nework.R
 import ru.javacat.nework.databinding.FragmentRegistrationBinding
 import ru.javacat.nework.domain.model.AttachModel
 import ru.javacat.nework.util.AndroidUtils
@@ -22,6 +24,21 @@ import ru.javacat.nework.ui.viewmodels.RegistrationViewModel
 private var avatar = AttachModel()
 
 class RegistrationFragment : Fragment() {
+
+    override fun onStart() {
+        super.onStart()
+        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
+    }
+
+    override fun onStop() {
+        super.onStop()
+        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.VISIBLE
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
+    }
 
     companion object {
         fun newInstance() = RegistrationFragment()

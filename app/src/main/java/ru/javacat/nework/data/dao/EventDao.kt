@@ -17,6 +17,9 @@ interface EventDao {
     @Query("SELECT * FROM EventEntity ORDER BY id DESC")
     fun getPagingSource(): PagingSource<Int, EventEntity>
 
+    @Query("SELECT * FROM EventEntity WHERE authorId = :userId ORDER BY id DESC")
+    fun getWallPagingSource(userId: Long): PagingSource<Int, EventEntity>
+
     @Query("SELECT * FROM EventEntity WHERE id = :id")
     suspend fun getById(id: Long): EventEntity
 

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:drawable="@drawable/ic_baseline_play_circle_24"
-        android:state_checked="false"/>
+        android:drawable="@drawable/baseline_play_circle_outline_48"
+        android:state_checked="true"/>
     <item
-        android:drawable="@drawable/ic_baseline_pause_circle_24"
-        android:state_checked="true"
+        android:drawable="@drawable/baseline_pause_circle_outline_48"
+        android:state_checked="false"
         />
 </selector>

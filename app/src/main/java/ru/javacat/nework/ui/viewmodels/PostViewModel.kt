@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.core.net.toFile
 import androidx.lifecycle.*
 import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -34,10 +35,10 @@ private val noAttach = AttachModel()
 class PostViewModel @Inject constructor(
     private val postRepository: PostRepository
 ) : ViewModel() {
-    val data: Flow<PagingData<PostModel>> = postRepository.data
+    val data: Flow<PagingData<PostModel>> =
+        postRepository.data.cachedIn(viewModelScope)
 
     val count = 5
-
 
     private var _userPosts = MutableLiveData<List<PostModel>>()
     val userPosts: LiveData<List<PostModel>>
@@ -52,13 +53,6 @@ class PostViewModel @Inject constructor(
     val coords: LiveData<CoordinatesModel>
         get() = _coords
 
-//    private var _addedUsersIds = MutableLiveData(emptyList<Long>())
-//    val addedUsersIds: LiveData<List<Long>>
-//        get() = _addedUsersIds
-
-//    private val _addedUsers = MutableLiveData<List<User>>(emptyList())
-//    val addedUsers: LiveData<List<User>>
-//        get() = _addedUsers
 
 
 //    val newerCount: LiveData<Int> = data.switchMap {
@@ -67,9 +61,9 @@ class PostViewModel @Inject constructor(
 //            .asLiveData(Dispatchers.Default)
 //    }
 
-    private val _isNewPost = MutableLiveData<Boolean>(true)
-    val isNewPost: LiveData<Boolean>
-        get() = _isNewPost
+//    private val _isNewPost = MutableLiveData<Boolean>(true)
+//    val isNewPost: LiveData<Boolean>
+//        get() = _isNewPost
 
 
     private val _edited = MutableLiveData(empty)
@@ -106,27 +100,31 @@ class PostViewModel @Inject constructor(
         }
     }
 
-    fun loadPostsByAuthorId(authorId: Long) = viewModelScope.launch {
-        try {
-            _state.value = FeedModelState(loading = true)
-            _userPosts.postValue(postRepository.getPostsByAuthorId(authorId))
-            _state.value = FeedModelState(idle = true)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            _state.value = FeedModelState(error = true)
-        }
+    suspend fun getUserPosts(id: Long): Flow<PagingData<PostModel>>{
+        return postRepository.getUserPosts(id).cachedIn(viewModelScope)
     }
 
-    fun updatePostsByAuthorId(authorId: Long) = viewModelScope.launch {
-        try {
-            _state.value = FeedModelState(loading = true)
-            _userPosts.postValue(postRepository.updatePostsByAuthorId(authorId))
-            _state.value = FeedModelState(idle = true)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            _state.value = FeedModelState(error = true)
-        }
-    }
+//    fun loadPostsByAuthorId(authorId: Long) = viewModelScope.launch {
+//        try {
+//            _state.value = FeedModelState(loading = true)
+//            _userPosts.postValue(postRepository.getPostsByAuthorId(authorId))
+//            _state.value = FeedModelState(idle = true)
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//            _state.value = FeedModelState(error = true)
+//        }
+//    }
+//
+//    fun updatePostsByAuthorId(authorId: Long) = viewModelScope.launch {
+//        try {
+//            _state.value = FeedModelState(loading = true)
+//            _userPosts.postValue(postRepository.updatePostsByAuthorId(authorId))
+//            _state.value = FeedModelState(idle = true)
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//            _state.value = FeedModelState(error = true)
+//        }
+//    }
 
 
     fun refresh() {
@@ -238,13 +236,13 @@ class PostViewModel @Inject constructor(
         _state.value = state
     }
 
-    fun setNew(){
-        _isNewPost.value = true
-    }
-
-    fun setOld(){
-        _isNewPost.value = false
-    }
+//    fun setNew(){
+//        _isNewPost.value = true
+//    }
+//
+//    fun setOld(){
+//        _isNewPost.value = false
+//    }
 
 
 

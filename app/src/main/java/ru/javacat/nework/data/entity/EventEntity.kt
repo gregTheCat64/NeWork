@@ -38,7 +38,7 @@ data class EventEntity (
         id,authorId,author,authorAvatar,authorJob,content,datetime.toLocalDateTime(),
         published.toLocalDateTime(), coords?.toDto(), EventType.valueOf(typeOfEvent),
         likeOwnerIds, likedByMe,speakerIds,participantsIds,participatedByMe,
-        attachment?.toDto(), link,ownedByMe,users
+        attachment?.toDto(),false, link,ownedByMe,users
     )
 
     companion object{

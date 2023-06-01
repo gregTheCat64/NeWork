@@ -14,47 +14,55 @@
         android:orientation="vertical"
         >
 
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/toolBarFrame"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?attr/actionBarSize"
+        android:orientation="horizontal"
+
+        android:background="@color/color_primary"
         app:layout_scrollFlags="scroll|enterAlways"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+       >
 
-        <androidx.appcompat.widget.Toolbar
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/dim48dp"
-            android:background="@color/color_primary" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/back_button"
+                style="@style/Widget.AppTheme.WhiteIconButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                app:icon="@drawable/ic_baseline_arrow_back_24" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/back_button"
-            style="@style/Widget.AppTheme.WhiteIconButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            app:icon="@drawable/ic_baseline_arrow_back_24" />
+            <ImageView
+                android:id="@+id/avatar"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginStart="@dimen/dim32dp"
+                android:layout_marginEnd="@dimen/dim16dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_baseline_account_circle_24"
+                />
 
-        <TextView
-            style="@style/TextAppearance.AppCompat.WhiteCaption"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Стена"
+            <TextView
+                android:id="@+id/name"
+                style="@style/TextAppearance.AppCompat.WhiteCaption"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Стена"/>
 
-            />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/refreshBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.AppTheme.WhiteIconButton"
+                android:layout_gravity="center_vertical"
+                app:icon="@drawable/ic_baseline_refresh_24"
+                />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/refreshBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/Widget.AppTheme.WhiteIconButton"
-            android:layout_gravity="end"
-            app:icon="@drawable/ic_baseline_refresh_24"
-            />
 
-    </FrameLayout>
+
+    </LinearLayout>
 
     <ProgressBar
         android:id="@+id/progress"
@@ -62,36 +70,11 @@
         android:layout_height="wrap_content"
         android:visibility="visible"
         android:layout_gravity="center"
+        android:padding="@dimen/dim8dp"
         />
 
 
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_margin="@dimen/dim16dp"
-        android:layout_gravity="start"
-        >
-
-        <ImageView
-            android:id="@+id/avatar"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_baseline_account_circle_24"
-            />
-
-        <TextView
-            android:id="@+id/name"
-            android:layout_marginStart="@dimen/dim16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="22sp"
-            android:text="@string/default_name"
-            android:layout_gravity="center"
-            />
-
-    </LinearLayout>
 
 
 

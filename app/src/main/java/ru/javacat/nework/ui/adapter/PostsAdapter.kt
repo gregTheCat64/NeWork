@@ -92,7 +92,6 @@ class PostViewHolder(
             interactionPosts.takePartBtn.isVisible = false
             interactionPosts.mentioned.setIconResource(R.drawable.baseline_alternate_email_24)
 
-
             //likes:
             interactionPosts.likeBtn.isChecked = post.likedByMe //???
             interactionPosts.likeBtn.text = "${post.likeOwnerIds?.size ?: ""}"
@@ -143,7 +142,7 @@ class PostViewHolder(
 
             // audio:
             attachLayout.attachAudio.isVisible = post.attachment?.type == AttachmentType.AUDIO
-            attachLayout.attachAudio.isChecked = post.playBtnPressed
+            //attachLayout.attachAudio.isChecked = post.playBtnPressed
             attachLayout.attachAudio.setOnClickListener {
                 onInteractionListener.onPlayAudio(post)
             }
@@ -203,9 +202,6 @@ class PostViewHolder(
 }
 
 
-fun playVideo(post: PostModel, url: String) {
-
-}
 
 
 class PostDiffCallback : DiffUtil.ItemCallback<PostModel>() {

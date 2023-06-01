@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.core.net.toFile
 import androidx.lifecycle.*
 import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.yandex.mapkit.geometry.Point
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +34,7 @@ import javax.inject.Inject
 private val emptyEvent = EventModel(
     0, 0L, "", null,null, "",null,
     null, null, EventType.OFFLINE, emptyList(), false,
-    emptyList(), emptyList(), false, null, null,
+    emptyList(), emptyList(), false, null, false,null,
     false, emptyMap()
 )
 
@@ -47,13 +48,13 @@ class EventViewModel @Inject constructor(
 ) : ViewModel() {
 
 
-    val data: Flow<PagingData<EventModel>> = repository.eventData
+    val data: Flow<PagingData<EventModel>> = repository.eventData.cachedIn(viewModelScope)
 
     val count = 5
 
-    private val _userEvents = MutableLiveData<List<EventModel>>()
-    val userEvents: LiveData<List<EventModel>>
-        get() = _userEvents
+//    private val _userEvents = MutableLiveData<List<EventModel>>()
+//    val userEvents: LiveData<List<EventModel>>
+//        get() = _userEvents
 
     private val _state = MutableLiveData(FeedModelState(idle = true))
     val state: LiveData<FeedModelState>
@@ -104,22 +105,26 @@ class EventViewModel @Inject constructor(
         }
     }
 
-    fun getByAuthorId(id: Long) {
-        viewModelScope.launch {
-            _state.value = FeedModelState(loading = true)
-            _userEvents.postValue(repository.getEventsByAuthorId(id))
-            _state.value = FeedModelState(idle = true)
-            //println("SPEAKER= ${_dataByAuthor.value.toString()}")
-        }
+    suspend fun getUserEvents(id: Long): Flow<PagingData<EventModel>>{
+        return repository.getUserEvents(id).cachedIn(viewModelScope)
     }
 
-    fun updateEventsByAuthorId(authorId: Long) = viewModelScope.launch {
-        try {
-            _userEvents.postValue(repository.updateEventsByAuthorId(authorId))
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
+//    fun getByAuthorId(id: Long) {
+//        viewModelScope.launch {
+//            _state.value = FeedModelState(loading = true)
+//            _userEvents.postValue(repository.getEventsByAuthorId(id))
+//            _state.value = FeedModelState(idle = true)
+//            //println("SPEAKER= ${_dataByAuthor.value.toString()}")
+//        }
+//    }
+//
+//    fun updateEventsByAuthorId(authorId: Long) = viewModelScope.launch {
+//        try {
+//            _userEvents.postValue(repository.updateEventsByAuthorId(authorId))
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//        }
+//    }
 
 
     fun likeById(id: Long) {

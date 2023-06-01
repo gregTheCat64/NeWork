@@ -38,9 +38,9 @@ import javax.inject.Inject
 class PostRepositoryImpl @Inject constructor(
     private val postDao: PostDao,
     private val postsApi: PostsApi,
-    postRemoteKeyDao: PostRemoteKeyDao,
+    private val postRemoteKeyDao: PostRemoteKeyDao,
     private val appAuth: AppAuth,
-    appDb: AppDb
+    private val appDb: AppDb
 ) : PostRepository {
 
     @OptIn(ExperimentalPagingApi::class)
@@ -55,6 +55,22 @@ class PostRepositoryImpl @Inject constructor(
         )
     ).flow
         .map { it.map(PostEntity::toDto) }
+
+    @OptIn(ExperimentalPagingApi::class)
+    override suspend fun getUserPosts(id: Long): Flow<PagingData<PostModel>>{
+        return Pager(
+            config = PagingConfig(pageSize = 5),
+            pagingSourceFactory = { postDao.getWallPagingSource(id) },
+            remoteMediator = PostRemoteMediator(
+                postsApi,
+                postDao,
+                postRemoteKeyDao,
+                appDb
+            )
+        ).flow
+            .map { it.map(PostEntity::toDto) }
+    }
+
 
 
 
@@ -82,27 +98,27 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getPostsByAuthorId(authorId: Long):List<PostModel>? {
-        val userPosts = postDao.getByAuthorId(authorId)
-        return userPosts.toDto()
-    }
-
-    override suspend fun updatePostsByAuthorId(authorId: Long):List<PostModel>? {
-        try {
-            val response = postsApi.getAll().body()?.filter {
-                it.authorId == authorId
-            }
-            if (response != null) {
-                postDao.insert(response.map { it.toEntity() })
-            }
-            return response?.map { it.toModel() }
-
-        } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
-        }
-    }
+//    override suspend fun getPostsByAuthorId(authorId: Long):List<PostModel>? {
+//        val userPosts = postDao.getByAuthorId(authorId)
+//        return userPosts.toDto()
+//    }
+//
+//    override suspend fun updatePostsByAuthorId(authorId: Long):List<PostModel>? {
+//        try {
+//            val response = postsApi.getAll().body()?.filter {
+//                it.authorId == authorId
+//            }
+//            if (response != null) {
+//                postDao.insert(response.map { it.toEntity() })
+//            }
+//            return response?.map { it.toModel() }
+//
+//        } catch (e: IOException) {
+//            throw NetworkError
+//        } catch (e: Exception) {
+//            throw UnknownError
+//        }
+//    }
 
     override fun getNewerCount(id: Long): Flow<Int> = flow {
         while (true) {

@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -19,7 +20,7 @@ import ru.javacat.nework.databinding.FragmentVideoPlayerBinding
 import ru.javacat.nework.util.DownloadAndSaveImageTask
 
 @AndroidEntryPoint
-class VideoPlayerFragment : DialogFragment() {
+class VideoPlayerFragment : Fragment() {
     private lateinit var binding: FragmentVideoPlayerBinding
     private lateinit var player: ExoPlayer
 
@@ -46,22 +47,29 @@ class VideoPlayerFragment : DialogFragment() {
 
         binding.closeBtn.setOnClickListener {
             player.release()
-            this.dismiss()
+            findNavController().navigateUp()
         }
 
         return binding.root
     }
     override fun onStart() {
         super.onStart()
-        dialog!!.window?.setLayout(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
+        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
+//        dialog!!.window?.setLayout(
+//            ViewGroup.LayoutParams.MATCH_PARENT,
+//            ViewGroup.LayoutParams.WRAP_CONTENT
+//        )
     }
 
     override fun onStop() {
         super.onStop()
         player.stop()
+        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.VISIBLE
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
     }
 
     //    override fun onCreateDialog(
