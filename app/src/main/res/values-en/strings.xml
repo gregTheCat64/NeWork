@@ -35,4 +35,16 @@
     <string name="sign_up">Sign Up</string>
     <string name="sign_in">Sign In</string>
     <string name="Liked">Liked</string>
+    <string name="When">Date:</string>
+    <string name="Where">Where:</string>
+    <string name="Speakers">Speakers</string>
+    <string name="Required_field">Required field</string>
+    <string name="chooser_link">Choose app</string>
+    <string name="choose_avatar">Add picture</string>
+    <string name="passwordCheckError">Password fields are not the same</string>
+    <string name="incorrect_symbol">incorrect symbols</string>
+    <string name="pass_check">Password check</string>
+    <string name="pass">Password</string>
+    <string name="login">Login</string>
+    <string name="name">Name</string>
 </resources>

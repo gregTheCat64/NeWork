@@ -54,4 +54,12 @@
     <string name="When">Когда:</string>
     <string name="Where">Где:</string>
     <string name="Speakers">Спикеры:</string>
+    <string name="Required_field">Обязательное поле</string>
+    <string name="choose_avatar">Добавить фото</string>
+    <string name="passwordCheckError">Пароли не совпадают</string>
+    <string name="incorrect_symbol">Некорректный ввод</string>
+    <string name="pass_check">Проверка пароля</string>
+    <string name="pass">Пароль</string>
+    <string name="login">Логин</string>
+    <string name="name">Имя</string>
 </resources>

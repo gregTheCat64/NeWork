@@ -3,6 +3,8 @@ package ru.javacat.nework.ui.screens
 import android.app.Activity
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,11 +19,10 @@ import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.android.material.snackbar.Snackbar
 import ru.javacat.nework.R
 import ru.javacat.nework.databinding.FragmentRegistrationBinding
-import ru.javacat.nework.domain.model.AttachModel
-import ru.javacat.nework.util.AndroidUtils
 import ru.javacat.nework.ui.viewmodels.RegistrationViewModel
+import ru.javacat.nework.util.loadCircleCrop
+import ru.javacat.nework.util.snack
 
-private var avatar = AttachModel()
 
 class RegistrationFragment : Fragment() {
 
@@ -49,7 +50,7 @@ class RegistrationFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val binding = FragmentRegistrationBinding.inflate(inflater, container,false)
 
         val pickPhotoLauncher =
@@ -85,30 +86,71 @@ class RegistrationFragment : Fragment() {
                 }
         }
 
+        binding.passwordEditText.addTextChangedListener(object : TextWatcher{
+            val wrongSymbols = context?.getString(R.string.incorrect_symbol)
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (!s.isNullOrBlank())
+                    if (s.contains("[^A-Za-z0-9_]".toRegex()))
+                        binding.passLayout.error = wrongSymbols
+                else binding.passLayout.error = null
+                else binding.passLayout.error = null
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+
+            }
+        })
+
         binding.registerUserBtn.setOnClickListener {
-            if (!binding.loginEditText.text.isNullOrEmpty() &&
-                !binding.passwordEditText.text.isNullOrEmpty()&&
-                !binding.nameEditText.text.isNullOrEmpty()){
-                val login = binding.loginEditText.text.toString().trim()
-                println("$login")
-                val password = binding.passwordEditText.text.toString().trim()
-                println("$password")
-                val name = binding.nameEditText.text.toString().trim()
-                AndroidUtils.hideKeyboard(requireView())
+            val login = binding.loginEditText.text.toString().trim()
+            val password = binding.passwordEditText.text.toString().trim()
+            val name = binding.nameEditText.text.toString().trim()
+            val passCheck = binding.passwordCheckEditText.text.toString().trim()
+            val errorString = context?.getString(R.string.Required_field)
+            val passwordCheckErrorString = context?.getString(R.string.passwordCheckError)
 
-                if (binding.passwordEditText.text.toString().trim() == binding.passwordCheckEditText.text.toString().trim()){
+            when {
+                login.isEmpty() && password.isEmpty() && name.isEmpty() && passCheck.isEmpty() -> {
+                    binding.loginLayout.error = errorString
+                    binding.nameLayout.error = errorString
+                    binding.passLayout.error = errorString
+                    binding.passCheckLayout.error = errorString
+                    binding.nameEditText.requestFocus()
+                }
+                name.isEmpty() ->{
+                    binding.nameLayout.error = errorString
+                }
+                login.isEmpty() -> {
+                    binding.loginLayout.error = errorString
+                    binding.loginEditText.requestFocus()
+                }
+                password.isEmpty() ->{
+                    binding.passLayout.error = errorString
+                    binding.passwordEditText.requestFocus()
+                }
+                passCheck.isEmpty() -> {
+                    binding.passLayout.error = errorString
+                    binding.passwordCheckEditText.requestFocus()
+                }
+                password != passCheck -> {
+                    snack(passwordCheckErrorString!!)
+                    binding.passwordEditText.requestFocus()
+                }
+                else -> {
                     viewModel.registerUser(login,password,name)
-                } else Snackbar.make(binding.root, "Пароли не совпадают", Snackbar.LENGTH_LONG).show()
-
-                //viewModel.registerUser(login,password,name)
-            } else Snackbar.make(binding.root, "Заполните все поля", Snackbar.LENGTH_LONG).show()
+                }
+            }
         }
 
         viewModel.photo.observe(viewLifecycleOwner) {
             if (it?.uri != null){
                 binding.avatarImage.isVisible = true
                 binding.pickPhoto.isVisible = false
-                binding.avatarImage.setImageURI(it.uri)
+                binding.avatarImage.loadCircleCrop(it.uri.toString())
                 //getAvatars(it.uri.toString(), binding)
             }
         }
