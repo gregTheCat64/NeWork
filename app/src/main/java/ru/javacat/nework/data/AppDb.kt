@@ -11,6 +11,7 @@ import ru.javacat.nework.util.Converters
     PostEntity::class,
     PostRemoteKeyEntity::class,
     EventRemoteKeyEntity::class,
+    WallRemoteKeyEntity::class,
     EventEntity::class,
     UserEntity::class,
     JobEntity::class
@@ -23,5 +24,6 @@ abstract class AppDb : RoomDatabase() {
     abstract fun eventRemoteKeyDao(): EventRemoteKeyDao
     abstract fun userDao(): UserDao
     abstract fun jobDao(): JobsDao
+    abstract fun wallRemoteKeyDao(): WallRemoteKeyDao
 
 }

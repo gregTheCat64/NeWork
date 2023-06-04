@@ -197,7 +197,10 @@ class NewPostFragment : Fragment() {
                 val result = bundle.getLongArray("IDS")
                 if (result != null) {
                     postViewModel.setMentions(result.toList())
-                    postViewModel.changeLink(binding.linkEditText.text.toString())
+                    if (binding.linkEditText.text?.isNotEmpty() == true){
+                        postViewModel.changeLink(binding.linkEditText.text.toString())
+                    }
+
                 }
             }
             findNavController().navigate(R.id.usersAddingFragment)

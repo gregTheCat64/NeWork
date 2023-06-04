@@ -20,6 +20,7 @@ import ru.javacat.nework.domain.model.PostModel
 import ru.javacat.nework.domain.model.User
 import ru.javacat.nework.domain.repository.PostRepository
 import ru.javacat.nework.domain.repository.UserRepository
+import ru.javacat.nework.domain.repository.WallRepository
 import ru.javacat.nework.util.SingleLiveEvent
 import javax.inject.Inject
 
@@ -33,10 +34,11 @@ private val noAttach = AttachModel()
 
 @HiltViewModel
 class PostViewModel @Inject constructor(
-    private val postRepository: PostRepository
+    private val postRepository: PostRepository,
 ) : ViewModel() {
     val data: Flow<PagingData<PostModel>> =
         postRepository.data.cachedIn(viewModelScope)
+
 
     val count = 5
 
@@ -100,9 +102,7 @@ class PostViewModel @Inject constructor(
         }
     }
 
-    suspend fun getUserPosts(id: Long): Flow<PagingData<PostModel>>{
-        return postRepository.getUserPosts(id).cachedIn(viewModelScope)
-    }
+
 
 //    fun loadPostsByAuthorId(authorId: Long) = viewModelScope.launch {
 //        try {
@@ -129,8 +129,9 @@ class PostViewModel @Inject constructor(
 
     fun refresh() {
         viewModelScope.launch {
-            _state.value = FeedModelState(refreshing = true)
+
             try {
+                _state.value = FeedModelState(loading = true)
                 postRepository.getLatest(count)
                 _state.value = FeedModelState(idle = true)
             } catch (e: Exception) {

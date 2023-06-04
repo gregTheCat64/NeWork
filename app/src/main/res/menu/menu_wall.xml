@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <group android:id="@+id/favMenu">
+        <item android:id="@+id/toFav" android:title="@string/toFav"
+            android:icon="@drawable/ic_like_selector"
+            android:checkable="true"
+            android:iconTint="@color/white"
+            app:showAsAction="always"/>
+    </group>
+    <group android:id="@+id/wallMenu">
+        <item android:id="@+id/addPostMenuBtn"
+            android:title="@string/add_post"
+            app:showAsAction="never"
+            />
+        <item android:id="@+id/addJobMenuBtn"
+            android:title="@string/addJob"
+            app:showAsAction="never"/>
+
+
+    </group>
+
+</menu>

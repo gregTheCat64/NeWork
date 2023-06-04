@@ -16,11 +16,8 @@ interface PostRepository {
     val data: Flow<PagingData<PostModel>>
     suspend fun getAll()
 
-    suspend fun getUserPosts(id: Long):Flow<PagingData<PostModel>>
-
     suspend fun getLatest(count: Int)
-//    suspend fun getPostsByAuthorId(authorId: Long):List<PostModel>?
-//    suspend fun updatePostsByAuthorId(authorId: Long):List<PostModel>?
+
     fun getNewerCount(id: Long): Flow<Int>
     suspend fun likeById(id: Long)
     suspend fun save(post: PostRequest)

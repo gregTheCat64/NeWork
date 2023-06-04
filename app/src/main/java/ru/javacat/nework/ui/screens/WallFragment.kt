@@ -15,8 +15,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.SimpleItemAnimator
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import ru.javacat.nework.R
 import ru.javacat.nework.data.auth.AppAuth
 import ru.javacat.nework.databinding.FragmentWallBinding
@@ -34,8 +38,7 @@ import javax.inject.Inject
 class WallFragment : Fragment() {
     private val userViewModel: UserViewModel by viewModels()
     private val postViewModel: PostViewModel by activityViewModels()
-    private val eventViewModel: EventViewModel by viewModels()
-    private val jobsViewModel: JobsViewModel by viewModels()
+    private val wallViewModel: WallViewModel by viewModels()
 
     override fun onStart() {
         super.onStart()
@@ -44,7 +47,8 @@ class WallFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.VISIBLE
+        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility =
+            View.VISIBLE
     }
 
     override fun onResume() {
@@ -52,7 +56,6 @@ class WallFragment : Fragment() {
         (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
     }
 
-    //private val mediaObserver = MediaLifecycleObserver()
 
     @Inject
     lateinit var appAuth: AppAuth
@@ -60,73 +63,93 @@ class WallFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val binding = FragmentWallBinding.inflate(inflater)
 
-        val mAnimator = binding.eventsList.itemAnimator as SimpleItemAnimator
+
+        val mAnimator = binding.postsList.itemAnimator as SimpleItemAnimator
         mAnimator.supportsChangeAnimations = false
 
         val args = arguments
         val authorId = args?.getLong("userID", 0L) ?: 0L
+        val myId = appAuth.authStateFlow.value.id
 
-
-        binding.addJobBtn.isVisible = authorId == appAuth.getId()
-
-        var expandedPosts = false
-        var expandedEvents = false
-        var expandedJobs = false
 
         //init
         userViewModel.getUserById(authorId)
-        jobsViewModel.getJobsByUserId(authorId)
-        //postViewModel.loadPostsByAuthorId(authorId)
-        //eventViewModel.getByAuthorId(authorId)
+        //jobsViewModel.getJobsByUserId(authorId)
+        val favBtn = binding.toFavBtn
+        val addJobBtn = binding.addJobBtn
+        val toolbar = binding.mainToolbar
+
+        toolbar.menu.setGroupVisible(R.id.wallMenu, myId == authorId)
+        toolbar.menu.setGroupVisible(R.id.favMenu, myId != authorId)
+        val fav = toolbar.menu.findItem(R.id.favMenu)
+        //fav.setChecked(true)
+
+        addJobBtn.isVisible = myId == authorId && binding.userJob.text.isEmpty()
+        favBtn.isVisible = myId != authorId
+
+        favBtn.setOnClickListener {
+            if (!favBtn.isChecked){
+                snack("Больше не в избранном")
+            } else {
+                snack("Добавлен в избранное")
+            }
+        }
+
+        addJobBtn.setOnClickListener {
+            findNavController().navigate(R.id.newJobFragment)
+        }
+
+        binding.userJob.setOnClickListener {
+            val bundle = Bundle()
+            bundle.putLong("userID", authorId)
+            findNavController().navigate(R.id.jobsFragment, bundle)
+        }
+
+
+        lifecycleScope.launch {
+            val job = wallViewModel.getUserJob(authorId)
+            if (job.isNullOrEmpty()) {
+                binding.userJob.visibility = View.GONE
+            } else {
+                binding.userJob.text = job
+            }
+            val postsSize = wallViewModel.getPostsCount(authorId)
+            binding.postsSize.text = "$postsSize записей "
+        }
+
 
         //refresh
-        binding.refreshBtn.setOnClickListener {
-            //postViewModel.updatePostsByAuthorId(authorId)
-            //eventViewModel.updateEventsByAuthorId(authorId)
-            jobsViewModel.updateJobsByUserId(authorId)
-        }
 
-        postViewModel.state.observe(viewLifecycleOwner){state->
-            binding.refreshBtn.isVisible = !state.loading
-            binding.progress.isVisible = state.loading
-        }
+//        postViewModel.state.observe(viewLifecycleOwner) { state ->
+//            //binding.refreshBtn.isVisible = !state.loading
+//            //binding.progress.isVisible = state.loading
+//        }
 
         //user:
-        userViewModel.user.observe(viewLifecycleOwner) { user ->
-            user?.avatar?.let { binding.avatar.loadCircleCrop(it) }
-            user?.name?.let { binding.name.text = it }
-        }
+//        userViewModel.user.observe(viewLifecycleOwner) { user ->
+//            user?.avatar?.let { binding.avatar.loadCircleCrop(it) }
+//            user?.name?.let { binding.mainToolbar.title = it }
+//
+//        }
+        binding.avatar
 
-        //jobs:
-        val jobsAdapter = JobsAdapter()
-
-        binding.jobsList.adapter = jobsAdapter
-
-        jobsViewModel.userJobs.observe(viewLifecycleOwner) {
-            jobsAdapter.submitList(it)
-        }
-        binding.jobsListBtn.setOnClickListener {
-            jobsViewModel.getJobsByUserId(authorId)
-            expandedJobs = !expandedJobs
-            binding.jobsList.isVisible = expandedJobs
-        }
-
-
-        //posts:
-        val postAdapter = PostsAdapter(object : OnInteractionListener {
+        val adapter = PostsAdapter(object : OnInteractionListener {
             override fun onLike(post: PostModel) {
-                if (appAuth.authStateFlow.value.id != 0L) {
+                val myId = appAuth.authStateFlow.value.id
+                if (myId != 0L) {
                     postViewModel.likeById(post.id)
                 } else showSignInDialog(this@WallFragment)
             }
 
             override fun onEdit(post: PostModel) {
+                //удаляем картинку из лайвдаты если она там есть
                 postViewModel.deleteAttachment()
                 postViewModel.edit(post)
                 findNavController().navigate(R.id.newPostFragment)
+
             }
 
             override fun onRemove(post: PostModel) {
@@ -160,7 +183,8 @@ class WallFragment : Fragment() {
             }
 
             override fun onResave(post: PostModel) {
-                super.onResave(post)
+                postViewModel.edit(post)
+                //postViewModel.save()
             }
 
             override fun onPlayAudio(post: PostModel) {
@@ -172,10 +196,7 @@ class WallFragment : Fragment() {
                 val bundle = Bundle()
                 bundle.putString("URL", url)
                 findNavController().navigate(R.id.videoPlayerFragment, bundle)
-            }
 
-            override fun onImage(url: String) {
-                showImageDialog(url, parentFragmentManager)
             }
 
             override fun onUser(post: PostModel) {
@@ -184,8 +205,16 @@ class WallFragment : Fragment() {
                 findNavController().navigate(R.id.wallFragment, bundle)
             }
 
+            override fun onImage(url: String) {
+                showImageDialog(url, childFragmentManager)
+            }
+
             override fun onMention(post: PostModel) {
-                showUserListDialog(post.mentionIds, parentFragmentManager)
+                showUserListDialog(post.mentionIds, childFragmentManager)
+            }
+
+            override fun onLiked(post: PostModel) {
+                post.likeOwnerIds?.let { showUserListDialog(it, childFragmentManager) }
             }
 
             override fun onCoords(post: PostModel) {
@@ -193,122 +222,6 @@ class WallFragment : Fragment() {
                 val bundle = Bundle()
                 if (coords != null) {
                     bundle.putDoubleArray("POINT", doubleArrayOf(coords.latitude, coords.longitude))
-                }
-                findNavController().navigate(R.id.mapsFragment, bundle)
-            }
-        })
-
-        binding.postsList.adapter = postAdapter
-
-//        postViewModel.userPosts.observe(viewLifecycleOwner) {
-//            postAdapter.submitList(it)
-//        }
-
-        lifecycleScope.launchWhenCreated {
-            postViewModel.getUserPosts(authorId).collectLatest {
-                postAdapter.submitData(it)
-            }
-        }
-
-        binding.postListBtn.setOnClickListener {
-            //postViewModel.loadPostsByAuthorId(authorId)
-            expandedPosts = !expandedPosts
-            binding.postsList.isVisible = expandedPosts
-            binding.eventsList.isVisible = false
-        }
-
-        //events:
-        val eventsAdapter = EventsAdapter(object : OnEventsListener {
-            override fun onLike(event: EventModel) {
-                if (appAuth.authStateFlow.value.id!=0L){
-                    eventViewModel.likeById(event.id)
-                }else showSignInDialog(this@WallFragment)
-            }
-
-            override fun onEdit(event: EventModel) {
-                eventViewModel.edit(event)
-                findNavController().navigate(R.id.newEventFragment)
-            }
-
-            override fun onRemove(event: EventModel) {
-                eventViewModel.removeById(event.id)
-            }
-
-            override fun onTakePartBtn(event: EventModel) {
-                if (appAuth.authStateFlow.value.id!=0L){
-                    eventViewModel.takePart(event)
-                    if (event.participatedByMe){
-                        snack("Вы вышли")
-                    } else{
-                        snack("Вы участвуете!")
-                    }
-                }else showSignInDialog(this@WallFragment)
-
-            }
-
-            override fun onShare(event: EventModel) {
-                val intent = Intent().apply {
-                    action = Intent.ACTION_SEND
-
-                    val author = event.author
-                    val content = event.content
-                    val attach = event.attachment?.url?:""
-                    val date = event.datetime?.asString()
-                    val link = event.link?:""
-                    val format = event.type.name
-
-                    val msg =
-                        "$author делится мероприятием:\n" +
-                                "$content \n" +
-                                "начало в $date \n"+
-                                "формат мероприятия: $format"+
-                                "$attach \n"+
-                                "$link\n"+
-                                "отправлено из NeWork App.\n"
-
-                    putExtra(Intent.EXTRA_TEXT, msg)
-                    type = "text/plain"
-                }
-
-                val shareIntent =
-                    Intent.createChooser(intent, getString(R.string.chooser_share_post))
-                startActivity(shareIntent)
-            }
-
-            override fun onParticipant(ids: List<Long>) {
-                showUserListDialog(ids, childFragmentManager)
-            }
-
-            override fun onPlayVideo(url: String) {
-                val bundle = Bundle()
-                bundle.putString("URL", url)
-                findNavController().navigate(R.id.videoPlayerFragment, bundle)
-            }
-
-            override fun onUser(event: EventModel) {
-                val bundle = Bundle()
-                bundle.putLong("userID", event.authorId)
-                findNavController().navigate(R.id.wallFragment, bundle)
-            }
-
-            override fun onLiked(event: EventModel) {
-                event.likeOwnerIds?.let { showUserListDialog(it, childFragmentManager) }
-            }
-
-            override fun onImage(url: String) {
-                showImageDialog(url, childFragmentManager)
-            }
-
-            override fun onPlayAudio(event: EventModel) {
-                event.playBtnPressed = !event.playBtnPressed
-                (requireActivity() as AppActivity).playAudio(event.attachment?.url.toString())
-            }
-
-            override fun onLocation(event: EventModel) {
-                val coords = event.coords
-                val bundle = Bundle()
-                if (coords != null) {
-                    bundle.putDoubleArray("POINT", doubleArrayOf(coords.latitude,coords.longitude))
                 }
                 findNavController().navigate(R.id.mapsFragment, bundle)
             }
@@ -324,61 +237,39 @@ class WallFragment : Fragment() {
             }
         })
 
-        binding.eventsList.adapter = eventsAdapter
+        binding.postsList.adapter = adapter
 
         lifecycleScope.launchWhenCreated {
-            eventViewModel.getUserEvents(authorId).collectLatest {
-                eventsAdapter.submitData(it)
+            wallViewModel.getUserPosts(authorId).collectLatest {
+                adapter.submitData(it)
             }
         }
 
-//        eventViewModel.userEvents.observe(viewLifecycleOwner){
-//            eventsAdapter.submitList(it)
-//        }
-
-
-        binding.eventsListBtn.setOnClickListener {
-            //eventViewModel.getByAuthorId(authorId)
-            expandedEvents = !expandedEvents
-            binding.eventsList.isVisible = expandedEvents
-        }
-
-        //navigation:
-        binding.addJobBtn.setOnClickListener {
-            findNavController().navigate(R.id.newJobFragment)
-        }
-
-
-        binding.backButton.setOnClickListener {
+        binding.mainToolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
 
-//        binding.swipeToRefresh.setOnRefreshListener {
-//            //binding.postsList.smoothScrollToPosition(0)
-//            wallViewModel.updatePostsByAuthorId(authorId)
-//        }
-
-//        binding.jobsListBtn.setOnClickListener {
-//            val action = WallFragmentDirections.actionWallFragmentToJobsFragment(authorId)
-//            findNavController().navigate(action)
-//        }
-
-//        binding.swipeToRefresh.setOnRefreshListener {
-//            jobsViewModel.getJobsByUserId(authorId)
-//        }
-//
-//        jobsViewModel.data.observe(viewLifecycleOwner){
-//           // adapter.(it)
-//        }
+        binding.mainToolbar.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.addPostMenuBtn ->{
+                    findNavController().navigate(R.id.newPostFragment)
+                    true
+                }
+                R.id.addJobMenuBtn -> {
+                    findNavController().navigate(R.id.newJobFragment)
+                    true
+                }
+                R.id.toFav -> {
+                    snack("В избранное")
+                    true
+                }
+                else -> false
+            }
+        }
 
 
         return binding.root
     }
 
-    companion object {
-        @JvmStatic
-        fun newInstance() =
-            WallFragment()
-    }
 
 }

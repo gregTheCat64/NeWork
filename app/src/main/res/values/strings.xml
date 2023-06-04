@@ -62,4 +62,6 @@
     <string name="pass">Пароль</string>
     <string name="login">Логин</string>
     <string name="name">Имя</string>
+    <string name="addJob">Добавить работу</string>
+    <string name="toFav">в избранное</string>
 </resources>

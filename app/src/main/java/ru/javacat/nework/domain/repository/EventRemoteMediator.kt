@@ -34,12 +34,12 @@ class EventRemoteMediator(
                 }
                 LoadType.PREPEND -> {
                     return MediatorResult.Success(
-                        false
+                        true
                     )
                 }
                 LoadType.APPEND -> {
                     val id = keyDao.min() ?: return MediatorResult.Success(
-                        true
+                        false
                     )
                     apiService.getBefore(id, state.config.pageSize)
                 }

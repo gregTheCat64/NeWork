@@ -1,5 +1,6 @@
 package ru.javacat.nework.domain.repository
 
+import android.util.Log
 import androidx.paging.*
 import androidx.room.withTransaction
 import ru.javacat.nework.data.dao.PostDao
@@ -24,6 +25,7 @@ class PostRemoteMediator(
         loadType: LoadType,
         state: PagingState<Int, PostEntity>
     ): MediatorResult {
+        Log.i("mLOAD", loadType.name)
         try {
             val response = when (loadType) {
                 LoadType.REFRESH -> {
@@ -31,7 +33,7 @@ class PostRemoteMediator(
                 }
                 LoadType.PREPEND -> {
                     return MediatorResult.Success(
-                        false
+                        true
                     )
                 }
                 LoadType.APPEND -> {
@@ -82,13 +84,6 @@ class PostRemoteMediator(
                     }
                     else -> Unit
                 }
-                //val nextKey = if (body.isEmpty()) null else body.last().id
-//                body.map {
-//                    it.savedOnServer = true
-//                }
-                //val result = body.map { it.toModel() }.map(PostWithLikeOwnersAndMentions::fromDto)
-                //val result = body.map { it.toModel() }.map(PostEntity::fromDto)
-                //println("POST_MEDIATOR: $body")
 
 
                 dao.insert(

@@ -38,9 +38,16 @@
         <item name="android:minHeight">@dimen/icon_button_min_size</item>
     </style>
 
-    <style name="Widget.AppTheme.LikeCheckBox" parent="Widget.Material3.Button.ElevatedButton.Icon">
+    <style name="Widget.AppTheme.LikeCheckBox" parent="Widget.Material3.Button.ElevatedButton">
         <item name="iconTint">@color/like_checkbox_tint</item>
          <item name="android:inset">12dp</item>
+        <item name="android:minWidth">@dimen/icon_button_min_size</item>
+        <item name="android:minHeight">@dimen/icon_button_min_size</item>
+    </style>
+
+    <style name="Widget.AppTheme.FavCheckBox" parent="Widget.Material3.Button.IconButton">
+        <item name="iconTint">@color/white</item>
+        <item name="android:inset">12dp</item>
         <item name="android:minWidth">@dimen/icon_button_min_size</item>
         <item name="android:minHeight">@dimen/icon_button_min_size</item>
     </style>

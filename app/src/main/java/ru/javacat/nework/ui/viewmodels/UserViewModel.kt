@@ -52,7 +52,7 @@ class UserViewModel @Inject constructor(
         }
     }
 
-    fun getUserById(id: Long) {
+    fun getUserById(id: Long): User? {
         viewModelScope.launch {
             try {
                 if (id == 0L){
@@ -64,6 +64,7 @@ class UserViewModel @Inject constructor(
                 e.printStackTrace()
             }
         }
+        return _user.value
     }
 
     fun getUsersById(list: List<Long>): List<User>? {
@@ -75,11 +76,5 @@ class UserViewModel @Inject constructor(
         return _addedUsers.value
     }
 
-    fun getSpeakersById(list: List<Long>) {
-        viewModelScope.launch {
-            val users = repository.getUsersById(list)
-            _speakers.postValue(users as List<User>?)
-        }
-    }
 
 }

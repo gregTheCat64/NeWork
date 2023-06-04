@@ -1,165 +1,171 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
     android:orientation="vertical"
+    android:backgroundTint="@color/color_primary"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.screens.WallFragment">
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/main.appbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
+        android:layout_height="300dp"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         >
 
-    <LinearLayout
-        android:id="@+id/toolBarFrame"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:orientation="horizontal"
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/main.collapsing"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:contentScrim="?attr/colorPrimary"
+            app:expandedTitleTextColor="@color/white"
+            app:collapsedTitleTextColor="@color/white"
+            app:expandedTitleMarginStart="48dp"
+            app:expandedTitleMarginEnd="64dp"
+            >
 
-        android:background="@color/color_primary"
-        app:layout_scrollFlags="scroll|enterAlways"
-       >
+<!--            <ImageView-->
+<!--                android:id="@+id/main.backdrop"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:scaleType="centerCrop"-->
+<!--                android:src="@color/color_primary"-->
+<!--                app:layout_collapseMode="parallax"-->
+<!--                tools:ignore="ContentDescription"-->
+<!--                />-->
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/back_button"
-                style="@style/Widget.AppTheme.WhiteIconButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                app:icon="@drawable/ic_baseline_arrow_back_24" />
+            <FrameLayout
+                android:id="@+id/toolBarFrame"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/color_primary"
+                android:orientation="vertical"
+                app:layout_scrollFlags="scroll|enterAlways">
 
-            <ImageView
-                android:id="@+id/avatar"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:layout_marginStart="@dimen/dim32dp"
-                android:layout_marginEnd="@dimen/dim16dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_baseline_account_circle_24"
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <ImageView
+                        android:id="@+id/avatar"
+                        android:layout_width="102dp"
+                        android:layout_height="102dp"
+                        android:layout_marginTop="@dimen/dim64dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_baseline_account_circle_24" />
+
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/userJob"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Job Inc"
+                            android:layout_gravity="center"
+                            android:textSize="18sp"
+                            android:textColor="@color/light_grey"
+                            />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/addJobBtn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:visibility="invisible"
+                            android:text="Добавить работу"
+                            android:textColor="@color/white"
+                            app:icon="@drawable/ic_baseline_add_24"
+                            style="@style/Widget.Material3.Button"
+                            />
+
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/postsSize"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="13 записей"
+                        android:textColor="@color/light_grey"
+                        />
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/toFavBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_marginTop="@dimen/dim64dp"
+                    android:layout_marginEnd="@dimen/dim16dp"
+                    android:checkable="true"
+                    style="@style/Widget.AppTheme.FavCheckBox"
+                    app:icon="@drawable/ic_like_selector"
+                    />
+
+
+            </FrameLayout>
+
+
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/main.toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+
+                app:titleMarginStart="@dimen/dim48dp"
+                app:layout_collapseMode="pin"
+                app:menu="@menu/menu_wall"
+                app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
                 />
 
-            <TextView
-                android:id="@+id/name"
-                style="@style/TextAppearance.AppCompat.WhiteCaption"
-                android:layout_gravity="center"
-                android:layout_width="wrap_content"
+
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+
+
+<!--    <ProgressBar-->
+<!--        android:id="@+id/progress"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="center"-->
+<!--        android:padding="@dimen/dim8dp"-->
+<!--        android:visibility="visible"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+        >
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/postsList"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Стена"/>
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/card_post" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/refreshBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Widget.AppTheme.WhiteIconButton"
-                android:layout_gravity="center_vertical"
-                app:icon="@drawable/ic_baseline_refresh_24"
-                />
+    </androidx.core.widget.NestedScrollView>
 
-
-
-    </LinearLayout>
-
-    <ProgressBar
-        android:id="@+id/progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="visible"
-        android:layout_gravity="center"
-        android:padding="@dimen/dim8dp"
-        />
-
-
-
-
-
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/jobsListBtn"
-        style="@style/Widget.Material3.Button.TextButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/dim32dp"
-        android:checkable="true"
-        app:icon="@drawable/ic_expand_selector"
-        android:text="Места работы"
-        />
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/addJobBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/Widget.Material3.Button.TextButton"
-        android:text="Добавить работу"
-        android:visibility="gone"
-        android:layout_gravity="center"
-        app:icon="@drawable/ic_baseline_add_24"
-        />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/jobsList"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/card_job"
-        />
-
-
-
-    <Button
-        android:id="@+id/postListBtn"
-        style="@style/Widget.Material3.Button.TextButton"
-        android:layout_marginStart="@dimen/dim32dp"
-        android:checkable="true"
-        app:icon="@drawable/ic_expand_selector"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Записи пользователя"
-        />
-
-
-    <TextView
-        android:id="@+id/emptyText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/empty_posts"
-        android:visibility="gone"
-        android:padding="@dimen/dim64dp" />
-
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/postsList"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/card_post" />
-
-    <Button
-        android:id="@+id/eventsListBtn"
-        style="@style/Widget.Material3.Button.TextButton"
-        android:layout_marginStart="@dimen/dim32dp"
-        android:checkable="true"
-        app:icon="@drawable/ic_expand_selector"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Автор мероприятий"
-        />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/eventsList"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/card_event" />
-
-    </androidx.appcompat.widget.LinearLayoutCompat>
-</androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 
 

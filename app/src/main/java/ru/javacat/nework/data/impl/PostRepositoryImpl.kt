@@ -56,23 +56,6 @@ class PostRepositoryImpl @Inject constructor(
     ).flow
         .map { it.map(PostEntity::toDto) }
 
-    @OptIn(ExperimentalPagingApi::class)
-    override suspend fun getUserPosts(id: Long): Flow<PagingData<PostModel>>{
-        return Pager(
-            config = PagingConfig(pageSize = 5),
-            pagingSourceFactory = { postDao.getWallPagingSource(id) },
-            remoteMediator = PostRemoteMediator(
-                postsApi,
-                postDao,
-                postRemoteKeyDao,
-                appDb
-            )
-        ).flow
-            .map { it.map(PostEntity::toDto) }
-    }
-
-
-
 
     override suspend fun getAll() {
         try {

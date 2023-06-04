@@ -1,5 +1,6 @@
 package ru.javacat.nework.domain.repository
 
+import android.util.Log
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
@@ -20,23 +21,25 @@ class WallRemoteMediator(
     private val api: WallApi,
     private val dao: PostDao,
     private val keyDao: WallRemoteKeyDao,
-    private val appDb: AppDb
+    private val appDb: AppDb,
+    private val userId: Long
 ): RemoteMediator<Int, PostEntity>() {
     override suspend fun load(
         loadType: LoadType,
         state: PagingState<Int, PostEntity>
     ): MediatorResult {
+        Log.i("mLOAD", loadType.name)
         try {
             val response = when (loadType) {
                 LoadType.REFRESH -> {
-                    api.getMyWallLatest(state.config.initialLoadSize)
+                    api.getWallLatest(userId, state.config.initialLoadSize)
                 }
                 LoadType.PREPEND -> {
-                    return MediatorResult.Success(false)
+                    return MediatorResult.Success(true)
                 }
                 LoadType.APPEND -> {
-                    val id = keyDao.min() ?: return  MediatorResult.Success(true)
-                    api.getMyWallBefore(id, state.config.pageSize)
+                    val id = keyDao.min() ?: return  MediatorResult.Success(false)
+                    api.getWallBefore(userId, id, state.config.pageSize)
                 }
             }
 

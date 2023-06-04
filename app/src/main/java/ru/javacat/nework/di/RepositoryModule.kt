@@ -8,10 +8,12 @@ import ru.javacat.nework.data.impl.EventRepositoryImpl
 import ru.javacat.nework.data.impl.JobRepositoryImpl
 import ru.javacat.nework.data.impl.PostRepositoryImpl
 import ru.javacat.nework.data.impl.UserRepositoryImpl
+import ru.javacat.nework.data.impl.WallRepositoryImpl
 import ru.javacat.nework.domain.repository.EventRepository
 import ru.javacat.nework.domain.repository.JobRepository
 import ru.javacat.nework.domain.repository.PostRepository
 import ru.javacat.nework.domain.repository.UserRepository
+import ru.javacat.nework.domain.repository.WallRepository
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -33,4 +35,8 @@ interface RepositoryModule {
     @Singleton
     @Binds
     fun bindsJobRepository(impl: JobRepositoryImpl): JobRepository
+
+    @Singleton
+    @Binds
+    fun bindsWallRepository(impl: WallRepositoryImpl): WallRepository
 }

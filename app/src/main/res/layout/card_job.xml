@@ -11,6 +11,15 @@
 
     >
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/menuBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        style="@style/Widget.Material3.Button.IconButton"
+        app:icon="@drawable/ic_baseline_more_vert_24"
+        />
+
     <TableLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -45,13 +54,7 @@
                 app:layout_constraintStart_toEndOf="@+id/name"
                 app:layout_constraintTop_toTopOf="@+id/name" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/menuBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Widget.Material3.Button.IconButton"
-                app:icon="@drawable/ic_baseline_more_vert_24"
-                />
+
 
         </TableRow>
 

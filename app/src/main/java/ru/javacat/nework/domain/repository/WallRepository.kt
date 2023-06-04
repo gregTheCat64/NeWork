@@ -5,7 +5,13 @@ import kotlinx.coroutines.flow.Flow
 import ru.javacat.nework.domain.model.PostModel
 
 interface WallRepository {
-    val data: Flow<PagingData<PostModel>>
     suspend fun getAll()
+
+    suspend fun getLatest(id: Long): Flow<PagingData<PostModel>>
+
+    suspend fun getUserJob(id: Long): String?
+
+    suspend fun getPostsCount(id: Long): Int?
+
 
 }
