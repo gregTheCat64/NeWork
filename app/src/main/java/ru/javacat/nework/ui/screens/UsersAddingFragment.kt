@@ -69,8 +69,6 @@ class UsersAddingFragment : Fragment() {
         })
         binding.usersList.adapter = adapter
 
-
-
         var userList: List<User> = listOf()
         userViewModel.users.observe(viewLifecycleOwner){
             userList = it

@@ -32,18 +32,19 @@ class JobRepositoryImpl @Inject constructor(
 
     override suspend fun getJobsByUserId(id: Long): List<JobModel> {
         try {
-            val daoResult = jobDao.getByAuthorId(id)
-            Log.i("DAORES", "$daoResult")
-            if (daoResult.isEmpty()) {
+            var result = jobDao.getByAuthorId(id)
+            Log.i("DAORES", "$result")
+            if (result.isEmpty()) {
                 val response = jobsApi.getJobsById(id)
                 val body = response.body() ?: throw ApiError(response.code(), response.message())
-                val result = body.map {
+                val apiResult = body.map {
                     it.copy(userId = id)
                 }.map { it.toEntity() }
-                result.map { it.ownedByMe = appAuth.getId() == it.userId }
+                //result.map { it.ownedByMe = appAuth.getId() == it.userId }
                 jobDao.insert(result)
+                result = apiResult
             }
-            return daoResult.toModel()
+            return result.toModel()
 
         } catch (e: IOException) {
             e.printStackTrace()

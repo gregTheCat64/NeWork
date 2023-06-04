@@ -67,6 +67,8 @@ class UserViewModel @Inject constructor(
         return _user.value
     }
 
+    suspend fun getUser(id: Long): User? = repository.getById(id)
+
     fun getUsersById(list: List<Long>): List<User>? {
           viewModelScope.launch {
             val users = repository.getUsersById(list)

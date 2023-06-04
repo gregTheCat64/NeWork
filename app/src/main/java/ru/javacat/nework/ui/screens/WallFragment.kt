@@ -91,7 +91,7 @@ class WallFragment : Fragment() {
         favBtn.isVisible = myId != authorId
 
         favBtn.setOnClickListener {
-            if (!favBtn.isChecked){
+            if (!favBtn.isChecked) {
                 snack("Больше не в избранном")
             } else {
                 snack("Добавлен в избранное")
@@ -120,6 +120,14 @@ class WallFragment : Fragment() {
             binding.postsSize.text = "$postsSize записей "
         }
 
+        lifecycleScope.launch {
+            val user = userViewModel.getUser(authorId)
+            user?.avatar?.let { binding.avatar.loadCircleCrop(it) }
+            user?.name?.let {
+                binding.mainToolbar.title = user.name
+            }
+        }
+
 
         //refresh
 
@@ -128,13 +136,7 @@ class WallFragment : Fragment() {
 //            //binding.progress.isVisible = state.loading
 //        }
 
-        //user:
-//        userViewModel.user.observe(viewLifecycleOwner) { user ->
-//            user?.avatar?.let { binding.avatar.loadCircleCrop(it) }
-//            user?.name?.let { binding.mainToolbar.title = it }
-//
-//        }
-        binding.avatar
+
 
         val adapter = PostsAdapter(object : OnInteractionListener {
             override fun onLike(post: PostModel) {
@@ -251,18 +253,21 @@ class WallFragment : Fragment() {
 
         binding.mainToolbar.setOnMenuItemClickListener {
             when (it.itemId) {
-                R.id.addPostMenuBtn ->{
+                R.id.addPostMenuBtn -> {
                     findNavController().navigate(R.id.newPostFragment)
                     true
                 }
+
                 R.id.addJobMenuBtn -> {
                     findNavController().navigate(R.id.newJobFragment)
                     true
                 }
+
                 R.id.toFav -> {
                     snack("В избранное")
                     true
                 }
+
                 else -> false
             }
         }
