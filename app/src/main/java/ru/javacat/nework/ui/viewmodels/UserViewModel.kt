@@ -1,5 +1,6 @@
 package ru.javacat.nework.ui.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
@@ -26,6 +28,8 @@ class UserViewModel @Inject constructor(
     val anon: User = User(0L,"","","")
 
     val users = userData.asLiveData()
+
+    var newUser: User = anon
 
     private val _user = MutableLiveData<User>()
     val user: LiveData<User>
@@ -52,19 +56,13 @@ class UserViewModel @Inject constructor(
         }
     }
 
-    fun getUserById(id: Long): User? {
+    fun     getUserById(id: Long): User? {
         viewModelScope.launch {
-            try {
-                if (id == 0L){
-                    _user.postValue(anon)
-                } else{
-                    _user.postValue(repository.getById(id))
-                }
-            } catch (e: Exception){
-                e.printStackTrace()
-            }
+                _user.postValue(repository.getById(id))
+            Log.i("mUSER", newUser.name)
         }
-        return _user.value
+        //Log.i("mUSER", newUser.name)
+        return newUser
     }
 
     suspend fun getUser(id: Long): User? = repository.getById(id)
@@ -73,10 +71,7 @@ class UserViewModel @Inject constructor(
           viewModelScope.launch {
             val users = repository.getUsersById(list)
             _addedUsers.postValue(users as List<User>?)
-
         }
         return _addedUsers.value
     }
-
-
 }

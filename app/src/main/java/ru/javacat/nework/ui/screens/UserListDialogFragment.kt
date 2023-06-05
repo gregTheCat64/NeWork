@@ -37,6 +37,7 @@ class UserListDialogFragment: DialogFragment() {
             override fun onTouch(user: User) {
                 val bundle = Bundle()
                 bundle.putLong("userID", user.id)
+                dialog?.dismiss()
                 findNavController().navigate(R.id.wallFragment, bundle)
             }
         } )

@@ -1,5 +1,6 @@
 package ru.javacat.nework.data.impl
 
+import android.util.Log
 import androidx.paging.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -51,7 +52,28 @@ class WallRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getUserJob(id: Long): String? {
-        return dao.getByAuthorId(id).last().authorJob
+        try {
+            Log.i("GETTING_JOB","try in repo")
+            val daoResult = dao.getPostsByAuthorId(id)
+            if (daoResult.isNullOrEmpty()){
+                val response = api.getWallLatest(id, 1)
+                val body = response.body()?: throw  ApiError(response.code(), response.message())
+                dao.insert(body.map { it.toEntity() })
+            }
+            return if (daoResult.isNullOrEmpty()){
+                Log.i("GETTING_JOB","api_worked in repo")
+                api.getWallLatest(id, 1).body()?.last()?.authorJob
+            } else {
+                Log.i("GETTING_JOB","dao_worked in repo")
+                daoResult.last().authorJob
+            }
+
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw UnknownError
+        }
     }
 
 

@@ -1,9 +1,14 @@
 package ru.javacat.nework.data.impl
 
 import android.util.Log
+import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -71,19 +76,15 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getUsersById(list: List<Long>): List<User?> {
-        try {
-            val result = list.map {
-                userApi.getById(it)
-            }.let { it }.map {
-                it.body()?.toModel()
+    override suspend fun getUsersById(list: List<Long>): List<User>? {
+        val userList = mutableListOf<User>()
+        for (i in list){
+            val u = userDao.getUserById(i)?.toModel()
+            if (u != null) {
+                userList.add(u)
             }
-            Log.i("USERS", result.toList().toString())
-            return result
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
-        return emptyList()
+        return userList.toList()
     }
 
     override suspend fun registerUser(
@@ -119,7 +120,6 @@ class UserRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             println(e)
             throw UnknownError
-
         }
     }
 

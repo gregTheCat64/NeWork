@@ -55,8 +55,7 @@ class UsersAddingFragment : Fragment() {
     ): View? {
         val binding = FragmentUsersAddingBinding.inflate(inflater, container, false)
 
-        val args : UsersAddingFragmentArgs by navArgs()
-        val typeOfUsers = args.usersArg
+        //val args : UsersAddingFragmentArgs by navArgs()
         val usersIds = mutableListOf<Long>()
         val sb = StringBuffer()
 

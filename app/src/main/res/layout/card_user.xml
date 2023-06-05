@@ -3,21 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:layout_margin="@dimen/dim8dp"
-    app:cardCornerRadius="@dimen/dim4dp"
+    app:cardCornerRadius="@dimen/dim8dp"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
 
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="156dp"
+        android:layout_height="48dp"
         android:orientation="horizontal"
-        android:padding="@dimen/dim4dp"
-        android:layout_height="wrap_content">
+        android:padding="@dimen/dim8dp"
+        >
 
         <ImageView
             android:id="@+id/userAvatar"
-            android:layout_gravity="center_horizontal"
+            android:layout_gravity="center"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/ic_baseline_account_circle_24"
@@ -25,12 +26,12 @@
         <TextView
             android:id="@+id/userName"
             android:layout_marginStart="@dimen/dim8dp"
-            android:text="fjksaljdfskajdsf"
-            android:layout_gravity="center"
+            android:text="fjksalj"
+            android:gravity="center_vertical"
             android:ellipsize="end"
             android:maxLines="2"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             />
 
     </LinearLayout>

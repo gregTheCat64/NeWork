@@ -2,6 +2,7 @@ package ru.javacat.nework.ui.screens
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -76,7 +77,9 @@ class WallFragment : Fragment() {
 
 
         //init
+        wallViewModel.getUserJob(authorId)
         userViewModel.getUserById(authorId)
+        Log.i("GETTING_JOB","init in Fragment")
         //jobsViewModel.getJobsByUserId(authorId)
         val favBtn = binding.toFavBtn
         val addJobBtn = binding.addJobBtn
@@ -109,24 +112,51 @@ class WallFragment : Fragment() {
         }
 
 
-        lifecycleScope.launch {
-            val job = wallViewModel.getUserJob(authorId)
-            if (job.isNullOrEmpty()) {
-                binding.userJob.visibility = View.GONE
-            } else {
-                binding.userJob.text = job
+        wallViewModel.userJob.observe(viewLifecycleOwner){
+            Log.i("GETTING_JOB","observer started in Fragment")
+            it.let {
+                Log.i("GETTING_JOB","binding in Fragment")
+                binding.userJob.isVisible != it.isNullOrEmpty()
+                binding.userJob.text = it
             }
-            val postsSize = wallViewModel.getPostsCount(authorId)
-            binding.postsSize.text = "$postsSize записей "
         }
 
+        wallViewModel.dataState.observe(viewLifecycleOwner){
+            snack("Ошибка загрузки")
+        }
+
+//        lifecycleScope.launch {
+//            val job = wallViewModel.getUserJob(authorId)
+//            if (job.isNullOrEmpty()) {
+//                binding.userJob.visibility = View.GONE
+//            } else {
+//                binding.userJob.text = job
+//            }
+//
+//        }
+
         lifecycleScope.launch {
-            val user = userViewModel.getUser(authorId)
+            val postsSize = wallViewModel.getPostsCount(authorId)
+            val postsSizeText = "$postsSize записей "
+            binding.postsSize.text = postsSizeText
+        }
+
+        userViewModel.user.observe(viewLifecycleOwner){user->
             user?.avatar?.let { binding.avatar.loadCircleCrop(it) }
             user?.name?.let {
-                binding.mainToolbar.title = user.name
+                binding.mainToolbar.title = it
             }
         }
+        //val user = userViewModel.getUserById(authorId)
+
+
+//        lifecycleScope.launch {
+//            val user = userViewModel.getUser(authorId)
+//            user?.avatar?.let { binding.avatar.loadCircleCrop(it) }
+//            user?.name?.let {
+//                binding.mainToolbar.title = user.name
+//            }
+//        }
 
 
         //refresh

@@ -50,11 +50,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="@dimen/dim8dp"
+        android:background="@color/white"
         android:orientation="horizontal">
 
         <EditText
             android:id="@+id/userFilter"
             android:layout_width="200sp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:hint="Введите имя" />
 
@@ -65,16 +67,18 @@
             app:icon="@drawable/ic_baseline_clear_24"
             style="@style/Widget.AppTheme.IconButton"
             />
+
+        <Button
+            android:id="@+id/filterButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Найти"
+            style="@style/Widget.Material3.Button"
+            />
     </LinearLayout>
 
 
-    <Button
-        android:id="@+id/filterButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Найти"
-        style="@style/Widget.Material3.Button.TextButton"
-        />
+
 
     <TextView
         android:id="@+id/usersTextView"
@@ -87,6 +91,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="visible"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:spanCount="2"
+        />
 
 </LinearLayout>

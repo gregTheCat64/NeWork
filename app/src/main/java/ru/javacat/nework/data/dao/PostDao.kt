@@ -25,7 +25,7 @@ interface PostDao {
     suspend fun getById(id: Long): PostEntity
 
     @Query("SELECT * FROM PostEntity WHERE authorId = :authorId ORDER BY id DESC")
-    suspend fun getByAuthorId(authorId: Long): List<PostEntity>
+    suspend fun getPostsByAuthorId(authorId: Long): List<PostEntity>?
 
     @Query("SELECT COUNT(*) == 0 FROM PostEntity")
     suspend fun isEmpty(): Boolean
