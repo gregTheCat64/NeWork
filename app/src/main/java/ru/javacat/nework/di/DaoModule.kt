@@ -32,4 +32,7 @@ object DaoModule {
     @Provides
     fun provideJobsDao(db: AppDb): JobsDao = db.jobDao()
 
+    @Provides
+    fun provideProfileDao(db: AppDb): ProfileDao = db.profileDao()
+
 }

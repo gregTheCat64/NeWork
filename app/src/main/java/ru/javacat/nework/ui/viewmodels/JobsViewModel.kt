@@ -39,15 +39,6 @@ class JobsViewModel @Inject constructor(
         }
     }
 
-    fun updateJobsByUserId(id: Long){
-        viewModelScope.launch {
-            try {
-                _userJobs.postValue(repository.updateJobsByUserId(id))
-            } catch (e: Exception){
-                e.printStackTrace()
-            }
-        }
-    }
 
     fun save(jobModel: JobModel){
         viewModelScope.launch {

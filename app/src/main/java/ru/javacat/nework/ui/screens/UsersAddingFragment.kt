@@ -29,9 +29,7 @@ import ru.javacat.nework.ui.viewmodels.UserViewModel
 @AndroidEntryPoint
 class UsersAddingFragment : Fragment() {
 
-    private val postViewModel: PostViewModel by activityViewModels()
     private val userViewModel: UserViewModel by activityViewModels()
-    private val eventViewModel: EventViewModel by activityViewModels()
 
     override fun onStart() {
         super.onStart()
@@ -61,17 +59,20 @@ class UsersAddingFragment : Fragment() {
 
         val adapter = UsersAdapter(object : OnUserListener {
             override fun onTouch(user: User) {
-                sb.append("@${user.name} ")
-                binding.usersTextView.text = sb
-                usersIds.add(user.id)
+                //sb.append("@${user.name} ")
+                //binding.usersTextView.text = sb
+                if (usersIds.contains(user.id)){
+                    usersIds.remove(user.id)
+                } else {usersIds.add(user.id)}
+
             }
         })
         binding.usersList.adapter = adapter
 
         var userList: List<User> = listOf()
         userViewModel.users.observe(viewLifecycleOwner){
-            userList = it
-            adapter.submitList(it)
+            userList = it.sortedBy { !it.favoured }
+            adapter.submitList(userList)
         }
 
         binding.filterButton.setOnClickListener {
@@ -93,20 +94,7 @@ class UsersAddingFragment : Fragment() {
         binding.saveBtn.setOnClickListener {
             val users = usersIds.toLongArray()
             setFragmentResult("IDS", bundleOf("IDS" to users))
-//            when (typeOfUsers){
-//                UsersType.MENTION -> {
-//                    postViewModel.setMentionIds(usersIds)
-//                    postViewModel.setUsersAdded(sb.toString())
-//                }
-//                UsersType.PARTICIPANT -> {
-//                    eventViewModel.setParticipantIds(usersIds)
-//                    eventViewModel.setParticipantAdded(sb.toString())
-//                }
-//                UsersType.SPEAKER -> {
-//                    eventViewModel.setSpeakerIds(usersIds)
-//                    eventViewModel.setSpeakerAdded(sb.toString())
-//                }
-//            }
+
             findNavController().navigateUp()
         }
 

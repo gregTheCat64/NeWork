@@ -9,7 +9,7 @@ interface WallRepository {
 
     suspend fun getLatest(id: Long): Flow<PagingData<PostModel>>
 
-    suspend fun getUserJob(id: Long): String?
+
 
     suspend fun getPostsCount(id: Long): Int?
 

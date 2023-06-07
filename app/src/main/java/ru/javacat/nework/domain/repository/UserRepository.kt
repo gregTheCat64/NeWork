@@ -10,6 +10,12 @@ interface UserRepository {
     suspend fun getAll()
     suspend fun getById(id: Long): User?
     suspend fun getUsersById(list: List<Long>): List<User>?
+
+    suspend fun addToFav(id: Long)
+
+    suspend fun deleteFromFav(id: Long)
     suspend fun updateUser(login: String, pass: String)
     suspend fun registerUser(login: String, pass: String, name: String, upload: MediaUpload?)
+
+
 }

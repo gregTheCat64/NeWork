@@ -51,7 +51,6 @@ class AppActivity : AppCompatActivity() {
     private lateinit var player: ExoPlayer
     private lateinit var binding: ActivityAppBinding
 
-    //private val postViewModel: PostViewModel by viewModels()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,9 +65,8 @@ class AppActivity : AppCompatActivity() {
         val barPlayBtn = findViewById<Button>(R.id.barPlayBtn)
         val barSeekBar = findViewById<SeekBar>(R.id.barSeekBar)
         val barCloseBtn = findViewById<Button>(R.id.barCloseBtn)
-        val profileBtn = findViewById<View>(R.id.profileBtn)
         val avatarImage = findViewById<ImageView>(R.id.appBarImage)
-        //val mainMenu = findViewById<MenuItem>(R.id.authorized)
+
 
         avatarImage.setOnClickListener {
             var authorized = viewModel.authorized
@@ -110,7 +108,8 @@ class AppActivity : AppCompatActivity() {
         //menu:
         viewModel.data.observe(this) {
             val id = appAuth.getId()
-            userViewModel.getUserById(id)
+                userViewModel.getUserById(id)
+
         }
 
         userViewModel.user.observe(this){user->
@@ -155,8 +154,6 @@ class AppActivity : AppCompatActivity() {
                         delay(1000)
                     }
                 }
-                //scope.cancel()
-                //duration = 0L
             }
         })
     }
@@ -199,6 +196,9 @@ class AppActivity : AppCompatActivity() {
                     showSignOutDialog(appAuth, this)
 
                 }
+                R.id.userListBtn -> {
+                    findNavController(R.id.nav_host_fragment).navigate(R.id.usersSearchFragment)
+                }
                 R.id.profileBtn -> {
                     if (appAuth.getId() != 0L) {
                         val id = appAuth.getId()
@@ -218,48 +218,6 @@ class AppActivity : AppCompatActivity() {
         menu.show()
     }
 
-
-//    private fun showSignOutDialog() {
-//        val listener = DialogInterface.OnClickListener { _, which ->
-//            when (which) {
-//                DialogInterface.BUTTON_POSITIVE -> appAuth.removeAuth()
-//                DialogInterface.BUTTON_NEGATIVE -> Toast.makeText(
-//                    this,
-//                    "ну и ладненько...",
-//                    Toast.LENGTH_SHORT
-//                ).show()
-//            }
-//        }
-//        val dialog = AlertDialog.Builder(this)
-//            .setCancelable(false)
-//            .setTitle("Внимание!")
-//            .setMessage("Вы точно хотите выйти?")
-//            .setPositiveButton("Уверен!", listener)
-//            .setNegativeButton("Нет", listener)
-//            .create()
-//
-//        dialog.show()
-//    }
-
-
-//    private fun checkGoogleApiAvailability() {
-//        with(googleApiAvailability) {
-//            val code = isGooglePlayServicesAvailable(this@AppActivity)
-//            if (code == ConnectionResult.SUCCESS) {
-//                return@with
-//            }
-//            if (isUserResolvableError(code)) {
-//                getErrorDialog(this@AppActivity, code, 9000)?.show()
-//                return
-//            }
-//            Toast.makeText(this@AppActivity, R.string.google_play_unavailable, Toast.LENGTH_LONG)
-//                .show()
-//        }
-//
-//        firebaseMessaging.token.addOnSuccessListener {
-//            println(it)
-//        }
-//    }
 
 }
 

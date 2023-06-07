@@ -14,7 +14,8 @@ import ru.javacat.nework.util.Converters
     WallRemoteKeyEntity::class,
     EventEntity::class,
     UserEntity::class,
-    JobEntity::class
+    JobEntity::class,
+    ProfileEntity::class
                      ], version = 1)
 @TypeConverters(Converters::class)
 abstract class AppDb : RoomDatabase() {
@@ -25,5 +26,7 @@ abstract class AppDb : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun jobDao(): JobsDao
     abstract fun wallRemoteKeyDao(): WallRemoteKeyDao
+
+    abstract fun profileDao(): ProfileDao
 
 }

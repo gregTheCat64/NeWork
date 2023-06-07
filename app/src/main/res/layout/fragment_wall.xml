@@ -29,15 +29,7 @@
             app:expandedTitleMarginEnd="64dp"
             >
 
-<!--            <ImageView-->
-<!--                android:id="@+id/main.backdrop"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:scaleType="centerCrop"-->
-<!--                android:src="@color/color_primary"-->
-<!--                app:layout_collapseMode="parallax"-->
-<!--                tools:ignore="ContentDescription"-->
-<!--                />-->
+
 
             <FrameLayout
                 android:id="@+id/toolBarFrame"
@@ -57,7 +49,7 @@
                         android:id="@+id/avatar"
                         android:layout_width="102dp"
                         android:layout_height="102dp"
-                        android:layout_marginTop="@dimen/dim64dp"
+                        android:layout_marginTop="94dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_baseline_account_circle_24" />
 
@@ -66,13 +58,15 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:orientation="horizontal">
+                        android:layout_marginTop="@dimen/dim8dp"
+                        android:orientation="vertical">
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/userJob"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Job Inc"
+
+                            android:visibility="gone"
                             android:layout_gravity="center"
                             android:textSize="18sp"
                             android:textColor="@color/light_grey"
@@ -81,24 +75,23 @@
                             android:id="@+id/addJobBtn"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:visibility="invisible"
+                            android:visibility="gone"
                             android:text="Добавить работу"
                             android:textColor="@color/white"
                             app:icon="@drawable/ic_baseline_add_24"
                             style="@style/Widget.Material3.Button"
                             />
-
+                        <TextView
+                            android:id="@+id/postsSize"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:textColor="@color/light_grey"
+                            />
 
                     </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/postsSize"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="13 записей"
-                        android:textColor="@color/light_grey"
-                        />
+
                 </LinearLayout>
 
                 <com.google.android.material.button.MaterialButton
@@ -107,15 +100,13 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
                     android:layout_marginTop="@dimen/dim64dp"
-                    android:layout_marginEnd="@dimen/dim16dp"
+                    android:layout_marginEnd="@dimen/dim32dp"
                     android:checkable="true"
                     style="@style/Widget.AppTheme.FavCheckBox"
                     app:icon="@drawable/ic_like_selector"
                     />
 
-
             </FrameLayout>
-
 
 
             <androidx.appcompat.widget.Toolbar
@@ -136,19 +127,19 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="@dimen/dim8dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
-<!--    <ProgressBar-->
-<!--        android:id="@+id/progress"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_gravity="center"-->
-<!--        android:padding="@dimen/dim8dp"-->
-<!--        android:visibility="visible"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent" />-->
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"

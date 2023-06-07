@@ -16,15 +16,24 @@ interface UserDao {
     @Query("SELECT * FROM UserEntity WHERE id = :id")
     suspend fun getUserById(id: Long): UserEntity?
 
-//    @Query("SELECT * FROM UserEntity WHERE id = :id")
-//    suspend fun getUserListById(list: List<Long>): List<UserEntity?>
+    @Query("""
+        UPDATE UserEntity SET
+        favoured = 1
+        WHERE id = :id
+    """)
+    suspend fun addToFav(id: Long)
 
-//    @Query("SELECT * FROM UserEntity WHERE name LIKE '%name%'")
-//    suspend fun getByString(name:String): List<UserEntity>
+    @Query("""
+        UPDATE UserEntity SET
+        favoured = 0
+        WHERE id = :id
+    """)
+    suspend fun deleteFromFav(id: Long)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(users: List<UserEntity>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(user: UserEntity)
 }

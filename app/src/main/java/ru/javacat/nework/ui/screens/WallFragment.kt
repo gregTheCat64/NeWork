@@ -5,10 +5,18 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.app.ActivityCompat.invalidateOptionsMenu
 import androidx.core.net.toUri
+import androidx.core.view.MenuProvider
+import androidx.core.view.get
+import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -26,7 +34,9 @@ import ru.javacat.nework.R
 import ru.javacat.nework.data.auth.AppAuth
 import ru.javacat.nework.databinding.FragmentWallBinding
 import ru.javacat.nework.domain.model.EventModel
+import ru.javacat.nework.domain.model.FeedModelState
 import ru.javacat.nework.domain.model.PostModel
+import ru.javacat.nework.domain.model.User
 import ru.javacat.nework.mediaplayer.MediaLifecycleObserver
 import ru.javacat.nework.ui.adapter.*
 import ru.javacat.nework.ui.viewmodels.*
@@ -40,6 +50,10 @@ class WallFragment : Fragment() {
     private val userViewModel: UserViewModel by viewModels()
     private val postViewModel: PostViewModel by activityViewModels()
     private val wallViewModel: WallViewModel by viewModels()
+
+
+    var currentUser: User = User(0L, "", "", "", false)
+
 
     override fun onStart() {
         super.onStart()
@@ -61,42 +75,80 @@ class WallFragment : Fragment() {
     @Inject
     lateinit var appAuth: AppAuth
 
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = FragmentWallBinding.inflate(inflater)
-
+        val binding = FragmentWallBinding.inflate(inflater, container, false)
 
         val mAnimator = binding.postsList.itemAnimator as SimpleItemAnimator
         mAnimator.supportsChangeAnimations = false
+
 
         val args = arguments
         val authorId = args?.getLong("userID", 0L) ?: 0L
         val myId = appAuth.authStateFlow.value.id
 
 
+        val favedIcon =
+            AppCompatResources.getDrawable(requireContext(), R.drawable.ic_baseline_favorite_24)
+        val unFavedIcon = AppCompatResources.getDrawable(
+            requireContext(),
+            R.drawable.ic_baseline_favorite_border_24
+        )
+
+
         //init
         wallViewModel.getUserJob(authorId)
         userViewModel.getUserById(authorId)
-        Log.i("GETTING_JOB","init in Fragment")
+        wallViewModel.getPostsCount(authorId)
+
         //jobsViewModel.getJobsByUserId(authorId)
-        val favBtn = binding.toFavBtn
+
         val addJobBtn = binding.addJobBtn
         val toolbar = binding.mainToolbar
+        val progressBar = binding.progress
+        val favBtn = binding.toFavBtn
 
-        toolbar.menu.setGroupVisible(R.id.wallMenu, myId == authorId)
-        toolbar.menu.setGroupVisible(R.id.favMenu, myId != authorId)
-        val fav = toolbar.menu.findItem(R.id.favMenu)
-        //fav.setChecked(true)
+        //(requireActivity() as AppActivity).setSupportActionBar(toolbar)
 
-        addJobBtn.isVisible = myId == authorId && binding.userJob.text.isEmpty()
+
+//        toolbar.menu.setGroupVisible(R.id.wallMenu, myId == authorId)
+//        toolbar.menu.setGroupVisible(R.id.favMenu, myId != authorId)
+
+
+//        toolbar.addMenuProvider(object : MenuProvider{
+//            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+//                menuInflater.inflate(R.menu.menu_wall, menu)
+//                menu.findItem(R.id.favMenu).icon = favedIcon
+//            }
+//
+//            override fun onPrepareMenu(menu: Menu) {
+//
+//
+//            }
+//
+//            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+//                return true
+//            }
+//
+//        })
+
+
+
+
+
         favBtn.isVisible = myId != authorId
 
         favBtn.setOnClickListener {
             if (!favBtn.isChecked) {
+                wallViewModel.deleteUserFromFav(myId, authorId)
+                val daores = wallViewModel.getFavList(myId)
+                snack("$daores")
                 snack("Больше не в избранном")
             } else {
+                wallViewModel.addUserToFav(myId, authorId)
                 snack("Добавлен в избранное")
             }
         }
@@ -112,60 +164,41 @@ class WallFragment : Fragment() {
         }
 
 
-        wallViewModel.userJob.observe(viewLifecycleOwner){
-            Log.i("GETTING_JOB","observer started in Fragment")
-            it.let {
-                Log.i("GETTING_JOB","binding in Fragment")
-                binding.userJob.isVisible != it.isNullOrEmpty()
+        wallViewModel.userJob.observe(viewLifecycleOwner) {
+            Log.i("GETTING_JOB", "observer started in Fragment")
+            if (it.isNullOrEmpty()) {
+                binding.userJob.visibility = View.GONE
+            } else {
+                binding.userJob.visibility = View.VISIBLE
                 binding.userJob.text = it
+            }
+            addJobBtn.isVisible = myId == authorId && binding.userJob.text.isNullOrBlank()
+//            it.let {
+//                Log.i("GETTING_JOB", "binding in Fragment")
+//                binding.userJob.isVisible != it.isNullOrEmpty()
+//                binding.userJob.text = it
+//            }
+        }
+
+        wallViewModel.dataState.observe(viewLifecycleOwner) { state ->
+            progressBar.isVisible = state.loading
+            if (state.error) {
+                snack("Ошибка загрузки")
             }
         }
 
-        wallViewModel.dataState.observe(viewLifecycleOwner){
-            snack("Ошибка загрузки")
+        wallViewModel.postsSize.observe(viewLifecycleOwner) { size ->
+            binding.postsSize.text = getPostSizeText(size)
         }
 
-//        lifecycleScope.launch {
-//            val job = wallViewModel.getUserJob(authorId)
-//            if (job.isNullOrEmpty()) {
-//                binding.userJob.visibility = View.GONE
-//            } else {
-//                binding.userJob.text = job
-//            }
-//
-//        }
-
-        lifecycleScope.launch {
-            val postsSize = wallViewModel.getPostsCount(authorId)
-            val postsSizeText = "$postsSize записей "
-            binding.postsSize.text = postsSizeText
-        }
-
-        userViewModel.user.observe(viewLifecycleOwner){user->
+        userViewModel.user.observe(viewLifecycleOwner) { user ->
             user?.avatar?.let { binding.avatar.loadCircleCrop(it) }
             user?.name?.let {
                 binding.mainToolbar.title = it
             }
+            currentUser = user
+            favBtn.isChecked = currentUser.favoured == true
         }
-        //val user = userViewModel.getUserById(authorId)
-
-
-//        lifecycleScope.launch {
-//            val user = userViewModel.getUser(authorId)
-//            user?.avatar?.let { binding.avatar.loadCircleCrop(it) }
-//            user?.name?.let {
-//                binding.mainToolbar.title = user.name
-//            }
-//        }
-
-
-        //refresh
-
-//        postViewModel.state.observe(viewLifecycleOwner) { state ->
-//            //binding.refreshBtn.isVisible = !state.loading
-//            //binding.progress.isVisible = state.loading
-//        }
-
 
 
         val adapter = PostsAdapter(object : OnInteractionListener {
@@ -231,11 +264,6 @@ class WallFragment : Fragment() {
 
             }
 
-            override fun onUser(post: PostModel) {
-                val bundle = Bundle()
-                bundle.putLong("userID", post.authorId)
-                findNavController().navigate(R.id.wallFragment, bundle)
-            }
 
             override fun onImage(url: String) {
                 showImageDialog(url, childFragmentManager)
@@ -277,11 +305,11 @@ class WallFragment : Fragment() {
             }
         }
 
-        binding.mainToolbar.setNavigationOnClickListener {
+        toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
 
-        binding.mainToolbar.setOnMenuItemClickListener {
+        toolbar.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.addPostMenuBtn -> {
                     findNavController().navigate(R.id.newPostFragment)
@@ -293,18 +321,28 @@ class WallFragment : Fragment() {
                     true
                 }
 
-                R.id.toFav -> {
-                    snack("В избранное")
-                    true
-                }
-
                 else -> false
             }
         }
 
-
         return binding.root
+
     }
+}
 
 
+fun getPostSizeText(size: Int): String {
+    val result = if (size in 5..20) {
+        "$size записей"
+    } else {
+        when (size % 10) {
+            1 -> "$size запись"
+            in (2..4) -> "$size записи"
+            in (5..9) -> "$size записей"
+            else -> {
+                "$size записей"
+            }
+        }
+    }
+    return result
 }

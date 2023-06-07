@@ -69,7 +69,6 @@ class UserRepositoryImpl @Inject constructor(
         } catch (e: IOException) {
             e.printStackTrace()
             throw NetworkError
-
         } catch (e: Exception) {
             e.printStackTrace()
             throw UnknownError
@@ -85,6 +84,14 @@ class UserRepositoryImpl @Inject constructor(
             }
         }
         return userList.toList()
+    }
+
+    override suspend fun addToFav(id: Long) {
+        userDao.addToFav(id)
+    }
+
+    override suspend fun deleteFromFav(id: Long) {
+       userDao.deleteFromFav(id)
     }
 
     override suspend fun registerUser(

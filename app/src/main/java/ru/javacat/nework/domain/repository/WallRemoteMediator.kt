@@ -43,10 +43,19 @@ class WallRemoteMediator(
                 }
             }
 
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+
+
             val body = response.body() ?: throw ApiError(
                 response.code(),
                 response.message()
             )
+
+            if (body.isEmpty()) {
+                return MediatorResult.Success(true)
+            }
 
             appDb.withTransaction {
                 when (loadType) {
@@ -77,7 +86,6 @@ class WallRemoteMediator(
                     }
                     else -> Unit
                 }
-
                 dao.insert(body.map { it.toEntity() })
             }
             return  MediatorResult.Success(body.isEmpty())

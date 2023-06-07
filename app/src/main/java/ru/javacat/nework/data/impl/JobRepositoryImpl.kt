@@ -30,21 +30,16 @@ class JobRepositoryImpl @Inject constructor(
         .map(List<JobEntity>::toModel)
         .flowOn(Dispatchers.Default)
 
-    override suspend fun getJobsByUserId(id: Long): List<JobModel> {
+    override suspend fun getJobsByUserId(id: Long): List<JobModel>? {
         try {
-            var result = jobDao.getByAuthorId(id)
-            Log.i("DAORES", "$result")
-            if (result.isEmpty()) {
-                val response = jobsApi.getJobsById(id)
-                val body = response.body() ?: throw ApiError(response.code(), response.message())
-                val apiResult = body.map {
-                    it.copy(userId = id)
-                }.map { it.toEntity() }
-                //result.map { it.ownedByMe = appAuth.getId() == it.userId }
-                jobDao.insert(result)
-                result = apiResult
-            }
-            return result.toModel()
+            val response = jobsApi.getJobsById(id)
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
+            val apiResult = body.map {
+                it.copy(userId = id)
+            }.map { it.toEntity() }
+            jobDao.insert(apiResult)
+            val daoResult = jobDao.getByAuthorId(id).map { it.toModel() }
+            return daoResult
 
         } catch (e: IOException) {
             e.printStackTrace()
@@ -61,7 +56,7 @@ class JobRepositoryImpl @Inject constructor(
             val result = jobsApi.getJobsById(id)
             result.body()?.let { it -> jobDao.insert(it.map { it.toEntity() }) }
             return result.body()?.map { it.toModel() }
-        }catch (e: Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
             throw UnknownError
         }

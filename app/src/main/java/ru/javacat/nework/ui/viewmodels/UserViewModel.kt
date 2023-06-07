@@ -25,7 +25,7 @@ class UserViewModel @Inject constructor(
 
 ) : ViewModel() {
     private val userData = repository.userData
-    val anon: User = User(0L,"","","")
+    val anon: User = User(0L, "", "", "", false)
 
     val users = userData.asLiveData()
 
@@ -48,7 +48,7 @@ class UserViewModel @Inject constructor(
         loadUsers()
     }
 
-    private fun loadUsers() = viewModelScope.launch {
+    fun loadUsers() = viewModelScope.launch {
         try {
             repository.getAll()
         } catch (e: Exception) {
@@ -56,22 +56,37 @@ class UserViewModel @Inject constructor(
         }
     }
 
-    fun     getUserById(id: Long): User? {
+    fun getUserById(id: Long) {
         viewModelScope.launch {
+            if (id!=0L){
                 _user.postValue(repository.getById(id))
+            } else _user.postValue(anon)
+
             Log.i("mUSER", newUser.name)
         }
         //Log.i("mUSER", newUser.name)
-        return newUser
     }
 
-    suspend fun getUser(id: Long): User? = repository.getById(id)
+    //suspend fun getUser(id: Long): User? = repository.getById(id)
 
     fun getUsersById(list: List<Long>): List<User>? {
-          viewModelScope.launch {
+        viewModelScope.launch {
             val users = repository.getUsersById(list)
             _addedUsers.postValue(users as List<User>?)
         }
         return _addedUsers.value
+    }
+
+    fun addToFav(id: Long){
+        viewModelScope.launch {
+            repository.addToFav(id)
+        }
+
+    }
+
+    fun deleteFromFav(id: Long){
+        viewModelScope.launch {
+            repository.deleteFromFav(id)
+        }
     }
 }

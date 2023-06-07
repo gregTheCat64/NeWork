@@ -40,13 +40,16 @@ import kotlinx.coroutines.flow.collectLatest
 import ru.javacat.nework.R
 import ru.javacat.nework.data.auth.AppAuth
 import ru.javacat.nework.databinding.FragmentPostsBinding
+import ru.javacat.nework.domain.model.FeedModelState
 import ru.javacat.nework.domain.model.PostModel
+import ru.javacat.nework.error.NetworkError
 import ru.javacat.nework.mediaplayer.MediaLifecycleObserver
 import ru.javacat.nework.ui.adapter.OnInteractionListener
 import ru.javacat.nework.ui.adapter.PostsAdapter
 import ru.javacat.nework.ui.screens.NewPostFragment.Companion.textArg
 import ru.javacat.nework.ui.viewmodels.PostViewModel
 import ru.javacat.nework.ui.viewmodels.UserViewModel
+import ru.javacat.nework.ui.viewmodels.WallViewModel
 import ru.javacat.nework.util.asString
 import ru.javacat.nework.util.snack
 import java.io.Serializable
@@ -60,7 +63,8 @@ class PostsFragment : Fragment() {
 
 
     private val postViewModel: PostViewModel by activityViewModels()
-    val userViewModel: UserViewModel by viewModels()
+    val wallViewModel: WallViewModel by viewModels()
+    private val userViewModel: UserViewModel by viewModels()
     //private val mediaObserver = MediaLifecycleObserver()
 
 
@@ -82,6 +86,14 @@ class PostsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentPostsBinding.inflate(inflater, container, false)
+
+        //init:
+        userViewModel.loadUsers()
+//        wallViewModel.getFavList(appAuth.getId())
+//        val favList = wallViewModel.favList.value
+//        favList?.map {
+//            userViewModel.addToFav(it)
+//        }
 
 
 
@@ -182,14 +194,13 @@ class PostsFragment : Fragment() {
             }
 
             override fun onPlayAudio(post: PostModel) {
-                post.playBtnPressed = !post.playBtnPressed
-                //snack(post.playBtnPressed.toString())
-                (requireActivity() as AppActivity).playAudio(post.attachment?.url.toString())
-//                if (!post.playBtnPressed){
-//                    (requireActivity() as AppActivity).stopAudio()
-//                } else {
-//                    (requireActivity() as AppActivity).playAudio(post.attachment?.url.toString())
-//                }
+                try {
+                    post.playBtnPressed = !post.playBtnPressed
+                    (requireActivity() as AppActivity).playAudio(post.attachment?.url.toString())
+                }
+                catch (e: NetworkError){
+                    snack("Ошибка сети")
+                }
 
             }
 

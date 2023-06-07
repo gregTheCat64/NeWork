@@ -196,7 +196,12 @@ class PostViewModel @Inject constructor(
     }
 
     fun edit(post: PostModel) {
-        _edited.value = post
+        try {
+            _edited.value = post
+        } catch (e:java.lang.Exception){
+            _state.value = FeedModelState(error = true)
+        }
+
         //_addedUsersIds.value = post.mentionIds
         println("POST2: ${_edited.value!!.content}")
     }
@@ -208,12 +213,22 @@ class PostViewModel @Inject constructor(
 
 
     fun likeById(id: Long) {
-        viewModelScope.launch { postRepository.likeById(id) }
+        viewModelScope.launch {
+            try {
+                postRepository.likeById(id)
+            } catch (e:java.lang.Exception){
+                _state.value = FeedModelState(error = true)
+            }
+        }
     }
 
     fun removeById(id: Long) {
         viewModelScope.launch {
-            postRepository.removeById(id)
+            try {
+                postRepository.removeById(id)
+            } catch (e:java.lang.Exception){
+                _state.value = FeedModelState(error = true)
+            }
         }
     }
 

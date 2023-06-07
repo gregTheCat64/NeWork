@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
+    android:layout_marginTop="@dimen/dim8dp"
     android:layout_margin="@dimen/dim8dp"
     app:cardCornerRadius="@dimen/dim8dp"
-    android:layout_width="wrap_content"
+    android:checkable="true"
+    android:clickable="true"
+    android:focusable="true"
+    android:layout_gravity="center_horizontal"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
 
-
-    <LinearLayout
-        android:layout_width="156dp"
+    <FrameLayout
+        android:layout_width="match_parent"
         android:layout_height="48dp"
         android:orientation="horizontal"
         android:padding="@dimen/dim8dp"
@@ -18,15 +22,16 @@
 
         <ImageView
             android:id="@+id/userAvatar"
-            android:layout_gravity="center"
+            android:layout_gravity="center|start"
             android:layout_width="24dp"
             android:layout_height="24dp"
+            android:layout_marginStart="@dimen/dim4dp"
             android:src="@drawable/ic_baseline_account_circle_24"
             />
         <TextView
             android:id="@+id/userName"
-            android:layout_marginStart="@dimen/dim8dp"
-            android:text="fjksalj"
+            android:layout_marginStart="@dimen/dim32dp"
+            android:text="fjkfdaslj"
             android:gravity="center_vertical"
             android:ellipsize="end"
             android:maxLines="2"
@@ -34,8 +39,16 @@
             android:layout_height="match_parent"
             />
 
-    </LinearLayout>
+        <ImageView
+            android:id="@+id/favIcon"
+            android:layout_width="@dimen/dim16dp"
+            android:layout_height="@dimen/dim16dp"
+            android:visibility="visible"
+            android:layout_gravity="start"
+            android:src="@drawable/ic_baseline_favorite_24"
+            />
+    </FrameLayout>
 
 
 
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

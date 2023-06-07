@@ -110,10 +110,17 @@
         <action
             android:id="@+id/action_viewPagerFragment_to_userListDialogFragment"
             app:destination="@id/userListDialogFragment" />
+        <action
+            android:id="@+id/action_viewPagerFragment_to_usersSearchFragment"
+            app:destination="@id/usersSearchFragment" />
 
     </fragment>
     <fragment
         android:id="@+id/videoPlayerFragment"
         android:name="ru.javacat.nework.ui.screens.VideoPlayerFragment"
         android:label="VideoPlayerFragment" />
+    <fragment
+        android:id="@+id/usersSearchFragment"
+        android:name="ru.javacat.nework.ui.screens.UsersSearchFragment"
+        android:label="UsersSearchFragment" />
 </navigation>
