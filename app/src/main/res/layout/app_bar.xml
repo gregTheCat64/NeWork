@@ -2,7 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/color_primary"
+
     android:padding="@dimen/dim8dp"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize">
@@ -11,9 +11,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="NeWork"
+        style="@style/MaterialAlertDialog.Material3.Title.Text"
         android:layout_gravity="center_vertical"
         android:layout_marginStart="@dimen/dim16dp"
-        style="@style/TextAppearance.AppCompat.WhiteCaption"
         />
     <ImageView
         android:id="@+id/appBarImage"

@@ -5,7 +5,7 @@ import ru.javacat.nework.data.entity.UserEntity
 import ru.javacat.nework.domain.model.User
 
 fun UserResponse.toModel() = User(
-    id,login, name, avatar, false
+    id,login, name, avatar, false, false
 )
 
 fun UserResponse.toEntity(): UserEntity = UserEntity(

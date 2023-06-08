@@ -20,6 +20,8 @@ class UsersAdapter(
 ): ListAdapter<User, UserViewHolder>(UsersDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
         val binding = CardUserBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        binding.root.isCheckable = true
+        binding.root.isClickable = true
         return UserViewHolder(binding,onUserListener)
     }
 
@@ -41,11 +43,18 @@ class UserViewHolder(
             userName.text = user.name
             userAvatar.loadCircleCrop(user.avatar.toString())
             favIcon.isVisible = user.favoured
-
+            cardView.isChecked = user.checked
         }
 
         binding.userName.setOnClickListener {
-            cardView.isChecked = !cardView.isChecked
+            if (cardView.isChecked){
+                cardView.isChecked = false
+                user.checked = false
+            } else {
+                cardView.isChecked = true
+                user.checked = true
+            }
+
             onUserListener.onTouch(user)
         }
     }

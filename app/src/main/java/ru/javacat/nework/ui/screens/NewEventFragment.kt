@@ -210,6 +210,12 @@ class NewEventFragment : Fragment() {
             eventViewModel.deleteAttachment()
         }
 
+        binding.clearUsersAdded.setOnClickListener {
+            eventViewModel.setSpeakers(emptyList())
+            userViewModel.clearUsersChecked()
+            binding.clearUsersAdded.visibility = View.GONE
+        }
+
         binding.placeBtn.setOnClickListener {
             findNavController().navigate(R.id.mapsFragment)
         }
@@ -293,8 +299,15 @@ class NewEventFragment : Fragment() {
 
         }
 
-        eventViewModel.state.observe(viewLifecycleOwner) {
-            binding.progress.isVisible = it.loading
+        eventViewModel.state.observe(viewLifecycleOwner) {state->
+            binding.progress.isVisible = state.loading
+            if (state.error) {
+                Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
+                    .setAction(R.string.retry_loading) {
+                        eventViewModel.refresh()
+                    }
+                    .show()
+            }
         }
         eventViewModel.postCreated.observe(viewLifecycleOwner) {
             eventViewModel.refresh()
@@ -303,6 +316,9 @@ class NewEventFragment : Fragment() {
 
         userViewModel.addedUsers.observe(viewLifecycleOwner) {
             speakerAdapter.submitList(it)
+            if (it.isNotEmpty()){
+                binding.clearUsersAdded.isVisible = true
+            }
         }
 
         eventViewModel.point.observe(viewLifecycleOwner) {

@@ -61,7 +61,7 @@ class PostRepositoryImpl @Inject constructor(
         try {
             val response = postsApi.getAll()
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            postDao.insert(body.map { it.toEntity()})
+            postDao.insert(body.map { it.toEntity() })
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
@@ -73,7 +73,7 @@ class PostRepositoryImpl @Inject constructor(
         try {
             val response = postsApi.getLatest(count)
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            postDao.insert(body.map { it.toEntity()})
+            postDao.insert(body.map { it.toEntity() })
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
@@ -120,7 +120,7 @@ class PostRepositoryImpl @Inject constructor(
 
 
     override suspend fun save(post: PostRequest) {
-            postsApi.save(post)
+        postsApi.save(post)
 
     }
 
@@ -131,7 +131,7 @@ class PostRepositoryImpl @Inject constructor(
             }?.let {
                 post.copy(attachment = type?.name?.let { type -> Attachment(it.url, type) })
             }
-            postsApi.save(postWithAttachment?: post)
+            postsApi.save(postWithAttachment ?: post)
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
@@ -171,23 +171,24 @@ class PostRepositoryImpl @Inject constructor(
         val authorId = appAuth.authStateFlow.value.id
         val currentPost = postDao.getById(id)
         var likeOwnersIdList = currentPost.likeOwnerIds
-        if (currentPost.likedByMe == true) {
-            likeOwnersIdList = likeOwnersIdList?.minusElement(authorId)
-//            currentPost.likedByMe = false
-//            postDao.insert(currentPost)
-//            if (userList != null) {
+        try {
+            if (currentPost.likedByMe) {
+                likeOwnersIdList = likeOwnersIdList?.minusElement(authorId)
                 postDao.likeById(id, likeOwnersIdList)
-//            }
-            postsApi.dislikeById(id)
-        } else {
-            likeOwnersIdList = likeOwnersIdList?.plusElement(authorId)
-            //currentPost.likedByMe = true
-            //postDao.insert(currentPost)
-//            if (userList != null) {
+                postsApi.dislikeById(id)
+            } else {
+                likeOwnersIdList = likeOwnersIdList?.plusElement(authorId)
                 postDao.likeById(id, likeOwnersIdList)
-//            }
-            postsApi.likeById(id)
+                postsApi.likeById(id)
+            }
+        } catch (e: IOException) {
+            //println("worked in repo NETWORKERROR $e")
+            throw NetworkError
+        } catch (e: Exception) {
+            //println("worked in repo UNKNOWNERROR $e")
+            throw UnknownError
         }
-        }
+
+    }
 
 }

@@ -7,11 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.net.toUri
+import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.SimpleItemAnimator
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
@@ -184,6 +186,17 @@ class EventsFragment : Fragment() {
                 binding.swipeToRefresh.isRefreshing = it.refresh is LoadState.Loading
                         ||it.append is LoadState.Loading
                         ||it.prepend is LoadState.Loading
+            }
+        }
+
+        viewModel.state.observe(viewLifecycleOwner){state->
+            binding.progressBar.isVisible = state.loading
+            if (state.error) {
+                Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
+                    .setAction(R.string.retry_loading) {
+                        viewModel.refresh()
+                    }
+                    .show()
             }
         }
 

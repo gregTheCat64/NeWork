@@ -56,7 +56,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginBottom="4dp"
-                    android:textColor="@color/grey"
+
                     android:text="21 февраля 2023"
                     />
 
@@ -135,7 +135,7 @@
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:text="www.google.com"
-                android:textColor="@color/color_primary"
+
                 android:textStyle="italic" />
 
 
@@ -147,7 +147,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="@dimen/dim8dp"
-            android:background="@color/divider_color"
+
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/infoLayout" />
@@ -168,15 +168,14 @@
             android:id="@+id/likedList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/light_grey"
             android:maxLines="1"
             android:ellipsize="end"
-            android:textColor="@color/grey"
+            android:background="?attr/colorSurface"
             android:paddingStart="@dimen/dim16dp"
             android:paddingEnd="@dimen/dim16dp"
             android:paddingTop="@dimen/dim8dp"
             android:paddingBottom="@dimen/dim8dp"
-            android:visibility="gone"
+            android:visibility="visible"
             app:layout_constraintTop_toBottomOf="@id/divider"
             />
     </LinearLayout>

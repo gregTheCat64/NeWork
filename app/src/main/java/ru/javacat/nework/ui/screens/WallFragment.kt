@@ -24,6 +24,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.SimpleItemAnimator
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
@@ -52,7 +53,7 @@ class WallFragment : Fragment() {
     private val wallViewModel: WallViewModel by viewModels()
 
 
-    var currentUser: User = User(0L, "", "", "", false)
+    var currentUser: User = User(0L, "", "", "", false, false)
 
 
     override fun onStart() {
@@ -104,7 +105,6 @@ class WallFragment : Fragment() {
         userViewModel.getUserById(authorId)
         wallViewModel.getPostsCount(authorId)
 
-        //jobsViewModel.getJobsByUserId(authorId)
 
         val addJobBtn = binding.addJobBtn
         val toolbar = binding.mainToolbar
@@ -183,7 +183,11 @@ class WallFragment : Fragment() {
         wallViewModel.dataState.observe(viewLifecycleOwner) { state ->
             progressBar.isVisible = state.loading
             if (state.error) {
-                snack("Ошибка загрузки")
+                Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
+                    .setAction(R.string.retry_loading) {
+                        wallViewModel.refresh(authorId)
+                    }
+                    .show()
             }
         }
 

@@ -13,7 +13,7 @@ data class UserEntity(
     val avatar: String?,
     val favoured: Boolean
 ){
-    fun toModel() = User(id,login,name, avatar, favoured)
+    fun toModel() = User(id,login,name, avatar, favoured, false)
 
     companion object{
         fun fromModel(model: User) = UserEntity(model.id,model.login,model.name,model.avatar, model.favoured)

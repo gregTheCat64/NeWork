@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -56,6 +57,11 @@ class UsersAddingFragment : Fragment() {
         //val args : UsersAddingFragmentArgs by navArgs()
         val usersIds = mutableListOf<Long>()
         val sb = StringBuffer()
+
+
+        //временное решение, сбрасываем чеки у всех юзеров
+        //TODO: доработать чеки у юзеров которые были добавлены
+        userViewModel.clearUsersChecked()
 
         val adapter = UsersAdapter(object : OnUserListener {
             override fun onTouch(user: User) {

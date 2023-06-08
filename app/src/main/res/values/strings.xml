@@ -38,7 +38,7 @@
     <string name="Profile">Профиль</string>
     <string name="save">Сохранить</string>
     <string name="empty_posts">Здесь пока нет постов. Создайте новый :)</string>
-    <string name="error_loading">Ошибка загрузки</string>
+    <string name="error_loading">Ошибка сети</string>
     <string name="retry_loading">Повторить</string>
     <string name="chooser_share_post">Поделиться записью</string>
     <string name="chooser_link">Открыть ссылку</string>

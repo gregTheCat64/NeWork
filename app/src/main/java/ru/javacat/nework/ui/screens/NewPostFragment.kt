@@ -200,10 +200,15 @@ class NewPostFragment : Fragment() {
                     if (binding.linkEditText.text?.isNotEmpty() == true){
                         postViewModel.changeLink(binding.linkEditText.text.toString())
                     }
-
                 }
             }
             findNavController().navigate(R.id.usersAddingFragment)
+        }
+
+        binding.clearUsersAdded.setOnClickListener {
+            postViewModel.setMentions(emptyList())
+            userViewModel.clearUsersChecked()
+            binding.clearUsersAdded.visibility = View.GONE
         }
 
 
@@ -235,6 +240,9 @@ class NewPostFragment : Fragment() {
 
         userViewModel.addedUsers.observe(viewLifecycleOwner) {
             adapter.submitList(it)
+            if (it.isNotEmpty()){
+                binding.clearUsersAdded.visibility = View.VISIBLE
+            }
         }
 
         //observers:
@@ -251,8 +259,15 @@ class NewPostFragment : Fragment() {
             initUI(post, attach.value, binding)
         }
 
-        postViewModel.state.observe(viewLifecycleOwner) {
-            binding.progressBar.isVisible = it.loading
+        postViewModel.state.observe(viewLifecycleOwner) {state->
+            binding.progressBar.isVisible = state.loading
+            if (state.error) {
+                Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
+                    .setAction(R.string.retry_loading) {
+                        postViewModel.refresh()
+                    }
+                    .show()
+            }
         }
 
         //navigation

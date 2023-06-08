@@ -9,12 +9,12 @@
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:backgroundTint="@color/color_primary"
+        android:backgroundTint="?android:colorBackground"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tabSelectedTextColor="#FF9800"
-        app:tabTextColor="@color/light_grey">
+        app:tabSelectedTextColor="?attr/colorOnPrimary"
+        >
 
 
     </com.google.android.material.tabs.TabLayout>
@@ -23,7 +23,7 @@
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:backgroundTint="@color/color_primary"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -39,6 +39,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/dim16dp"
+        app:elevation="@dimen/dim16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:src="@drawable/ic_baseline_add_24"

@@ -5,9 +5,7 @@
     android:layout_marginTop="@dimen/dim8dp"
     android:layout_margin="@dimen/dim8dp"
     app:cardCornerRadius="@dimen/dim8dp"
-    android:checkable="true"
-    android:clickable="true"
-    android:focusable="true"
+
     android:layout_gravity="center_horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -17,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:orientation="horizontal"
-        android:padding="@dimen/dim8dp"
+        android:padding="@dimen/dim4dp"
         >
 
         <ImageView

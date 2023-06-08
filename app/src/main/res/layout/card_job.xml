@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_gravity="top"
-            android:backgroundTint="@color/color_primary"
+
             >
             <TextView
                 android:id="@+id/name"
@@ -40,7 +40,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/job"
                 android:layout_marginEnd="@dimen/dim32dp"
-                android:backgroundTint="@color/color_primary"
+
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 

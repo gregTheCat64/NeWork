@@ -105,7 +105,7 @@
             android:id="@+id/eventInfoCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/light_grey"
+
             android:paddingStart="@dimen/dim8dp"
             android:paddingEnd="@dimen/dim8dp"
             android:layout_gravity="center"
@@ -116,7 +116,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/light_grey"
+                android:backgroundTint="?attr/colorOutline"
                 android:orientation="vertical"
                 android:padding="@dimen/dim8dp">
 
@@ -127,7 +127,7 @@
                         android:layout_height="wrap_content"
                         android:text="Event Info"
                         android:layout_gravity="center"
-                        android:textColor="@color/color_primary"
+
                         android:textStyle="bold"
 
                         app:layout_constraintStart_toStartOf="parent"
@@ -138,9 +138,10 @@
                     android:id="@+id/divider"
                     android:layout_width="178dp"
                     android:layout_height="1dp"
+                    android:backgroundTint="?attr/colorOutline"
                     android:layout_gravity="center"
                     android:layout_marginTop="4dp"
-                    android:background="@color/divider_color"
+
                      />
 
                 <LinearLayout
@@ -177,7 +178,7 @@
                     android:layout_marginTop="@dimen/dimBetweenStringsInInfoPanel"
                     android:layout_marginStart="@dimen/dim32dp"
                     android:text="@string/default_city"
-                    android:textColor="@color/color_primary"
+
                     android:textStyle="italic" />
 
 
@@ -261,10 +262,10 @@
             android:id="@+id/likedList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/light_grey"
+
             android:maxLines="1"
             android:ellipsize="end"
-            android:textColor="@color/grey"
+
             android:paddingStart="@dimen/dim16dp"
             android:paddingEnd="@dimen/dim16dp"
             android:paddingTop="@dimen/dim8dp"

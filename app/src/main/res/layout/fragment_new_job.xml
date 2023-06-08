@@ -18,18 +18,18 @@
     <Toolbar
         android:layout_width="match_parent"
         android:layout_height="@dimen/dim48dp"
-        android:background="@color/color_primary" />
+        />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/cancelBtn"
-        style="@style/Widget.AppTheme.WhiteIconButton"
+
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="start"
         app:icon="@drawable/ic_baseline_close_24" />
 
     <TextView
-        style="@style/TextAppearance.AppCompat.WhiteCaption"
+
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -37,7 +37,7 @@
         />
         <com.google.android.material.button.MaterialButton
             android:id="@+id/saveJobBtn"
-            style="@style/Widget.AppTheme.WhiteIconButton"
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"

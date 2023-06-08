@@ -25,7 +25,7 @@ class UserViewModel @Inject constructor(
 
 ) : ViewModel() {
     private val userData = repository.userData
-    val anon: User = User(0L, "", "", "", false)
+    val anon: User = User(0L, "", "", "", false, false)
 
     val users = userData.asLiveData()
 
@@ -77,16 +77,23 @@ class UserViewModel @Inject constructor(
         return _addedUsers.value
     }
 
-    fun addToFav(id: Long){
-        viewModelScope.launch {
-            repository.addToFav(id)
-        }
-
-    }
-
-    fun deleteFromFav(id: Long){
-        viewModelScope.launch {
-            repository.deleteFromFav(id)
+    fun clearUsersChecked(){
+        _addedUsers.value = emptyList()
+        users.value?.map {
+            it.checked = false
         }
     }
+
+//    fun addToFav(id: Long){
+//        viewModelScope.launch {
+//            repository.addToFav(id)
+//        }
+//
+//    }
+//
+//    fun deleteFromFav(id: Long){
+//        viewModelScope.launch {
+//            repository.deleteFromFav(id)
+//        }
+//    }
 }

@@ -5,5 +5,6 @@ data class User(
     val login: String,
     val name: String,
     val avatar: String?,
-    val favoured: Boolean
+    val favoured: Boolean,
+    var checked: Boolean
 )

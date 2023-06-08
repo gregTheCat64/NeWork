@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
     <FrameLayout
@@ -16,18 +17,18 @@
         <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
             android:layout_height="@dimen/dim48dp"
-            android:background="@color/color_primary" />
+            />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/cancel_button"
-            style="@style/Widget.AppTheme.WhiteIconButton"
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
             app:icon="@drawable/ic_baseline_close_24" />
 
         <TextView
-            style="@style/TextAppearance.AppCompat.WhiteCaption"
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -38,7 +39,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/saveBtn"
-            style="@style/Widget.AppTheme.WhiteIconButton"
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
@@ -50,7 +51,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="@dimen/dim8dp"
-        android:background="@color/white"
+
         android:orientation="horizontal">
 
         <EditText
@@ -65,7 +66,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_baseline_clear_24"
-            style="@style/Widget.AppTheme.IconButton"
+
             />
 
         <Button
@@ -82,7 +83,7 @@
 
     <TextView
         android:id="@+id/usersTextView"
-        android:textColor="@color/white"
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
@@ -92,6 +93,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="visible"
+        tools:listitem="@layout/card_user"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:spanCount="2"
         />

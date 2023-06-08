@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:backgroundTint="@color/color_primary"
     android:orientation="vertical"
     tools:context=".ui.screens.PostsFragment">
 
@@ -15,10 +14,8 @@
         android:layout_height="1dp"
         android:layout_marginStart="@dimen/dim16dp"
         android:layout_marginEnd="@dimen/dim16dp"
-        android:background="@color/divider_color"
-        app:layout_constraintBottom_toTopOf="@id/buttonPanel"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+
+     />
 
 
 

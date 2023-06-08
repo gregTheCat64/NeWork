@@ -44,9 +44,6 @@ class PostRemoteMediator(
                 }
             }
 
-//            if (!response.isSuccessful) {
-//                throw ApiError(response.code(), response.message())
-//            }
             val body = response.body() ?: throw ApiError(
                 response.code(),
                 response.message()
@@ -84,7 +81,6 @@ class PostRemoteMediator(
                     }
                     else -> Unit
                 }
-
 
                 dao.insert(
                     body.map { it.toEntity() }

@@ -108,26 +108,7 @@ class EventRepositoryImpl @Inject constructor(
         TODO("Not yet implemented")
     }
 
-//    override suspend fun getEventsByAuthorId(authorId: Long): List<EventModel> {
-//        val daoResult = eventDao.getByAuthorId(authorId)
-//        return daoResult.toDto()
-//    }
-//
-//    override suspend fun updateEventsByAuthorId(authorId: Long): List<EventModel>? {
-//        try {
-//            val response = eventsApi.getAll().body()?.filter {
-//                it.authorId == authorId
-//            }
-//            if (response != null) {
-//                eventDao.insert(response.map { it.toEventEntity() })
-//            }
-//            return response?.map { it.toEventModel() }
-//        } catch (e: IOException) {
-//            throw NetworkError
-//        } catch (e: Exception) {
-//            throw UnknownError
-//        }
-//    }
+
 
     override suspend fun removeById(id: Long) {
         try {
@@ -144,15 +125,24 @@ class EventRepositoryImpl @Inject constructor(
         val authorId = appAuth.authStateFlow.value.id
         val currentPost = eventDao.getById(id)
         var likeOwners = currentPost.likeOwnerIds
-        if (currentPost.likedByMe == true) {
-            likeOwners = likeOwners?.minusElement(authorId)
-            eventDao.likeById(id, likeOwners)
-            eventsApi.dislikeById(id)
-        } else {
-            likeOwners = likeOwners?.plusElement(authorId)
-            eventDao.likeById(id, likeOwners)
-            eventsApi.likeById(id)
+        try {
+            if (currentPost.likedByMe) {
+                likeOwners = likeOwners?.minusElement(authorId)
+                eventDao.likeById(id, likeOwners)
+                eventsApi.dislikeById(id)
+            } else {
+                likeOwners = likeOwners?.plusElement(authorId)
+                eventDao.likeById(id, likeOwners)
+                eventsApi.likeById(id)
+            }
+        }catch (e: IOException) {
+            println("worked in repo NETWORKERROR $e")
+            throw NetworkError
+        } catch (e: Exception) {
+            println("worked in repo UNKNOWNERROR $e")
+            throw UnknownError
         }
+
     }
 
     override suspend fun save(event: EventCreateRequest, upload: MediaUpload?, type: AttachmentType?) {
@@ -164,7 +154,10 @@ class EventRepositoryImpl @Inject constructor(
             }
             eventsApi.create(eventWithAttachment?:event)
         } catch (e:IOException){
+            println("IN REPO ERROR")
             throw NetworkError
+        }catch (e: Exception) {
+            throw UnknownError
         }
     }
 

@@ -4,17 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
     android:orientation="vertical"
-    android:backgroundTint="@color/color_primary"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.screens.WallFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/main.appbar"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:layout_height="320dp"
+        android:backgroundTint="?android:colorBackground"
+
         >
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
@@ -22,23 +21,17 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:contentScrim="?attr/colorPrimary"
-            app:expandedTitleTextColor="@color/white"
-            app:collapsedTitleTextColor="@color/white"
             app:expandedTitleMarginStart="48dp"
             app:expandedTitleMarginEnd="64dp"
+
             >
-
-
 
             <FrameLayout
                 android:id="@+id/toolBarFrame"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/color_primary"
                 android:orientation="vertical"
                 app:layout_scrollFlags="scroll|enterAlways">
-
 
 
                 <LinearLayout
@@ -65,11 +58,10 @@
                             android:id="@+id/userJob"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-
                             android:visibility="gone"
                             android:layout_gravity="center"
                             android:textSize="18sp"
-                            android:textColor="@color/light_grey"
+
                             />
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/addJobBtn"
@@ -77,7 +69,7 @@
                             android:layout_height="wrap_content"
                             android:visibility="gone"
                             android:text="Добавить работу"
-                            android:textColor="@color/white"
+
                             app:icon="@drawable/ic_baseline_add_24"
                             style="@style/Widget.Material3.Button"
                             />
@@ -85,8 +77,9 @@
                             android:id="@+id/postsSize"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:text="13 posts"
                             android:layout_gravity="center"
-                            android:textColor="@color/light_grey"
+
                             />
 
                     </LinearLayout>
@@ -102,7 +95,7 @@
                     android:layout_marginTop="@dimen/dim64dp"
                     android:layout_marginEnd="@dimen/dim32dp"
                     android:checkable="true"
-                    style="@style/Widget.AppTheme.FavCheckBox"
+                    style="@style/Widget.Material3.Button.IconButton"
                     app:icon="@drawable/ic_like_selector"
                     />
 
@@ -113,10 +106,10 @@
                 android:id="@+id/main.toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-
                 app:titleMarginStart="@dimen/dim48dp"
                 app:layout_collapseMode="pin"
                 app:menu="@menu/menu_wall"
+                android:backgroundTint="?android:colorBackground"
                 app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
                 />
 

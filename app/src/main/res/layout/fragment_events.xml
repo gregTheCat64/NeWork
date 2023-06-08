@@ -8,17 +8,23 @@
     tools:context=".ui.screens.EventsFragment">
 
 
-
     <View
         android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginStart="@dimen/dim16dp"
         android:layout_marginEnd="@dimen/dim16dp"
-        android:background="@color/divider_color"
+
         app:layout_constraintBottom_toTopOf="@id/buttonPanel"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
 
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout

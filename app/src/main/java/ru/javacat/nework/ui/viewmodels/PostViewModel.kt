@@ -56,7 +56,6 @@ class PostViewModel @Inject constructor(
         get() = _coords
 
 
-
 //    val newerCount: LiveData<Int> = data.switchMap {
 //        repository.getNewerCount(it.posts.firstOrNull()?.id ?: 0L)
 //            .catch { e -> e.printStackTrace() }
@@ -81,12 +80,7 @@ class PostViewModel @Inject constructor(
         get() = _attachFile
 
 
-
-
     init {
-        Log.i("MYTAG", "Init postViewModel")
-        println("PHOTO: ${attachFile.value?.uri}")
-        println("ПОСТ: ${_edited.value?.content}")
         loadPosts()
     }
 
@@ -103,33 +97,8 @@ class PostViewModel @Inject constructor(
     }
 
 
-
-//    fun loadPostsByAuthorId(authorId: Long) = viewModelScope.launch {
-//        try {
-//            _state.value = FeedModelState(loading = true)
-//            _userPosts.postValue(postRepository.getPostsByAuthorId(authorId))
-//            _state.value = FeedModelState(idle = true)
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//            _state.value = FeedModelState(error = true)
-//        }
-//    }
-//
-//    fun updatePostsByAuthorId(authorId: Long) = viewModelScope.launch {
-//        try {
-//            _state.value = FeedModelState(loading = true)
-//            _userPosts.postValue(postRepository.updatePostsByAuthorId(authorId))
-//            _state.value = FeedModelState(idle = true)
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//            _state.value = FeedModelState(error = true)
-//        }
-//    }
-
-
     fun refresh() {
         viewModelScope.launch {
-
             try {
                 _state.value = FeedModelState(loading = true)
                 postRepository.getLatest(count)
@@ -167,14 +136,16 @@ class PostViewModel @Inject constructor(
     }
 
 
-
-    fun setNewAttach(uri: Uri?, type: AttachmentType?){
+    fun setNewAttach(uri: Uri?, type: AttachmentType?) {
         _state.value = FeedModelState(loading = true)
-        _edited.value = _edited.value?.copy(attachment = null)
-        _attachFile.value = AttachModel(uri, type)
-        _state.value = FeedModelState(idle = true)
+        try {
+            _edited.value = _edited.value?.copy(attachment = null)
+            _attachFile.value = AttachModel(uri, type)
+            _state.value = FeedModelState(idle = true)
+        } catch (e: Exception) {
+            _state.value = FeedModelState(error = true)
+        }
     }
-
 
 
     fun changeContent(content: String) {
@@ -182,13 +153,13 @@ class PostViewModel @Inject constructor(
         _edited.value = edited.value?.copy(content = text)
     }
 
-    fun changeLink(link: String){
+    fun changeLink(link: String) {
         val link = link.trim().toString()
         _edited.value = edited.value?.copy(link = link)
     }
 
     fun deleteAttachment() {
-       // _attachFile.value = noAttach
+        // _attachFile.value = noAttach
         //_edited.value?.attachment = null //observer не срабатывает
         _attachFile.value = noAttach
         _edited.value = _edited.value?.copy(attachment = null) //срабатывает
@@ -198,15 +169,13 @@ class PostViewModel @Inject constructor(
     fun edit(post: PostModel) {
         try {
             _edited.value = post
-        } catch (e:java.lang.Exception){
+        } catch (e: java.lang.Exception) {
             _state.value = FeedModelState(error = true)
         }
-
-        //_addedUsersIds.value = post.mentionIds
         println("POST2: ${_edited.value!!.content}")
     }
 
-    fun clearEdit(){
+    fun clearEdit() {
         _attachFile.value = noAttach
         _edited.value = empty
     }
@@ -216,7 +185,8 @@ class PostViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 postRepository.likeById(id)
-            } catch (e:java.lang.Exception){
+            } catch (e: java.lang.Exception) {
+                println("worked in VM EXCEPTION $e")
                 _state.value = FeedModelState(error = true)
             }
         }
@@ -226,39 +196,37 @@ class PostViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 postRepository.removeById(id)
-            } catch (e:java.lang.Exception){
+            } catch (e: java.lang.Exception) {
                 _state.value = FeedModelState(error = true)
             }
         }
     }
 
-    fun setMentions(list: List<Long>){
+    fun setMentions(list: List<Long>) {
         _edited.value = edited.value?.copy(mentionIds = list)
     }
 
-    fun getCoordinates(lat: Double, long: Double){
+    fun getCoordinates(lat: Double, long: Double) {
         _coords.value = CoordinatesModel(lat, long)
+
+
     }
 
     fun setCoordinates() {
-        _edited.value = edited.value?.copy(coords = coords.value)
+        try {
+            _edited.value = edited.value?.copy(coords = coords.value)
+        } catch (e: Exception) {
+            _state.value = FeedModelState(error = true)
+        }
     }
 
-    fun clearCoordinates(){
+    fun clearCoordinates() {
         _edited.value = edited.value?.copy(coords = null)
     }
 
-    fun setState(state: FeedModelState){
+    fun setState(state: FeedModelState) {
         _state.value = state
     }
-
-//    fun setNew(){
-//        _isNewPost.value = true
-//    }
-//
-//    fun setOld(){
-//        _isNewPost.value = false
-//    }
 
 
 

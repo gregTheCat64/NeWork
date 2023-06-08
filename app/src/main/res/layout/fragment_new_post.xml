@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/white"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.screens.NewPostFragment">
@@ -62,7 +62,7 @@
                     android:id="@+id/clearLocationBtn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="@style/Widget.AppTheme.IconButton"
+
                     app:icon="@drawable/ic_baseline_close_24"
                     />
 
@@ -97,13 +97,31 @@
             </com.google.android.material.textfield.TextInputLayout>
 
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/addedUsersList"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                android:orientation="vertical"
-                app:spanCount="3" />
+                android:orientation="horizontal">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/addedUsersList"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                    app:spanCount="3" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/clearUsersAdded"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:icon="@drawable/ic_baseline_clear_24"
+                    style="@style/Widget.Material3.Button.IconButton"
+                    android:layout_gravity="end"/>
+
+            </LinearLayout>
+
 
             <ProgressBar
                 android:id="@+id/progressBar"

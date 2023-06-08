@@ -47,6 +47,7 @@ import ru.javacat.nework.mediaplayer.MediaLifecycleObserver
 import ru.javacat.nework.ui.adapter.OnInteractionListener
 import ru.javacat.nework.ui.adapter.PostsAdapter
 import ru.javacat.nework.ui.screens.NewPostFragment.Companion.textArg
+import ru.javacat.nework.ui.viewmodels.PlayerViewModel
 import ru.javacat.nework.ui.viewmodels.PostViewModel
 import ru.javacat.nework.ui.viewmodels.UserViewModel
 import ru.javacat.nework.ui.viewmodels.WallViewModel
@@ -63,8 +64,8 @@ class PostsFragment : Fragment() {
 
 
     private val postViewModel: PostViewModel by activityViewModels()
-    val wallViewModel: WallViewModel by viewModels()
     private val userViewModel: UserViewModel by viewModels()
+    //private val playerViewModel: PlayerViewModel by activityViewModels()
     //private val mediaObserver = MediaLifecycleObserver()
 
 

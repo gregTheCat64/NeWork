@@ -47,6 +47,15 @@ class WallViewModel @Inject constructor(
         return wallRepository.getLatest(id)
     }
 
+    fun refresh(id: Long){
+        viewModelScope.launch {
+            getUserJob(id)
+            getUserPosts(id)
+            getPostsCount(id)
+        }
+
+    }
+
      fun getUserJob(id: Long) {
          viewModelScope.launch {
              try {

@@ -26,15 +26,17 @@ import ru.javacat.nework.domain.model.FeedModelState
 import ru.javacat.nework.domain.model.PostModel
 import ru.javacat.nework.domain.model.User
 import ru.javacat.nework.domain.repository.EventRepository
+import ru.javacat.nework.error.NetworkError
 import ru.javacat.nework.util.SingleLiveEvent
 import ru.javacat.nework.util.toFile
 import ru.javacat.nework.util.toLocalDateTimeWhithoutZone
+import java.lang.Error
 import javax.inject.Inject
 
 private val emptyEvent = EventModel(
-    0, 0L, "", null,null, "",null,
+    0, 0L, "", null, null, "", null,
     null, null, EventType.OFFLINE, emptyList(), false,
-    emptyList(), emptyList(), false, null, false,null,
+    emptyList(), emptyList(), false, null, false, null,
     false, emptyMap()
 )
 
@@ -93,7 +95,7 @@ class EventViewModel @Inject constructor(
         }
     }
 
-    fun refresh(){
+    fun refresh() {
         viewModelScope.launch {
             _state.value = FeedModelState(refreshing = true)
             try {
@@ -105,33 +107,24 @@ class EventViewModel @Inject constructor(
         }
     }
 
-    suspend fun getUserEvents(id: Long): Flow<PagingData<EventModel>>{
+    suspend fun getUserEvents(id: Long): Flow<PagingData<EventModel>> {
         return repository.getUserEvents(id).cachedIn(viewModelScope)
     }
 
-//    fun getByAuthorId(id: Long) {
-//        viewModelScope.launch {
-//            _state.value = FeedModelState(loading = true)
-//            _userEvents.postValue(repository.getEventsByAuthorId(id))
-//            _state.value = FeedModelState(idle = true)
-//            //println("SPEAKER= ${_dataByAuthor.value.toString()}")
-//        }
-//    }
-//
-//    fun updateEventsByAuthorId(authorId: Long) = viewModelScope.launch {
-//        try {
-//            _userEvents.postValue(repository.updateEventsByAuthorId(authorId))
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//        }
-//    }
-
 
     fun likeById(id: Long) {
-        viewModelScope.launch { repository.likeById(id) }
+        viewModelScope.launch {
+            try {
+                repository.likeById(id)
+            } catch (e: Exception) {
+                println("worked in VM EXCEPTION $e")
+                _state.value = FeedModelState(error = true)
+            }
+        }
     }
 
-    fun setNewAttach(uri: Uri?, type: AttachmentType?){
+
+    fun setNewAttach(uri: Uri?, type: AttachmentType?) {
         _state.value = FeedModelState(loading = true)
         _edited.value = _edited.value?.copy(attachment = null)
         _attachFile.value = AttachModel(uri, type)
@@ -142,31 +135,37 @@ class EventViewModel @Inject constructor(
         _edited.value = edited.value?.copy(content = content)
     }
 
-    fun setStartDateTime(dateTime: String){
+    fun setStartDateTime(dateTime: String) {
         _edited.value = edited.value?.copy(datetime = dateTime.toLocalDateTimeWhithoutZone())
     }
 
-    fun setSpeakers(list: List<Long>){
+    fun setSpeakers(list: List<Long>) {
         _edited.value = edited.value?.copy(speakerIds = list)
     }
 
-    fun setType(type: EventType){
+
+    fun setType(type: EventType) {
         _edited.value = edited.value?.copy(type = type)
     }
-    fun setLink(link: String){
+
+    fun setLink(link: String) {
         _edited.value = edited.value?.copy(link = link)
     }
-    fun setPoint(point: DoubleArray){
+
+    fun setPoint(point: DoubleArray) {
         _point.value = point
-        _edited.value = edited.value?.copy(type = EventType.OFFLINE, coords = CoordinatesModel(point[0], point[1]))
+        _edited.value = edited.value?.copy(
+            type = EventType.OFFLINE,
+            coords = CoordinatesModel(point[0], point[1])
+        )
     }
 
-    fun deleteAttachment(){
+    fun deleteAttachment() {
         _edited.value = _edited.value?.copy(attachment = null)
         _attachFile.value = noAttach
     }
 
-    fun save(){
+    fun save() {
         edited.value?.let {
             viewModelScope.launch {
                 try {
@@ -174,43 +173,44 @@ class EventViewModel @Inject constructor(
                     repository.save(
                         it.toEventRequest(), attachFile.value?.uri?.let {
                             MediaUpload(it.toFile())
-                        } , attachFile.value?.type
+                        }, attachFile.value?.type
                     )
                     _edited.postValue(emptyEvent)
                     _attachFile.postValue(noAttach)
                     _point.postValue(noPoint)
                     _postCreated.postValue(Unit)
                     _state.value = FeedModelState(idle = true)
-                }catch (e: java.lang.Exception){
+                } catch (e: Exception) {
+                    println("IN VM ERROR")
                     _state.value = FeedModelState(error = true)
                 }
             }
         }
     }
 
-    fun edit(event: EventModel){
+    fun edit(event: EventModel) {
         _edited.value = event
     }
 
-    fun takePart(event: EventModel){
+    fun takePart(event: EventModel) {
         viewModelScope.launch {
             repository.createParticipant(event)
         }
     }
 
-    fun clearEdit(){
+    fun clearEdit() {
         _attachFile.value = noAttach
         _point.value = noPoint
         _edited.value = emptyEvent
     }
 
-    fun removeById(id: Long){
+    fun removeById(id: Long) {
         viewModelScope.launch {
             repository.removeById(id)
         }
     }
 
-    fun setState(state: FeedModelState){
+    fun setState(state: FeedModelState) {
         _state.value = state
     }
 
