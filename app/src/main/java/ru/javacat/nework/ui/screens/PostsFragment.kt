@@ -37,6 +37,7 @@ import com.yandex.mapkit.geometry.Point
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import ru.javacat.nework.R
 import ru.javacat.nework.data.auth.AppAuth
 import ru.javacat.nework.databinding.FragmentPostsBinding
@@ -47,6 +48,7 @@ import ru.javacat.nework.mediaplayer.MediaLifecycleObserver
 import ru.javacat.nework.ui.adapter.OnInteractionListener
 import ru.javacat.nework.ui.adapter.PostsAdapter
 import ru.javacat.nework.ui.screens.NewPostFragment.Companion.textArg
+import ru.javacat.nework.ui.viewmodels.EventViewModel
 import ru.javacat.nework.ui.viewmodels.PlayerViewModel
 import ru.javacat.nework.ui.viewmodels.PostViewModel
 import ru.javacat.nework.ui.viewmodels.UserViewModel
@@ -65,6 +67,7 @@ class PostsFragment : Fragment() {
 
     private val postViewModel: PostViewModel by activityViewModels()
     private val userViewModel: UserViewModel by viewModels()
+    private val eventsViewModel: EventViewModel by viewModels()
     //private val playerViewModel: PlayerViewModel by activityViewModels()
     //private val mediaObserver = MediaLifecycleObserver()
 
@@ -95,7 +98,6 @@ class PostsFragment : Fragment() {
 //        favList?.map {
 //            userViewModel.addToFav(it)
 //        }
-
 
 
         //Доступ к локации:
@@ -198,8 +200,7 @@ class PostsFragment : Fragment() {
                 try {
                     post.playBtnPressed = !post.playBtnPressed
                     (requireActivity() as AppActivity).playAudio(post.attachment?.url.toString())
-                }
-                catch (e: NetworkError){
+                } catch (e: NetworkError) {
                     snack("Ошибка сети")
                 }
 
@@ -257,40 +258,38 @@ class PostsFragment : Fragment() {
         val mAnimator = binding.postsList.itemAnimator as SimpleItemAnimator
         mAnimator.supportsChangeAnimations = false
 
-        lifecycleScope.launchWhenCreated {
+        lifecycleScope.launch {
             postViewModel.data
                 .catch { e: Throwable ->
                     e.printStackTrace()
-                    Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
-                        .setAction(R.string.retry_loading) {
-                            postViewModel.refresh()
-                        }
-                        .show()
                 }
                 .collectLatest {
                     adapter.submitData(it)
-                    //binding.postsList.smoothScrollToPosition(0)
-
                 }
         }
 
-
-        lifecycleScope.launchWhenCreated {
-            adapter.loadStateFlow.collectLatest {
-                binding.swipeToRefresh.isRefreshing =
-                    //it.refresh is LoadState.Loading||
-                             it.append is LoadState.Loading||
-                             it.prepend is LoadState.Loading
-            }
+        lifecycleScope.launch {
+            eventsViewModel.data.collectLatest {  }
         }
 
-//        lifecycleScope.launchWhenCreated {
-//            postViewModel.data.collectLatest {
-//                if (it.toString().isEmpty()) {
-//                    binding.emptyText.isVisible
-//                }
-//            }
-//        }
+
+        lifecycleScope.launch {
+            adapter.loadStateFlow.collectLatest {
+                binding.progress.isVisible = it.refresh is LoadState.Loading
+                binding.swipeToRefresh.isRefreshing = false
+
+                if (it.refresh is LoadState.Error||
+                            it.append is LoadState.Error ||
+                            it.prepend is LoadState.Error
+                ) {
+                    Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
+                    .setAction(R.string.retry_loading) {
+                        postViewModel.refresh()
+                    }
+                    .show()
+                }
+            }
+        }
 
 
         postViewModel.state.observe(viewLifecycleOwner) { state ->
@@ -300,7 +299,6 @@ class PostsFragment : Fragment() {
                 progress.isVisible = state.loading
                 //swipeToRefresh.isRefreshing = state.refreshing
             }
-            //if (!state.refreshing){binding.postsList.smoothScrollToPosition(0)}
             if (state.error) {
                 Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
                     .setAction(R.string.retry_loading) {
@@ -309,7 +307,6 @@ class PostsFragment : Fragment() {
                     .show()
             }
         }
-
 
 //        postViewModel.postCreated.observe(viewLifecycleOwner) {
 //            binding.postsList.smoothScrollToPosition(0)
@@ -330,21 +327,12 @@ class PostsFragment : Fragment() {
 //            binding.postsList.smoothScrollToPosition(0)
 //        }
 
-
         binding.swipeToRefresh.setOnRefreshListener {
             adapter.refresh()
-
         }
-
-
         return binding.root
     }
 
-    companion object {
-        @JvmStatic
-        fun newInstance() =
-            PostsFragment()
-    }
 
 }
 

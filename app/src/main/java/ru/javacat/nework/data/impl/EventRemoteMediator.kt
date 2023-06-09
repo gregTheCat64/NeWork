@@ -1,5 +1,6 @@
-package ru.javacat.nework.domain.repository
+package ru.javacat.nework.data.impl
 
+import android.util.Log
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
@@ -11,7 +12,6 @@ import ru.javacat.nework.data.dao.EventDao
 import ru.javacat.nework.data.dao.EventRemoteKeyDao
 import ru.javacat.nework.data.entity.EventEntity
 import ru.javacat.nework.data.entity.EventRemoteKeyEntity
-import ru.javacat.nework.data.mappers.toEntity
 import ru.javacat.nework.data.mappers.toEventEntity
 import ru.javacat.nework.error.ApiError
 import java.io.IOException
@@ -28,6 +28,7 @@ class EventRemoteMediator(
         state: PagingState<Int, EventEntity>
     ): MediatorResult {
         try {
+            Log.i("mState", loadType.name)
             val response = when (loadType) {
                 LoadType.REFRESH -> {
                     apiService.getLatest(state.config.initialLoadSize)

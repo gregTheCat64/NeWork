@@ -49,7 +49,6 @@ class EventViewModel @Inject constructor(
     private val repository: EventRepository
 ) : ViewModel() {
 
-
     val data: Flow<PagingData<EventModel>> = repository.eventData.cachedIn(viewModelScope)
 
     val count = 5
@@ -80,7 +79,7 @@ class EventViewModel @Inject constructor(
 
 
     init {
-        loadEvents()
+        //loadEvents()
     }
 
     fun loadEvents() {

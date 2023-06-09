@@ -17,6 +17,7 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import ru.javacat.nework.R
 import ru.javacat.nework.data.auth.AppAuth
 import ru.javacat.nework.databinding.FragmentEventsBinding
@@ -30,23 +31,26 @@ import ru.javacat.nework.util.snack
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class EventsFragment : Fragment() {
+class EventsFragment : Fragment(R.layout.fragment_events) {
     private val viewModel: EventViewModel by activityViewModels()
 
-    private val mediaObserver = MediaLifecycleObserver()
     @Inject
     lateinit var appAuth: AppAuth
+    lateinit var binding: FragmentEventsBinding
 
+//    override fun onCreateView(
+//        inflater: LayoutInflater,
+//        container: ViewGroup?,
+//        savedInstanceState: Bundle?
+//    ): View? {
+//        val fragmentBinding = FragmentEventsBinding.inflate(inflater)
+//        binding = fragmentBinding
+//        return super.onCreateView(inflater, container, savedInstanceState)
+//    }
 
-
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val binding = FragmentEventsBinding.inflate(inflater, container, false)
-
-        lifecycle.addObserver(mediaObserver)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding = FragmentEventsBinding.bind(view)
 
         val mAnimator = binding.eventsList.itemAnimator as SimpleItemAnimator
         mAnimator.supportsChangeAnimations = false
@@ -64,7 +68,7 @@ class EventsFragment : Fragment() {
             }
 
             override fun onRemove(event: EventModel) {
-               viewModel.removeById(event.id)
+                viewModel.removeById(event.id)
             }
 
             override fun onTakePartBtn(event: EventModel) {
@@ -91,13 +95,13 @@ class EventsFragment : Fragment() {
                     val format = event.type.name
 
                     val msg =
-                            "$author делится мероприятием:\n" +
-                            "$content \n" +
-                            "начало в $date \n"+
-                            "формат мероприятия: $format"+
-                            "$attach \n"+
-                            "$link\n"+
-                            "отправлено из NeWork App.\n"
+                        "$author делится мероприятием:\n" +
+                                "$content \n" +
+                                "начало в $date \n"+
+                                "формат мероприятия: $format"+
+                                "$attach \n"+
+                                "$link\n"+
+                                "отправлено из NeWork App.\n"
 
                     putExtra(Intent.EXTRA_TEXT, msg)
                     type = "text/plain"
@@ -171,7 +175,7 @@ class EventsFragment : Fragment() {
 //        adapter.submitList(it)
 //        }
 
-        lifecycleScope.launchWhenCreated {
+        lifecycleScope.launch {
             viewModel.data
                 .catch { e:Throwable->
                     e.printStackTrace()
@@ -181,11 +185,24 @@ class EventsFragment : Fragment() {
                 }
         }
 
-        lifecycleScope.launchWhenCreated {
+        lifecycleScope.launch {
             adapter.loadStateFlow.collectLatest {
-                binding.swipeToRefresh.isRefreshing = it.refresh is LoadState.Loading
+                binding.progressBar.isVisible = it.refresh is LoadState.Loading
                         ||it.append is LoadState.Loading
                         ||it.prepend is LoadState.Loading
+
+                binding.swipeToRefresh.isRefreshing = false
+
+                if (it.refresh is LoadState.Error||
+                    it.append is LoadState.Error ||
+                    it.prepend is LoadState.Error
+                ) {
+                    Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
+                        .setAction(R.string.retry_loading) {
+                            viewModel.refresh()
+                        }
+                        .show()
+                }
             }
         }
 
@@ -199,20 +216,8 @@ class EventsFragment : Fragment() {
                     .show()
             }
         }
-
-//        viewModel.state.observe(viewLifecycleOwner) {
-//            binding.swipeToRefresh.isRefreshing = it.refreshing
-//                    || it.loading
-//        }
-
-
-            //binding.eventsList.smoothScrollToPosition(0)
-
-
-        return binding.root
-
-        
     }
+
     companion object {
         @JvmStatic
         fun newInstance() =

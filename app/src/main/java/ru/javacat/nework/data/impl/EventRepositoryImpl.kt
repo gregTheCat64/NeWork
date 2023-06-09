@@ -5,10 +5,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -22,17 +19,10 @@ import ru.javacat.nework.data.dto.MediaUpload
 import ru.javacat.nework.data.dto.request.EventCreateRequest
 import ru.javacat.nework.data.dto.response.Attachment
 import ru.javacat.nework.data.entity.EventEntity
-import ru.javacat.nework.data.entity.PostEntity
-import ru.javacat.nework.data.entity.toDto
 import ru.javacat.nework.data.mappers.toEventEntity
-import ru.javacat.nework.data.mappers.toEventModel
-import ru.javacat.nework.data.mappers.toModel
 import ru.javacat.nework.domain.model.AttachmentType
 import ru.javacat.nework.domain.model.EventModel
-import ru.javacat.nework.domain.model.PostModel
-import ru.javacat.nework.domain.repository.EventRemoteMediator
 import ru.javacat.nework.domain.repository.EventRepository
-import ru.javacat.nework.domain.repository.PostRemoteMediator
 import ru.javacat.nework.error.ApiError
 import ru.javacat.nework.error.NetworkError
 import ru.javacat.nework.error.UnknownError
@@ -51,7 +41,7 @@ class EventRepositoryImpl @Inject constructor(
 //        .flowOn(Dispatchers.Default)
     @OptIn(ExperimentalPagingApi::class)
     override val eventData: Flow<PagingData<EventModel>> = Pager(
-        config = PagingConfig(pageSize = 5),
+        config = PagingConfig(pageSize = 5, enablePlaceholders = true),
         pagingSourceFactory = { eventDao.getPagingSource() },
         remoteMediator = EventRemoteMediator(
             eventsApi,

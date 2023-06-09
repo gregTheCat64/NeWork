@@ -1,7 +1,6 @@
 package ru.javacat.nework.data.impl
 
 
-import androidx.lifecycle.asLiveData
 import androidx.paging.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -18,14 +17,9 @@ import ru.javacat.nework.data.dto.MediaUpload
 import ru.javacat.nework.data.dto.request.PostRequest
 import ru.javacat.nework.data.dto.response.Attachment
 import ru.javacat.nework.data.entity.PostEntity
-import ru.javacat.nework.data.entity.toDto
 import ru.javacat.nework.data.mappers.toEntity
-import ru.javacat.nework.data.mappers.toEventEntity
-import ru.javacat.nework.data.mappers.toModel
 import ru.javacat.nework.domain.model.AttachmentType
 import ru.javacat.nework.domain.model.PostModel
-import ru.javacat.nework.domain.model.User
-import ru.javacat.nework.domain.repository.PostRemoteMediator
 import ru.javacat.nework.domain.repository.PostRepository
 import ru.javacat.nework.error.ApiError
 import ru.javacat.nework.error.AppError

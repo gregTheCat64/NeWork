@@ -1,23 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".ui.screens.PostsFragment">
-
-
-    <View
-        android:id="@+id/divider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginStart="@dimen/dim16dp"
-        android:layout_marginEnd="@dimen/dim16dp"
-
-     />
-
-
 
 
     <com.google.android.material.button.MaterialButton
@@ -34,9 +22,9 @@
         android:id="@+id/progress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-        android:visibility="visible"
-        android:layout_gravity="center"
+        android:visibility="gone"
+        android:layout_marginTop="@dimen/dim48dp"
+        android:layout_gravity="center|top"
         />
 
     <TextView
@@ -50,12 +38,11 @@
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeToRefresh"
-        android:layout_marginTop="@dimen/dim16dp"
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/postsList"
-
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
@@ -63,4 +50,4 @@
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

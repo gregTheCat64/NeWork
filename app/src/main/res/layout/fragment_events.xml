@@ -1,30 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".ui.screens.EventsFragment">
-
-
-    <View
-        android:id="@+id/divider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginStart="@dimen/dim16dp"
-        android:layout_marginEnd="@dimen/dim16dp"
-
-        app:layout_constraintBottom_toTopOf="@id/buttonPanel"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:visibility="gone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
 
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -40,6 +21,13 @@
             tools:listitem="@layout/card_event" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:visibility="visible"
+        android:layout_marginTop="@dimen/dim48dp"
+        android:layout_gravity="center|top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
 
-
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,4 +1,4 @@
-package ru.javacat.nework.domain.repository
+package ru.javacat.nework.data.impl
 
 import android.util.Log
 import androidx.paging.ExperimentalPagingApi

@@ -1,6 +1,5 @@
 package ru.javacat.nework.data.impl
 
-import android.util.Log
 import androidx.paging.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -9,13 +8,8 @@ import ru.javacat.nework.data.api.WallApi
 import ru.javacat.nework.data.dao.PostDao
 import ru.javacat.nework.data.dao.WallRemoteKeyDao
 import ru.javacat.nework.data.entity.PostEntity
-import ru.javacat.nework.data.entity.toEntity
-import ru.javacat.nework.data.entity.toModel
-import ru.javacat.nework.data.mappers.toEntity
 import ru.javacat.nework.domain.model.PostModel
-import ru.javacat.nework.domain.repository.WallRemoteMediator
 import ru.javacat.nework.domain.repository.WallRepository
-import ru.javacat.nework.error.ApiError
 import ru.javacat.nework.error.NetworkError
 import ru.javacat.nework.error.UnknownError
 import java.io.IOException
