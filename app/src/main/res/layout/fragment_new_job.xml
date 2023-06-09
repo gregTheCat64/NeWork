@@ -15,14 +15,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-    <Toolbar
+    <com.google.android.material.appbar.MaterialToolbar
         android:layout_width="match_parent"
-        android:layout_height="@dimen/dim48dp"
+
+        android:layout_height="?attr/actionBarSize"
         />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/cancelBtn"
-
+        style="@style/Widget.Material3.Button.IconButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="start"
@@ -37,7 +38,7 @@
         />
         <com.google.android.material.button.MaterialButton
             android:id="@+id/saveJobBtn"
-
+            style="@style/Widget.Material3.Button.IconButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
