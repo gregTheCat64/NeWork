@@ -105,20 +105,18 @@
             android:id="@+id/eventInfoCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="?attr/colorSurfaceVariant"
 
-            android:paddingStart="@dimen/dim8dp"
-            android:paddingEnd="@dimen/dim8dp"
             android:layout_gravity="center"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/content"
+
             >
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:backgroundTint="?attr/colorOutline"
+
                 android:orientation="vertical"
-                android:padding="@dimen/dim8dp">
+                android:padding="@dimen/dim16dp">
 
 
                     <TextView
@@ -126,19 +124,17 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Event Info"
-                        android:layout_gravity="center"
 
+                        android:layout_gravity="center"
                         android:textStyle="bold"
 
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
                         />
 
                 <View
                     android:id="@+id/divider"
                     android:layout_width="178dp"
                     android:layout_height="1dp"
-                    android:backgroundTint="?attr/colorOutline"
+                    android:background="?attr/colorOutline"
                     android:layout_gravity="center"
                     android:layout_marginTop="4dp"
 
@@ -168,20 +164,35 @@
 
                 </LinearLayout>
 
-
-
-
-                <TextView
-                    android:id="@+id/locationOfEvent"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:id="@+id/webLayout"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:orientation="horizontal"
                     android:layout_marginTop="@dimen/dimBetweenStringsInInfoPanel"
-                    android:layout_marginStart="@dimen/dim32dp"
-                    android:text="@string/default_city"
+                    >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="Веб:"
+                        />
+                    <TextView
+                        android:id="@+id/webText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="@dimen/dim16dp"
+                        android:layout_marginEnd="32dp"
+                        android:text="https://hd.kinopoisk.ru/"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:textStyle="italic|bold" />
 
-                    android:textStyle="italic" />
 
 
+                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -193,6 +204,7 @@
                         android:id="@+id/formatTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
                         android:text="@string/format"
 
                         />
@@ -203,10 +215,16 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/dim16dp"
                         android:textStyle="bold"
+                        android:layout_weight="1"
+                        android:layout_gravity="bottom"
                         android:text="@string/default_format"
                         app:layout_constraintStart_toEndOf="@+id/formatTextView"
                         app:layout_constraintTop_toTopOf="@+id/formatTextView" />
+
+
                 </LinearLayout>
+
+
 
                 <LinearLayout
                     android:id="@+id/speakersLayout"
@@ -235,6 +253,8 @@
                         />
                 </LinearLayout>
 
+
+
             </LinearLayout>
 
             <com.google.android.material.button.MaterialButton
@@ -242,8 +262,21 @@
                 style="@style/Widget.Material3.Button.IconButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+
                 app:icon="@drawable/ic_baseline_location_on_24"
+                android:visibility="visible"
                 android:layout_gravity="end" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/webBtn"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="56dp"
+                app:icon="@drawable/baseline_language_24"
+                android:visibility="visible"
+                android:layout_gravity="end" />
+
 
         </FrameLayout>
 
@@ -254,18 +287,14 @@
             layout="@layout/interaction_posts_panel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/eventInfoCard"
-            app:layout_constraintStart_toStartOf="parent"
             />
 
         <TextView
             android:id="@+id/likedList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
             android:maxLines="1"
             android:ellipsize="end"
-
             android:paddingStart="@dimen/dim16dp"
             android:paddingEnd="@dimen/dim16dp"
             android:paddingTop="@dimen/dim8dp"

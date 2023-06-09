@@ -20,7 +20,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_gravity="end|center_vertical"
-        android:layout_marginEnd="@dimen/dim16dp"
+        android:layout_margin="@dimen/dim8dp"
         android:src="@drawable/baseline_account_circle_36"
         />
 

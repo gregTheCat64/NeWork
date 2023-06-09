@@ -87,12 +87,17 @@ class EventViewHolder(
             content.text = event.content
             dateOfEvent.text = event.datetime?.asString()
             interactionPosts.mentioned.setIconResource(R.drawable.ic_baseline_people_24)
-            if(event.link != null){
-                locationOfEvent.isVisible = true
-                locationOfEvent.text = event.link.toString()
-            } else{ locationOfEvent.isVisible = false}
 
-            locationBtn.isVisible = event.coords != null
+            if(event.link != null){
+                webLayout.isVisible = true
+                webText.text = event.link.toString()
+            } else{ webLayout.isVisible = false}
+
+
+            locationBtn.isVisible = event.coords!=null
+            webBtn.isVisible = event.link !=null
+
+
 
             typeOfEvent.text = event.type.toString()
 
@@ -177,17 +182,6 @@ class EventViewHolder(
 
                 attachLayout.attachVideo.apply {
 
-//                    setMediaController(MediaController(context))
-//                    setVideoURI(
-//                        Uri.parse(event.attachment?.url)
-//                    )
-//                    setOnPreparedListener {
-//                        start()
-//                    }
-//                    setOnCompletionListener {
-//                        stopPlayback()
-//                        attachLayout.videoPlayBtn.isVisible = true
-//                    }
                 }
             }
 
@@ -226,7 +220,11 @@ class EventViewHolder(
                 onEventsListener.onShare(event)
             }
 
-            locationOfEvent.setOnClickListener {
+            webText.setOnClickListener {
+                onEventsListener.onLink(event.link.toString())
+            }
+
+            webBtn.setOnClickListener {
                 onEventsListener.onLink(event.link.toString())
             }
         }

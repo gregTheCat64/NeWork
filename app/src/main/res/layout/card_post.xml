@@ -170,7 +170,7 @@
             android:layout_height="wrap_content"
             android:maxLines="1"
             android:ellipsize="end"
-            android:background="?attr/colorSurface"
+
             android:paddingStart="@dimen/dim16dp"
             android:paddingEnd="@dimen/dim16dp"
             android:paddingTop="@dimen/dim8dp"
