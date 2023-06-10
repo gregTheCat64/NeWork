@@ -97,17 +97,25 @@ class UsersAddingFragment : Fragment() {
         }
 
 
-        binding.saveBtn.setOnClickListener {
-            val users = usersIds.toLongArray()
-            setFragmentResult("IDS", bundleOf("IDS" to users))
-
+        //navigation:
+        binding.topAppBar.setNavigationOnClickListener {
+              usersIds.clear()
             findNavController().navigateUp()
         }
 
-        binding.cancelButton.setOnClickListener {
-            usersIds.clear()
-            findNavController().navigateUp()
+        binding.topAppBar.setOnMenuItemClickListener {menuItem->
+            when (menuItem.itemId){
+                R.id.create -> {
+                    val users = usersIds.toLongArray()
+                    setFragmentResult("IDS", bundleOf("IDS" to users))
+
+                    findNavController().navigateUp()
+                }
+
+                else -> {false}
+            }
         }
+
 
         return binding.root
     }

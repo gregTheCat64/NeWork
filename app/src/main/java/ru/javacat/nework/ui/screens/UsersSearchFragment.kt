@@ -43,7 +43,7 @@ class UsersSearchFragment: Fragment() {
             adapter.submitList(userList)
         }
 
-        binding.cancelButton.setOnClickListener {
+        binding.topAppBar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
 

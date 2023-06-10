@@ -5,15 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import dagger.hilt.android.AndroidEntryPoint
 import ru.javacat.nework.R
+import ru.javacat.nework.data.auth.AppAuth
 import ru.javacat.nework.databinding.FragmentJobsBinding
 import ru.javacat.nework.ui.adapter.JobsAdapter
 import ru.javacat.nework.ui.viewmodels.JobsViewModel
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class JobsFragment: Fragment() {
@@ -35,6 +38,8 @@ class JobsFragment: Fragment() {
         (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
     }
 
+    @Inject
+    lateinit var appAuth: AppAuth
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,6 +50,7 @@ class JobsFragment: Fragment() {
 
         val args = arguments
         val authorId = args?.getLong("userID", 0L) ?:0L
+        val myId = appAuth.authStateFlow.value.id
 
         viewModel.getJobsByUserId(authorId)
 
@@ -60,6 +66,9 @@ class JobsFragment: Fragment() {
             findNavController().navigateUp()
         }
 
+        binding.jobsToolbar.menu.findItem(R.id.create).isVisible = myId == authorId
+
+
         binding.jobsToolbar.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.create -> {
@@ -70,7 +79,6 @@ class JobsFragment: Fragment() {
                 else -> {false}
             }
         }
-
 
         return binding.root
     }

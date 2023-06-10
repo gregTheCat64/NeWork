@@ -218,9 +218,4 @@ class EventsFragment : Fragment(R.layout.fragment_events) {
         }
     }
 
-    companion object {
-        @JvmStatic
-        fun newInstance() =
-            EventsFragment()
-    }
 }

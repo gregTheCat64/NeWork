@@ -49,11 +49,48 @@ class NewJobFragment : Fragment() {
         val binding = FragmentNewJobBinding.inflate(inflater)
         // Inflate the layout for this fragment
 
-        binding.cancelBtn.setOnClickListener {
+        //AppBar:
+        binding.topAppBar.setNavigationOnClickListener {
             AndroidUtils.hideKeyboard(requireView())
             findNavController().navigateUp()
         }
 
+        binding.topAppBar.setOnMenuItemClickListener {menuItem->
+            when (menuItem.itemId){
+                R.id.create -> {
+                    if (binding.jobEditText.text.isNotEmpty()&&
+                        binding.positionEditText.text.isNotEmpty()&&
+                        binding.startJobEditText.text.isNotEmpty()&&
+                        binding.linkEditText.text.isNotEmpty()
+                    ){
+                        val job = binding.jobEditText.text.toString().trim()
+                        val position = binding.positionEditText.text.toString().trim()
+                        val start = binding.startJobEditText.text.toString().trim() + " 08:00:00"
+                        var end: String? = binding.endJobEditText.text.toString().trim()
+                        end = if(binding.endJobEditText.text.isNotEmpty()){
+                            "$end 18:00:00"
+                        } else null
+
+                        val link = binding.linkEditText.text.toString().trim()
+                        try {
+                            viewModel.save(JobModel(0L,0L, true,job,position,start.toLocalDateTimeWhithoutZone(),
+                                end?.toLocalDateTimeWhithoutZone(), link))
+                            Snackbar.make(binding.root, "Успешно", Snackbar.LENGTH_LONG)
+                                .show()
+                            findNavController().navigateUp()
+                        } catch (e: NetworkError) {
+                            Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
+                                .show()
+                        }
+
+                    } else Snackbar.make(binding.root, "Заполните обязательные поля", Snackbar.LENGTH_LONG).show()
+                }
+            }
+            AndroidUtils.hideKeyboard(requireView())
+            true
+        }
+
+        //dates:
         binding.startDateBtn.setOnClickListener {
             showCalendar(parentFragmentManager, binding.startJobEditText)
         }
@@ -63,35 +100,7 @@ class NewJobFragment : Fragment() {
         }
 
 
-        binding.saveJobBtn.setOnClickListener {
-            AndroidUtils.hideKeyboard(requireView())
-            if (binding.jobEditText.text.isNotEmpty()&&
-                    binding.positionEditText.text.isNotEmpty()&&
-                        binding.startJobEditText.text.isNotEmpty()&&
-                        binding.linkEditText.text.isNotEmpty()
-                    ){
-                val job = binding.jobEditText.text.toString().trim()
-                val position = binding.positionEditText.text.toString().trim()
-                val start = binding.startJobEditText.text.toString().trim() + " 08:00:00"
-                var end: String? = binding.endJobEditText.text.toString().trim()
-                end = if(binding.endJobEditText.text.isNotEmpty()){
-                    "$end 18:00:00"
-                } else null
 
-                val link = binding.linkEditText.text.toString().trim()
-                try {
-                    viewModel.save(JobModel(0L,0L, true,job,position,start.toLocalDateTimeWhithoutZone(),
-                        end?.toLocalDateTimeWhithoutZone(), link))
-                    Snackbar.make(binding.root, "Успешно", Snackbar.LENGTH_LONG)
-                        .show()
-                    findNavController().navigateUp()
-                } catch (e: NetworkError) {
-                    Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
-                        .show()
-                }
-
-            } else Snackbar.make(binding.root, "Заполните обязательные поля", Snackbar.LENGTH_LONG).show()
-        }
 
         viewModel.state.observe(viewLifecycleOwner){state->
             binding.progress.isVisible = state.loading

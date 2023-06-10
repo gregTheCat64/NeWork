@@ -111,33 +111,6 @@ class WallFragment : Fragment() {
         val progressBar = binding.progress
         val favBtn = binding.toFavBtn
 
-        //(requireActivity() as AppActivity).setSupportActionBar(toolbar)
-
-
-//        toolbar.menu.setGroupVisible(R.id.wallMenu, myId == authorId)
-//        toolbar.menu.setGroupVisible(R.id.favMenu, myId != authorId)
-
-
-//        toolbar.addMenuProvider(object : MenuProvider{
-//            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-//                menuInflater.inflate(R.menu.menu_wall, menu)
-//                menu.findItem(R.id.favMenu).icon = favedIcon
-//            }
-//
-//            override fun onPrepareMenu(menu: Menu) {
-//
-//
-//            }
-//
-//            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-//                return true
-//            }
-//
-//        })
-
-
-
-
 
         favBtn.isVisible = myId != authorId
 

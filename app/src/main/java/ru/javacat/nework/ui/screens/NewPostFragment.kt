@@ -301,7 +301,7 @@ class NewPostFragment : Fragment() {
 
         }
 
-        //кнопка НАЗАД
+        //кнопка НАЗАД, создаем черновик
         val callback = requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             //проверим, новый ли это пост или редактирование старого
             val id = postViewModel.edited.value?.id

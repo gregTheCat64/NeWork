@@ -41,9 +41,6 @@ class RegistrationFragment : Fragment() {
         (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
     }
 
-    companion object {
-        fun newInstance() = RegistrationFragment()
-    }
 
     private  val viewModel: RegistrationViewModel by activityViewModels()
 
