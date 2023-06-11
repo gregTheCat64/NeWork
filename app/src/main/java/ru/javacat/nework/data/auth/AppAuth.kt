@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import ru.javacat.nework.data.api.PostsApi
+import ru.javacat.nework.ui.viewmodels.UserViewModel
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -22,6 +23,7 @@ class AppAuth @Inject constructor(
     private val tokenKey = "token"
 
     private val _authStateFlow: MutableStateFlow<Token>
+
 
     init {
         val id = prefs.getLong(idKey, 0)

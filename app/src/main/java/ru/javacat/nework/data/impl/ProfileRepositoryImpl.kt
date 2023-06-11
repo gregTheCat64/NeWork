@@ -4,7 +4,6 @@ import ru.javacat.nework.data.auth.AppAuth
 import ru.javacat.nework.data.dao.ProfileDao
 import ru.javacat.nework.data.entity.ProfileEntity
 import ru.javacat.nework.domain.repository.ProfileRepository
-import java.lang.Exception
 import javax.inject.Inject
 
 class ProfileRepositoryImpl @Inject constructor(

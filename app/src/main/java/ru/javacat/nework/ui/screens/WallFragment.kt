@@ -117,8 +117,8 @@ class WallFragment : Fragment() {
         favBtn.setOnClickListener {
             if (!favBtn.isChecked) {
                 wallViewModel.deleteUserFromFav(myId, authorId)
-                val daores = wallViewModel.getFavList(myId)
-                snack("$daores")
+                //val daores = wallViewModel.getFavList(myId)
+                //snack("$daores")
                 snack("Больше не в избранном")
             } else {
                 wallViewModel.addUserToFav(myId, authorId)

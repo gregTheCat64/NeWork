@@ -68,8 +68,8 @@ class PostsFragment : Fragment() {
     private val postViewModel: PostViewModel by activityViewModels()
     private val userViewModel: UserViewModel by viewModels()
     private val eventsViewModel: EventViewModel by viewModels()
-    //private val playerViewModel: PlayerViewModel by activityViewModels()
-    //private val mediaObserver = MediaLifecycleObserver()
+    private val wallViewModel: WallViewModel by viewModels()
+
 
 
     private val requestPermissionLauncher =
@@ -92,12 +92,8 @@ class PostsFragment : Fragment() {
         val binding = FragmentPostsBinding.inflate(inflater, container, false)
 
         //init:
-        userViewModel.loadUsers()
-//        wallViewModel.getFavList(appAuth.getId())
-//        val favList = wallViewModel.favList.value
-//        favList?.map {
-//            userViewModel.addToFav(it)
-//        }
+        //userViewModel.loadUsers()
+
 
 
         //Доступ к локации:
@@ -132,7 +128,7 @@ class PostsFragment : Fragment() {
                 shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) -> {
                     // TODO: show rationale dialog
                     //requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                    Toast.makeText(requireContext(), "НАМ НУЖНЫ ЕБАНЫ ПРАВА", Toast.LENGTH_SHORT)
+                    Toast.makeText(requireContext(), "Просто дай нам права!", Toast.LENGTH_SHORT)
                         .show()
                 }
                 // 3. Запрашиваем права
@@ -142,7 +138,6 @@ class PostsFragment : Fragment() {
             }
         }
 
-        //lifecycle.addObserver(mediaObserver)
 
 
         val adapter = PostsAdapter(object : OnInteractionListener {

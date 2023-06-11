@@ -3,18 +3,23 @@ package ru.javacat.nework.ui.screens
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import ru.javacat.nework.R
+import ru.javacat.nework.data.auth.AppAuth
 import ru.javacat.nework.databinding.FragmentSignInBinding
 import ru.javacat.nework.ui.viewmodels.SignInViewModel
+import ru.javacat.nework.ui.viewmodels.WallViewModel
 import ru.javacat.nework.util.AndroidUtils
+import javax.inject.Inject
 
 class SignInFragment : Fragment() {
 
@@ -34,11 +39,14 @@ class SignInFragment : Fragment() {
         (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
     }
 
-    companion object {
-        fun newInstance() = SignInFragment()
-    }
+
 
     private val viewModel: SignInViewModel by activityViewModels()
+
+
+
+    @Inject
+    lateinit var appAuth: AppAuth
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -99,9 +107,11 @@ class SignInFragment : Fragment() {
             findNavController().navigate(R.id.action_signInFragment_to_registrationFragment)
         }
         viewModel.tokenReceived.observe(viewLifecycleOwner) {
+            Log.i("TOKEN", it.toString())
             if (it == 0) {
                 Snackbar.make(binding.root, "успешный вход!", Snackbar.LENGTH_LONG).show()
                 findNavController().navigateUp()
+
             } else {
                 Snackbar.make(binding.root, "Неверный пароль или логин", Snackbar.LENGTH_LONG)
                     .show()

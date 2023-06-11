@@ -56,6 +56,22 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun clearUserList() {
+        try {
+            val response = userApi.getAll()
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
+            val result = body.map { it.toEntity() }
+            userDao.clearUserList(result)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            throw NetworkError
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw UnknownError
+        }
+    }
+
 
     override suspend fun getById(id: Long): User? {
         try {
@@ -84,6 +100,10 @@ class UserRepositoryImpl @Inject constructor(
             }
         }
         return userList.toList()
+    }
+
+    override suspend fun updateFavList(users: List<UserEntity>) {
+        userDao.updateFavs(users)
     }
 
     override suspend fun addToFav(id: Long) {

@@ -34,9 +34,7 @@ class WallViewModel @Inject constructor(
     val postsSize: LiveData<Int>
         get() = _postsSize
 
-    private val _favList = MutableLiveData<List<Long>>()
-    val favList: LiveData<List<Long>>
-        get() = _favList
+
 
     private val _dataState = MutableLiveData<FeedModelState>()
     val dataState: LiveData<FeedModelState>
@@ -84,29 +82,22 @@ class WallViewModel @Inject constructor(
         }
     }
 
-    fun getFavList(profileId: Long){
-        viewModelScope.launch {
-            val res = profileRepository.getFavListIds(profileId)
-            if (res != null) {
-                _favList.postValue(res.favListIds)
-            }
-        }
-    }
+
 
     fun addUserToFav(profileId: Long, id: Long){
         viewModelScope.launch {
-//            val favs = profileRepository.getFavListIds(profileId)?.favListIds
-//            val newList = favs?.plus(id)?: listOf(id)
-//            profileRepository.insert(ProfileEntity(profileId, newList))
+            val favs = profileRepository.getFavListIds(profileId)?.favListIds
+            val newList = favs?.plus(id)?: listOf(id)
+            profileRepository.insert(ProfileEntity(profileId, newList))
             userRepository.addToFav(id)
         }
     }
 
     fun deleteUserFromFav(profileId: Long, id: Long){
         viewModelScope.launch {
-//            val favs = profileRepository.getFavListIds(profileId)?.favListIds
-//            val newList = favs?.minus(id)?: emptyList()
-//            profileRepository.insert(ProfileEntity(profileId, newList))
+            val favs = profileRepository.getFavListIds(profileId)?.favListIds
+            val newList = favs?.minus(id)?: emptyList()
+            profileRepository.insert(ProfileEntity(profileId, newList))
             userRepository.deleteFromFav(id)
         }
     }

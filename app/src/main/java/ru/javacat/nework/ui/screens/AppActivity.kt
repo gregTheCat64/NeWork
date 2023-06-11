@@ -108,7 +108,8 @@ class AppActivity : AppCompatActivity() {
         //menu:
         viewModel.data.observe(this) {
             val id = appAuth.getId()
-                userViewModel.getUserById(id)
+            userViewModel.getUserById(id)
+            userViewModel.updateFavUserList(id)
 
         }
 

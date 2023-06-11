@@ -11,7 +11,7 @@ data class UserEntity(
     val login: String,
     val name: String,
     val avatar: String?,
-    val favoured: Boolean
+    var favoured: Boolean
 ){
     fun toModel() = User(id,login,name, avatar, favoured, false)
 

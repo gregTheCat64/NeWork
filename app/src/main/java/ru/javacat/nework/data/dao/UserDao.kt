@@ -5,7 +5,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
-import ru.javacat.nework.data.entity.EventEntity
 import ru.javacat.nework.data.entity.UserEntity
 
 @Dao
@@ -15,6 +14,8 @@ interface UserDao {
 
     @Query("SELECT * FROM UserEntity WHERE id = :id")
     suspend fun getUserById(id: Long): UserEntity?
+
+
 
     @Query("""
         UPDATE UserEntity SET
@@ -30,6 +31,11 @@ interface UserDao {
     """)
     suspend fun deleteFromFav(id: Long)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun updateFavs(users: List<UserEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun clearUserList(users: List<UserEntity>)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(users: List<UserEntity>)
