@@ -9,6 +9,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/likeBtn"
+            style="@style/Widget.AppTheme.LikeCheckBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -28,7 +29,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/takePartBtn"
-
+        style="@style/Widget.AppTheme.LikeCheckBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:checkable="true"

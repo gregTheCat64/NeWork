@@ -1,13 +1,13 @@
 
 <resources>
     <color name="seed">#1e4400</color>
-    <color name="md_theme_light_primary">#BC832F</color>
+    <color name="md_theme_light_primary">#C76D2E</color>
     <color name="md_theme_light_onPrimary">#FFFFFF</color>
-    <color name="md_theme_light_primaryContainer">#BCF293</color>
+    <color name="md_theme_light_primaryContainer">#FFFFFF</color>
     <color name="md_theme_light_onPrimaryContainer">#0B2000</color>
-    <color name="md_theme_light_secondary">#1C2612</color>
+    <color name="md_theme_light_secondary">#C76D2E</color>
     <color name="md_theme_light_onSecondary">#FFFFFF</color>
-    <color name="md_theme_light_secondaryContainer">#DAE7C9</color>
+    <color name="md_theme_light_secondaryContainer">#F6D5A8</color>
     <color name="md_theme_light_onSecondaryContainer">#141E0C</color>
     <color name="md_theme_light_tertiary">#386665</color>
     <color name="md_theme_light_onTertiary">#FFFFFF</color>
@@ -17,12 +17,12 @@
     <color name="md_theme_light_errorContainer">#FFDAD6</color>
     <color name="md_theme_light_onError">#FFFFFF</color>
     <color name="md_theme_light_onErrorContainer">#410002</color>
-    <color name="md_theme_light_background">#AEBF9C</color>
+    <color name="md_theme_light_background">#02433D</color>
     <color name="md_theme_light_onBackground">#FDFDF5</color>
     <color name="md_theme_light_surface">#FDFDF5</color>
     <color name="md_theme_light_onSurface">#1A1C18</color>
-    <color name="md_theme_light_surfaceVariant">#E0E4D6</color>
-    <color name="md_theme_light_onSurfaceVariant">#44483E</color>
+    <color name="md_theme_light_surfaceVariant">#DEDEDE</color>
+    <color name="md_theme_light_onSurfaceVariant">#C5C9BE</color>
     <color name="md_theme_light_outline">#74796D</color>
     <color name="md_theme_light_inverseOnSurface">#F1F1EA</color>
     <color name="md_theme_light_inverseSurface">#2F312C</color>
@@ -33,7 +33,7 @@
     <color name="md_theme_light_scrim">#000000</color>
     <color name="md_theme_dark_primary">#82A567</color>
     <color name="md_theme_dark_onPrimary">#0A1105</color>
-    <color name="md_theme_dark_primaryContainer">#255101</color>
+    <color name="md_theme_dark_primaryContainer">#2E3229</color>
     <color name="md_theme_dark_onPrimaryContainer">#BCF293</color>
     <color name="md_theme_dark_secondary">#636E55</color>
     <color name="md_theme_dark_onSecondary">#293420</color>

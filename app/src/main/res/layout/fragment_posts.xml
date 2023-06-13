@@ -8,25 +8,6 @@
     tools:context=".ui.screens.PostsFragment">
 
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/newPostsBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Новые записи"
-        android:layout_gravity="center"
-        android:visibility="gone"
-        />
-
-
-    <ProgressBar
-        android:id="@+id/progress"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:layout_marginTop="@dimen/dim48dp"
-        android:layout_gravity="center|top"
-        />
-
     <TextView
         android:id="@+id/emptyText"
         android:layout_width="wrap_content"
@@ -38,7 +19,7 @@
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeToRefresh"
-
+        android:layout_marginTop="@dimen/dim8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <androidx.recyclerview.widget.RecyclerView
@@ -49,5 +30,34 @@
             tools:listitem="@layout/card_post" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/newPostsBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dim32dp"
+        style="@style/Widget.Material3.Button.ElevatedButton"
+        app:elevation="@dimen/dim16dp"
+        android:elevation="@dimen/dim8dp"
+        android:layout_gravity="center|top"
+        android:visibility="gone"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/upBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:icon="@drawable/baseline_keyboard_arrow_up_24"
+        style="@style/Widget.Material3.Button.ElevatedButton.Icon"
+        android:text="@string/up"
+        android:visibility="gone"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="@dimen/dim16dp"
+        />
+
+
+    <include
+        android:id="@+id/progress"
+        layout="@layout/progress_bar_horizontal"
+        />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

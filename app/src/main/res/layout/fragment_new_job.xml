@@ -18,6 +18,11 @@
         style="@style/Widget.MaterialComponents.Toolbar.Primary"
         />
 
+    <include
+        android:id="@+id/progress"
+        layout="@layout/progress_bar_horizontal"
+        />
+
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -31,13 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <ProgressBar
-                android:id="@+id/progress"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="visible"
-                android:layout_gravity="center"
-                />
+
 
             <EditText
                 android:id="@+id/jobEditText"

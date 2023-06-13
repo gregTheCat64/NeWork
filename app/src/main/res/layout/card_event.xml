@@ -3,7 +3,6 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/dim8dp"
@@ -100,13 +99,20 @@
             layout="@layout/attachment"
             />
 
+        <View
+            android:id="@+id/divider3"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/dim8dp"
+            android:background="?attr/colorOutline"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/infoLayout" />
 
         <FrameLayout
             android:id="@+id/eventInfoCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/colorSurfaceVariant"
-
             android:layout_gravity="center"
 
             >
@@ -116,7 +122,11 @@
                 android:layout_height="wrap_content"
 
                 android:orientation="vertical"
-                android:padding="@dimen/dim16dp">
+                android:paddingTop="@dimen/dim8dp"
+                android:paddingStart="@dimen/dim16dp"
+                android:paddingEnd="@dimen/dim16dp"
+                android:paddingBottom="@dimen/dim8dp"
+               >
 
 
                     <TextView
@@ -279,6 +289,16 @@
 
 
         </FrameLayout>
+
+        <View
+            android:id="@+id/divider2"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/dim8dp"
+            android:background="?attr/colorOutline"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/infoLayout" />
 
 
 

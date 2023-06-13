@@ -3,44 +3,31 @@ package ru.javacat.nework.ui.screens
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.app.ActivityCompat.invalidateOptionsMenu
 import androidx.core.net.toUri
-import androidx.core.view.MenuProvider
-import androidx.core.view.get
-import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import ru.javacat.nework.R
 import ru.javacat.nework.data.auth.AppAuth
 import ru.javacat.nework.databinding.FragmentWallBinding
-import ru.javacat.nework.domain.model.EventModel
-import ru.javacat.nework.domain.model.FeedModelState
 import ru.javacat.nework.domain.model.PostModel
 import ru.javacat.nework.domain.model.User
-import ru.javacat.nework.mediaplayer.MediaLifecycleObserver
-import ru.javacat.nework.ui.adapter.*
-import ru.javacat.nework.ui.viewmodels.*
+import ru.javacat.nework.ui.adapter.OnInteractionListener
+import ru.javacat.nework.ui.adapter.PostsAdapter
+import ru.javacat.nework.ui.viewmodels.PostViewModel
+import ru.javacat.nework.ui.viewmodels.WallViewModel
 import ru.javacat.nework.util.asString
 import ru.javacat.nework.util.loadCircleCrop
 import ru.javacat.nework.util.snack
@@ -48,7 +35,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class WallFragment : Fragment() {
-    private val userViewModel: UserViewModel by viewModels()
+    //private val userViewModel: UserViewModel by viewModels()
     private val postViewModel: PostViewModel by activityViewModels()
     private val wallViewModel: WallViewModel by viewModels()
 
@@ -102,13 +89,13 @@ class WallFragment : Fragment() {
 
         //init
         wallViewModel.getUserJob(authorId)
-        userViewModel.getUserById(authorId)
+        wallViewModel.getUserById(authorId)
         wallViewModel.getPostsCount(authorId)
 
 
         val addJobBtn = binding.addJobBtn
         val toolbar = binding.mainToolbar
-        val progressBar = binding.progress
+        val progress = binding.progress
         val favBtn = binding.toFavBtn
 
 
@@ -154,7 +141,7 @@ class WallFragment : Fragment() {
         }
 
         wallViewModel.dataState.observe(viewLifecycleOwner) { state ->
-            progressBar.isVisible = state.loading
+            progress.root.isVisible = state.loading
             if (state.error) {
                 Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
                     .setAction(R.string.retry_loading) {
@@ -168,7 +155,7 @@ class WallFragment : Fragment() {
             binding.postsSize.text = getPostSizeText(size)
         }
 
-        userViewModel.user.observe(viewLifecycleOwner) { user ->
+        wallViewModel.user.observe(viewLifecycleOwner) { user ->
             user?.avatar?.let { binding.avatar.loadCircleCrop(it) }
             user?.name?.let {
                 binding.mainToolbar.title = it

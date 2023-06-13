@@ -10,6 +10,7 @@
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/main.appbar"
+        style="@style/Widget.MaterialComponents.Toolbar.Primary"
         android:layout_width="match_parent"
         android:layout_height="320dp"
         >
@@ -21,10 +22,11 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:expandedTitleMarginStart="48dp"
             app:expandedTitleMarginEnd="64dp"
-
+            app:expandedTitleTextColor="?attr/colorOnPrimary"
+            app:collapsedTitleTextColor="?attr/colorOnPrimary"
+            style="@style/Widget.MaterialComponents.Toolbar.Primary"
             android:background="?android:colorBackground"
-            app:titleTextColor="?attr/colorOnPrimary"
-            app:subtitleTextColor="?attr/colorOnPrimary"
+
             >
 
             <FrameLayout
@@ -119,19 +121,11 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <ProgressBar
+
+    <include
         android:id="@+id/progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:padding="@dimen/dim8dp"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-
+        layout="@layout/progress_bar_horizontal"
+        />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"

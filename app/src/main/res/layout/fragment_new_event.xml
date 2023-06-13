@@ -35,15 +35,15 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             >
-            <ProgressBar
+            <include
                 android:id="@+id/progress"
-                android:layout_gravity="center_horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                layout="@layout/progress_bar_horizontal"
                 />
             <com.google.android.material.textfield.TextInputLayout
+                android:layout_marginTop="@dimen/dim8dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/eventEditText"
                     android:layout_width="match_parent"

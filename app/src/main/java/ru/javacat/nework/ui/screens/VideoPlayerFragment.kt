@@ -1,8 +1,5 @@
 package ru.javacat.nework.ui.screens
 
-import android.app.AlertDialog
-import android.app.Dialog
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +7,6 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.media3.common.MediaItem
@@ -23,8 +19,6 @@ import ru.javacat.nework.R
 import ru.javacat.nework.databinding.FragmentVideoPlayerBinding
 import ru.javacat.nework.domain.model.FeedModelState
 import ru.javacat.nework.ui.viewmodels.PlayerViewModel
-import ru.javacat.nework.util.DownloadAndSaveImageTask
-import java.lang.Exception
 
 @AndroidEntryPoint
 class VideoPlayerFragment : Fragment() {

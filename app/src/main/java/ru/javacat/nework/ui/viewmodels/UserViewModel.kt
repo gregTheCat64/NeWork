@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import ru.javacat.nework.data.entity.toEntity
+import ru.javacat.nework.domain.model.FeedModelState
 import ru.javacat.nework.domain.model.User
 import ru.javacat.nework.domain.repository.ProfileRepository
 import ru.javacat.nework.domain.repository.UserRepository
@@ -39,6 +40,10 @@ class UserViewModel @Inject constructor(
     private val _speakers = MutableLiveData<List<User>>(emptyList())
     val speakers: LiveData<List<User>>
         get() = _speakers
+
+    private var _state = MutableLiveData(FeedModelState(idle = true))
+    val state: LiveData<FeedModelState>
+        get() = _state
 
 
     init {
@@ -83,33 +88,26 @@ class UserViewModel @Inject constructor(
 
     fun updateFavUserList(profileId: Long){
         viewModelScope.launch {
-            val daoResult = profileRepository.getFavListIds(profileId)?.favListIds
-            val users = daoResult?.let { userRepository.getUsersById(it)?.toEntity() }
-            val favUsers = users?.apply {
-                this.map {
-                    it.favoured = true
+                try {
+                    val daoResult = profileRepository.getFavListIds(profileId)?.favListIds
+                    val users = daoResult?.let { userRepository.getUsersById(it)?.toEntity() }
+                    val favUsers = users?.apply {
+                        this.map {
+                            it.favoured = true
+                        }
+                    }
+
+                    Log.i("TOKEN", users.toString())
+                    userRepository.clearUserList()
+                    if (favUsers != null) {
+                        userRepository.updateFavList(favUsers)
+                    }
+
+                }  catch (e: Exception) {
+                    _state.value = FeedModelState(error = true)
                 }
-            }
+                }
 
-            Log.i("TOKEN", users.toString())
-            userRepository.clearUserList()
-            if (favUsers != null) {
-                userRepository.updateFavList(favUsers)
-            }
-
-        }
     }
 
-//    fun addToFav(id: Long){
-//        viewModelScope.launch {
-//            repository.addToFav(id)
-//        }
-//
-//    }
-//
-//    fun deleteFromFav(id: Long){
-//        viewModelScope.launch {
-//            repository.deleteFromFav(id)
-//        }
-//    }
 }

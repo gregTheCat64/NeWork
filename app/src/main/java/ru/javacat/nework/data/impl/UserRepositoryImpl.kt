@@ -1,14 +1,8 @@
 package ru.javacat.nework.data.impl
 
-import android.util.Log
-import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -48,11 +42,11 @@ class UserRepositoryImpl @Inject constructor(
             userDao.insert(result)
         } catch (e: IOException) {
             e.printStackTrace()
-            throw NetworkError
+            throw NetworkError("error_network")
 
         } catch (e: Exception) {
             e.printStackTrace()
-            throw UnknownError
+            throw UnknownError("error_unknown")
         }
     }
 
@@ -64,11 +58,11 @@ class UserRepositoryImpl @Inject constructor(
             userDao.clearUserList(result)
         } catch (e: IOException) {
             e.printStackTrace()
-            throw NetworkError
+            throw NetworkError("error_network")
 
         } catch (e: Exception) {
             e.printStackTrace()
-            throw UnknownError
+            throw UnknownError("error_unknown")
         }
     }
 
@@ -84,10 +78,10 @@ class UserRepositoryImpl @Inject constructor(
             return daoResult ?: userApi.getById(id).body()?.toModel()
         } catch (e: IOException) {
             e.printStackTrace()
-            throw NetworkError
+            throw NetworkError("error_network")
         } catch (e: Exception) {
             e.printStackTrace()
-            throw UnknownError
+            throw UnknownError("error_unknown")
         }
     }
 
@@ -142,11 +136,13 @@ class UserRepositoryImpl @Inject constructor(
             if (token != null) {
                 appAuth.setAuth(id, token)
             }
+        } catch (e: ApiError) {
+            throw ApiError(e.responseCode, e.message)
         } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            println(e)
-            throw UnknownError
+            throw NetworkError("error_network")
+        }
+        catch (e: Exception) {
+            throw UnknownError("error_unknown")
         }
     }
 
@@ -162,12 +158,13 @@ class UserRepositoryImpl @Inject constructor(
             if (token != null) {
                 appAuth.setAuth(id, token)
             }
-
+        } catch (e: ApiError) {
+            throw ApiError(e.responseCode, e.message)
         } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            println(e)
-            throw UnknownError
+            throw NetworkError("error_network")
+        }
+        catch (e: Exception) {
+            throw UnknownError("error_unknown")
         }
     }
 }

@@ -1,21 +1,15 @@
 package ru.javacat.nework.ui.adapter
 
 
-import android.app.Application
-import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.MediaController
 import android.widget.PopupMenu
-import android.widget.Toast
 import androidx.core.view.isVisible
-import androidx.media3.exoplayer.ExoPlayer
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import dagger.hilt.android.qualifiers.ApplicationContext
 import ru.javacat.nework.R
 import ru.javacat.nework.databinding.CardPostBinding
 import ru.javacat.nework.domain.model.AttachmentType
@@ -23,7 +17,6 @@ import ru.javacat.nework.domain.model.PostModel
 import ru.javacat.nework.util.asString
 import ru.javacat.nework.util.load
 import ru.javacat.nework.util.loadAvatar
-import ru.javacat.nework.util.loadCircleCrop
 
 
 interface OnInteractionListener {
@@ -43,12 +36,19 @@ interface OnInteractionListener {
 
     fun onLink(url: String) {}
 
+    fun onUpBtn() {
+
+    }
+
 }
+
 
 
 class PostsAdapter(
     private val onInteractionListener: OnInteractionListener,
 ) : PagingDataAdapter<PostModel, PostViewHolder>(PostDiffCallback()) {
+    var isScrolledOver = false
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val binding = CardPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return PostViewHolder(binding, onInteractionListener)
@@ -56,6 +56,21 @@ class PostsAdapter(
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         val post = getItem(position) ?: return
+
+        Log.i("POS", position.toString())
+        if (position == 0) {isScrolledOver = false}
+        if (position == 10 && !isScrolledOver) {
+            isScrolledOver = true
+            onInteractionListener.onUpBtn()
+        }
+
+//        if (position<10) {isScrolledOver = false}
+//
+//        if (isScrolledOver && position == 10) {
+//
+//        }
+
+
         holder.bind(post)
     }
 }

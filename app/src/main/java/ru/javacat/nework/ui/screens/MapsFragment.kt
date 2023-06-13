@@ -1,12 +1,10 @@
 package ru.javacat.nework.ui.screens
 
-import android.graphics.PointF
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.yandex.mapkit.Animation
@@ -78,12 +76,6 @@ class MapsFragment : Fragment(R.layout.fragment_maps), InputListener {
     }
 
     override fun onMapTap(p0: Map, p1: Point) {
-        Toast.makeText(requireContext(), "${p1.latitude}, ${p1.longitude}", Toast.LENGTH_SHORT)
-            .show()
-        println("$p1")
-    }
-
-    override fun onMapLongTap(p0: Map, p1: Point) {
         collection.clear()
         collection.addPlacemark(p1).setIcon(ImageProvider.fromResource(context, R.drawable.ic_baseline_location_on_24))
         val lat = p1.latitude.toString().take(7).toDouble()
@@ -93,6 +85,12 @@ class MapsFragment : Fragment(R.layout.fragment_maps), InputListener {
             doubleArrayOf(lat,long)
         )
         Toast.makeText(requireContext(), "Точка добавлена", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onMapLongTap(p0: Map, p1: Point) {
+        Toast.makeText(requireContext(), "${p1.latitude}, ${p1.longitude}", Toast.LENGTH_SHORT)
+            .show()
+        println("$p1")
     }
 
     override fun onStart() {

@@ -6,20 +6,19 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.net.toFile
 import androidx.core.net.toUri
-import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.fragment.findNavController
 import com.github.dhaval2404.imagepicker.ImagePicker
-import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import ru.javacat.nework.R
@@ -35,7 +34,6 @@ import ru.javacat.nework.ui.adapter.UsersAdapter
 import ru.javacat.nework.ui.viewmodels.PostViewModel
 import ru.javacat.nework.ui.viewmodels.UserViewModel
 import ru.javacat.nework.util.AndroidUtils
-import ru.javacat.nework.util.StringArg
 import ru.javacat.nework.util.load
 import ru.javacat.nework.util.snack
 import ru.javacat.nework.util.toFile
@@ -44,9 +42,6 @@ import ru.javacat.nework.util.toast
 @AndroidEntryPoint
 class NewPostFragment : Fragment() {
 
-    companion object {
-        var Bundle.textArg: String? by StringArg
-    }
 
     private val postViewModel: PostViewModel by activityViewModels()
     private val userViewModel: UserViewModel by activityViewModels()
@@ -247,9 +242,8 @@ class NewPostFragment : Fragment() {
 
         //observers:
         postViewModel.postCreated.observe(viewLifecycleOwner) {
-            postViewModel.refresh()
             findNavController().navigateUp()
-
+            //postViewModel.refresh()
         }
 
         postViewModel.edited.observe(viewLifecycleOwner) { post ->
@@ -260,13 +254,10 @@ class NewPostFragment : Fragment() {
         }
 
         postViewModel.state.observe(viewLifecycleOwner) {state->
-            binding.progressBar.isVisible = state.loading
+            binding.progress.root.isVisible = state.loading
             if (state.error) {
-                Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
-                    .setAction(R.string.retry_loading) {
-                        postViewModel.refresh()
-                    }
-                    .show()
+                Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG).show()
+
             }
         }
 
@@ -279,6 +270,7 @@ class NewPostFragment : Fragment() {
         binding.topAppBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.create -> {
+
                     val link = binding.linkEditText.text.toString()
                     val content = binding.edit.text.toString()
                     if (link.isNotEmpty()) {

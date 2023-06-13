@@ -10,6 +10,7 @@
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeToRefresh"
+        android:layout_marginTop="@dimen/dim8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -21,13 +22,33 @@
             tools:listitem="@layout/card_event" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:visibility="visible"
-        android:layout_marginTop="@dimen/dim48dp"
-        android:layout_gravity="center|top"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/newEventsBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dim32dp"
+        style="@style/Widget.Material3.Button.ElevatedButton"
+        app:elevation="@dimen/dim16dp"
+        android:elevation="@dimen/dim8dp"
+        android:layout_gravity="center|top"
+        android:visibility="gone"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/upBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:icon="@drawable/baseline_keyboard_arrow_up_24"
+        style="@style/Widget.Material3.Button.ElevatedButton.Icon"
+        android:text="@string/up"
+        android:visibility="gone"
+        android:layout_gravity="bottom|center"
+        android:layout_margin="@dimen/dim16dp"
+        />
+
+    <include
+        android:id="@+id/progress"
+        layout="@layout/progress_bar_horizontal"
         />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

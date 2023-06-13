@@ -1,6 +1,5 @@
 package ru.javacat.nework.data.impl
 
-import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -23,14 +22,14 @@ import javax.inject.Inject
 class JobRepositoryImpl @Inject constructor(
     private val jobDao: JobsDao,
     private val jobsApi: JobsApi,
-    private val appAuth: AppAuth,
+    //private val appAuth: AppAuth,
 
     ) : JobRepository {
     override val jobsData: Flow<List<JobModel>> = jobDao.getAll()
         .map(List<JobEntity>::toModel)
         .flowOn(Dispatchers.Default)
 
-    override suspend fun getJobsByUserId(id: Long): List<JobModel>? {
+    override suspend fun getJobsByUserId(id: Long): List<JobModel> {
         try {
             val response = jobsApi.getJobsById(id)
             val body = response.body() ?: throw ApiError(response.code(), response.message())
@@ -41,13 +40,13 @@ class JobRepositoryImpl @Inject constructor(
             val daoResult = jobDao.getByAuthorId(id).map { it.toModel() }
             return daoResult
 
+        } catch (e: ApiError) {
+            throw ApiError(e.responseCode, e.message)
         } catch (e: IOException) {
-            e.printStackTrace()
-            throw NetworkError
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-            throw UnknownError
+            throw NetworkError("error_network")
+        }
+        catch (e: Exception) {
+            throw UnknownError("error_unknown")
         }
     }
 
@@ -56,17 +55,26 @@ class JobRepositoryImpl @Inject constructor(
             val result = jobsApi.getJobsById(id)
             result.body()?.let { it -> jobDao.insert(it.map { it.toEntity() }) }
             return result.body()?.map { it.toModel() }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            throw UnknownError
+        } catch (e: ApiError) {
+            throw ApiError(e.responseCode, e.message)
+        } catch (e: IOException) {
+            throw NetworkError("error_network")
+        }
+        catch (e: Exception) {
+            throw UnknownError("error_unknown")
         }
     }
 
     override suspend fun create(job: JobCreateRequest) {
         try {
             jobsApi.createJob(job)
-        } catch (e: Exception) {
-            throw ru.javacat.nework.error.UnknownError
+        } catch (e: ApiError) {
+            throw ApiError(e.responseCode, e.message)
+        } catch (e: IOException) {
+            throw NetworkError("error_network")
+        }
+        catch (e: Exception) {
+            throw UnknownError("error_unknown")
         }
     }
 
@@ -74,10 +82,13 @@ class JobRepositoryImpl @Inject constructor(
         try {
             jobsApi.removeById(id)
             jobDao.removeById(id)
+        } catch (e: ApiError) {
+            throw ApiError(e.responseCode, e.message)
         } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
+            throw NetworkError("error_network")
+        }
+        catch (e: Exception) {
+            throw UnknownError("error_unknown")
         }
     }
 }

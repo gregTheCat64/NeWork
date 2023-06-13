@@ -1,26 +1,31 @@
 package ru.javacat.nework.ui.viewmodels
 
 import android.net.Uri
-import android.util.Log
 import androidx.core.net.toFile
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
+import ru.javacat.nework.data.dao.PostRemoteKeyDao
 import ru.javacat.nework.data.dto.MediaUpload
 import ru.javacat.nework.data.mappers.toPostRequest
+import ru.javacat.nework.domain.model.AttachModel
 import ru.javacat.nework.domain.model.AttachmentType
 import ru.javacat.nework.domain.model.CoordinatesModel
 import ru.javacat.nework.domain.model.FeedModelState
-import ru.javacat.nework.domain.model.AttachModel
-import ru.javacat.nework.domain.model.AttachmentModel
 import ru.javacat.nework.domain.model.PostModel
-import ru.javacat.nework.domain.model.User
 import ru.javacat.nework.domain.repository.PostRepository
-import ru.javacat.nework.domain.repository.UserRepository
-import ru.javacat.nework.domain.repository.WallRepository
 import ru.javacat.nework.util.SingleLiveEvent
 import javax.inject.Inject
 
@@ -35,10 +40,10 @@ private val noAttach = AttachModel()
 @HiltViewModel
 class PostViewModel @Inject constructor(
     private val postRepository: PostRepository,
+    private val postRemoteKeyDao: PostRemoteKeyDao
 ) : ViewModel() {
     val data: Flow<PagingData<PostModel>> =
-        postRepository.data.cachedIn(viewModelScope)
-
+        postRepository.data.cachedIn(viewModelScope).flowOn(Dispatchers.IO)
 
     val count = 5
 
@@ -55,16 +60,11 @@ class PostViewModel @Inject constructor(
     val coords: LiveData<CoordinatesModel>
         get() = _coords
 
-
-//    val newerCount: LiveData<Int> = data.switchMap {
-//        repository.getNewerCount(it.posts.firstOrNull()?.id ?: 0L)
-//            .catch { e -> e.printStackTrace() }
-//            .asLiveData(Dispatchers.Default)
-//    }
-
-//    private val _isNewPost = MutableLiveData<Boolean>(true)
-//    val isNewPost: LiveData<Boolean>
-//        get() = _isNewPost
+    val newerCount: Flow<Int> = data.flatMapLatest {
+        postRepository.getNewerCount(postRemoteKeyDao.max() ?: 0L)
+            .catch { e -> e.printStackTrace() }
+            .asLiveData(Dispatchers.Default).asFlow()
+    }
 
 
     private val _edited = MutableLiveData(empty)
@@ -75,39 +75,16 @@ class PostViewModel @Inject constructor(
     val postCreated: LiveData<Unit>
         get() = _postCreated
 
+    private val _newPost = MutableLiveData<Boolean>()
+    val newPost: LiveData<Boolean>
+        get() = _newPost
+
     private val _attachFile = MutableLiveData(noAttach)
     val attachFile: LiveData<AttachModel>
         get() = _attachFile
 
 
-    init {
-        loadPosts()
-    }
 
-    fun loadPosts() {
-        viewModelScope.launch {
-            try {
-                _state.value = FeedModelState(loading = true)
-                //postRepository.getAll()
-                _state.value = FeedModelState(idle = true)
-            } catch (e: Exception) {
-                _state.value = FeedModelState(error = true)
-            }
-        }
-    }
-
-
-    fun refresh() {
-        viewModelScope.launch {
-            try {
-                _state.value = FeedModelState(loading = true)
-                postRepository.getLatest(count)
-                _state.value = FeedModelState(idle = true)
-            } catch (e: Exception) {
-                _state.value = FeedModelState(error = true)
-            }
-        }
-    }
 
     fun save(type: AttachmentType?) {
         println("Edited: ${edited.value}")
@@ -125,6 +102,7 @@ class PostViewModel @Inject constructor(
                     )
                     //_addedUsers.postValue(emptyList())
                     _postCreated.postValue(Unit)
+                    _newPost.postValue(true)
                     _state.value = FeedModelState(idle = true)
                     _edited.postValue(empty)
                     _attachFile.postValue(noAttach)

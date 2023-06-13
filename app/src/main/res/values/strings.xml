@@ -25,7 +25,7 @@
     <string name="description_select_photo">Выбрать фото</string>
     <string name="description_take_photo">Сделать снимок</string>
     <string name="Posts">Записи</string>
-    <string name="Me">Я</string>
+    <string name="Me">Вы</string>
     <string name="Liked">Оценили: </string>
     <string name="add_post">Добавить запись</string>
     <string name="menu_edit">Редактировать</string>
@@ -39,6 +39,8 @@
     <string name="save">Сохранить</string>
     <string name="empty_posts">Здесь пока нет постов. Создайте новый :)</string>
     <string name="error_loading">Ошибка сети</string>
+    <string name="error_password">Пароль не верный</string>
+    <string name="error_unknown">Неизвестная ошибка</string>
     <string name="retry_loading">Повторить</string>
     <string name="chooser_share_post">Поделиться записью</string>
     <string name="chooser_link">Открыть ссылку</string>
@@ -64,4 +66,6 @@
     <string name="name">Имя</string>
     <string name="addJob">Добавить работу</string>
     <string name="toFav">в избранное</string>
+    <string name="default_site" translatable="false">www.google.com</string>
+    <string name="up">наверх</string>
 </resources>

@@ -14,14 +14,13 @@
         android:checkable="true"
         app:icon="@drawable/ic_play_btn_selector"
         app:iconSize="@dimen/dim32dp"
-
         style="@style/Widget.Material3.Button.IconButton"
         />
 
     <SeekBar
         android:id="@+id/barSeekBar"
         style="@style/SeekBar"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_weight="1"

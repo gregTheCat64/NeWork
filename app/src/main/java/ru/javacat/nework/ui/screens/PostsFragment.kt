@@ -8,32 +8,22 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.SeekBar
+import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
-import androidx.media3.common.MediaItem
-import androidx.media3.common.Player
-import androidx.media3.common.Timeline
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.ui.PlayerControlView
-import androidx.media3.ui.PlayerView
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.material.snackbar.Snackbar
-import com.yandex.mapkit.geometry.Point
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
@@ -41,23 +31,13 @@ import kotlinx.coroutines.launch
 import ru.javacat.nework.R
 import ru.javacat.nework.data.auth.AppAuth
 import ru.javacat.nework.databinding.FragmentPostsBinding
-import ru.javacat.nework.domain.model.FeedModelState
 import ru.javacat.nework.domain.model.PostModel
 import ru.javacat.nework.error.NetworkError
-import ru.javacat.nework.mediaplayer.MediaLifecycleObserver
 import ru.javacat.nework.ui.adapter.OnInteractionListener
 import ru.javacat.nework.ui.adapter.PostsAdapter
-import ru.javacat.nework.ui.screens.NewPostFragment.Companion.textArg
-import ru.javacat.nework.ui.viewmodels.EventViewModel
-import ru.javacat.nework.ui.viewmodels.PlayerViewModel
 import ru.javacat.nework.ui.viewmodels.PostViewModel
-import ru.javacat.nework.ui.viewmodels.UserViewModel
-import ru.javacat.nework.ui.viewmodels.WallViewModel
 import ru.javacat.nework.util.asString
 import ru.javacat.nework.util.snack
-import java.io.Serializable
-import java.math.RoundingMode
-import java.text.DecimalFormat
 import javax.inject.Inject
 
 
@@ -66,9 +46,8 @@ class PostsFragment : Fragment() {
 
 
     private val postViewModel: PostViewModel by activityViewModels()
-    private val userViewModel: UserViewModel by viewModels()
-    private val eventsViewModel: EventViewModel by viewModels()
-    private val wallViewModel: WallViewModel by viewModels()
+    //private val eventsViewModel: EventViewModel by viewModels()
+
 
 
 
@@ -93,8 +72,15 @@ class PostsFragment : Fragment() {
 
         //init:
         //userViewModel.loadUsers()
+        //animation:
+        val upBtnAnim = AnimationUtils.loadAnimation(requireContext(), R.anim.up_btn)
+        val newPostsAnim = AnimationUtils.loadAnimation(requireContext(), R.anim.new_posts_btn)
 
+        val mAnimator = binding.postsList.itemAnimator as SimpleItemAnimator
+        mAnimator.supportsChangeAnimations = false
 
+        //обнуляем статус нового поста
+        //postViewModel.setNewPostFalse()
 
         //Доступ к локации:
         lifecycle.coroutineScope.launchWhenCreated {
@@ -127,9 +113,9 @@ class PostsFragment : Fragment() {
                 // 2. Должны показать обоснование необходимости прав
                 shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) -> {
                     // TODO: show rationale dialog
-                    //requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                    Toast.makeText(requireContext(), "Просто дай нам права!", Toast.LENGTH_SHORT)
+                    Toast.makeText(requireContext(), "Местоположение необходимо для добавления геометки", Toast.LENGTH_SHORT)
                         .show()
+                    //requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                 }
                 // 3. Запрашиваем права
                 else -> {
@@ -137,7 +123,6 @@ class PostsFragment : Fragment() {
                 }
             }
         }
-
 
 
         val adapter = PostsAdapter(object : OnInteractionListener {
@@ -246,12 +231,16 @@ class PostsFragment : Fragment() {
                     Intent.createChooser(intent, getString(R.string.chooser_link))
                 startActivity(shareIntent)
             }
+
+            override fun onUpBtn() {
+                binding.upBtn.isVisible = true
+                binding.upBtn.startAnimation(upBtnAnim)
+            }
         })
 
         binding.postsList.adapter = adapter
 
-        val mAnimator = binding.postsList.itemAnimator as SimpleItemAnimator
-        mAnimator.supportsChangeAnimations = false
+
 
         lifecycleScope.launch {
             postViewModel.data
@@ -263,14 +252,38 @@ class PostsFragment : Fragment() {
                 }
         }
 
-        lifecycleScope.launch {
-            eventsViewModel.data.collectLatest {  }
+        lifecycleScope.launch{
+            postViewModel.newerCount.collectLatest {
+                if (it>0){
+                    val string = "Новая запись ($it)"
+                    binding.newPostsBtn.apply {
+                        text = string
+                        isVisible = true
+                        startAnimation(newPostsAnim)
+                    }
+                }
+            }
         }
+
+        binding.newPostsBtn.setOnClickListener {
+            it.isVisible = false
+            binding.upBtn.isVisible = false
+            binding.postsList.smoothScrollToPosition(0)
+            adapter.refresh()
+        }
+
+        //TODO: осуществить предварительную загрузку ивентов
+//        lifecycleScope.launch {
+//            eventsViewModel.data.collectLatest {  }
+//        }
 
 
         lifecycleScope.launch {
             adapter.loadStateFlow.collectLatest {
-                binding.progress.isVisible = it.refresh is LoadState.Loading
+                binding.progress.root.isVisible = it.refresh is LoadState.Loading
+                        ||it.append is LoadState.Loading
+                        ||it.prepend is LoadState.Loading
+
                 binding.swipeToRefresh.isRefreshing = false
 
                 if (it.refresh is LoadState.Error||
@@ -279,7 +292,7 @@ class PostsFragment : Fragment() {
                 ) {
                     Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
                     .setAction(R.string.retry_loading) {
-                        postViewModel.refresh()
+                        adapter.refresh()
                     }
                     .show()
                 }
@@ -287,40 +300,38 @@ class PostsFragment : Fragment() {
         }
 
 
-        postViewModel.state.observe(viewLifecycleOwner) { state ->
-            println("state: $state")
-
-            with(binding) {
-                progress.isVisible = state.loading
-                //swipeToRefresh.isRefreshing = state.refreshing
-            }
-            if (state.error) {
-                Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
-                    .setAction(R.string.retry_loading) {
-                        postViewModel.refresh()
-                    }
-                    .show()
-            }
-        }
-
-//        postViewModel.postCreated.observe(viewLifecycleOwner) {
-//            binding.postsList.smoothScrollToPosition(0)
-//        }
-
-//        viewModel.newerCount.observe(viewLifecycleOwner) { state ->
-//            println("НОВЫХ ПОСТОВ: $state штук!!!")
-//            val btnText = "Новые записи"
-//            if(state>0){
-//                binding.newPostsBtn.isVisible = true
-//                binding.newPostsBtn.text = btnText
+//        postViewModel.state.observe(viewLifecycleOwner) { state ->
+//            println("state: $state")
+//
+//            with(binding) {
+//                progress.root.isVisible = state.loading
+//                progress.root.isVisible = state.refreshing
+//                //swipeToRefresh.isRefreshing = state.refreshing
+//            }
+//            if (state.error) {
+//                Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
+//                    .setAction(R.string.retry_loading) {
+//                        postViewModel.refresh()
+//                    }
+//                    .show()
 //            }
 //        }
 
-//        binding.newPostsBtn.setOnClickListener {
-//            viewModel.refresh()
-//            binding.newPostsBtn.isVisible = false
-//            binding.postsList.smoothScrollToPosition(0)
-//        }
+
+        //TODO адаптер не успевает обновиться, и скролл происходит к предыдущему посту
+        postViewModel.newPost.observe(viewLifecycleOwner){
+            adapter.refresh()
+            binding.postsList.smoothScrollToPosition(0)
+            binding.upBtn.isVisible = false
+            snack("Запись создана")
+        }
+
+
+        binding.upBtn.setOnClickListener {
+            binding.postsList.smoothScrollToPosition(0)
+            adapter.refresh()
+            it.isVisible = false
+        }
 
         binding.swipeToRefresh.setOnRefreshListener {
             adapter.refresh()

@@ -1,28 +1,20 @@
 package ru.javacat.nework.ui.adapter
 
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.MediaController
 import android.widget.PopupMenu
-import android.widget.Toast
 import androidx.core.view.isVisible
-import androidx.paging.PagingData
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.javacat.nework.R
 import ru.javacat.nework.databinding.CardEventBinding
 import ru.javacat.nework.domain.model.AttachmentType
 import ru.javacat.nework.domain.model.EventModel
-import ru.javacat.nework.domain.model.EventType
-import ru.javacat.nework.domain.model.User
 import ru.javacat.nework.util.asString
 import ru.javacat.nework.util.load
 import ru.javacat.nework.util.loadAvatar
-import ru.javacat.nework.util.loadCircleCrop
 
 interface OnEventsListener {
     fun onLike(event: EventModel) {}
@@ -43,10 +35,13 @@ interface OnEventsListener {
     fun onLocation(event: EventModel){}
 
     fun onLink(url: String){}
+
+    fun onUpBtn() {}
 }
 class EventsAdapter(
     private val onEventsListener: OnEventsListener
 ):PagingDataAdapter<EventModel, EventViewHolder>(EventsDiffCallback()) {
+    var isScrolledOver = false
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventViewHolder {
         val binding = CardEventBinding.inflate(LayoutInflater.from(parent.context),parent,false)
         return EventViewHolder(binding, onEventsListener)
@@ -54,6 +49,11 @@ class EventsAdapter(
 
     override fun onBindViewHolder(holder: EventViewHolder, position: Int) {
         val event = getItem(position) ?: return
+        if (position == 0) {isScrolledOver = false}
+        if (position == 10 && !isScrolledOver) {
+            isScrolledOver = true
+            onEventsListener.onUpBtn()
+        }
         holder.bind(event)
     }
 
@@ -71,7 +71,7 @@ class EventViewHolder(
                     binding.attachLayout.attachImage.load(event.attachment.url)
                 }
                 AttachmentType.VIDEO -> {
-                    binding.attachLayout.attachVideo.load(event.attachment!!.url)
+                    binding.attachLayout.attachVideo.load(event.attachment.url)
                 }
                 AttachmentType.AUDIO -> {
 

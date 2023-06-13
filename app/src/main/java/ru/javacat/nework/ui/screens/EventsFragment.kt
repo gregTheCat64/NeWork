@@ -2,12 +2,11 @@ package ru.javacat.nework.ui.screens
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -15,14 +14,15 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import ru.javacat.nework.R
 import ru.javacat.nework.data.auth.AppAuth
 import ru.javacat.nework.databinding.FragmentEventsBinding
 import ru.javacat.nework.domain.model.EventModel
-import ru.javacat.nework.mediaplayer.MediaLifecycleObserver
 import ru.javacat.nework.ui.adapter.EventsAdapter
 import ru.javacat.nework.ui.adapter.OnEventsListener
 import ru.javacat.nework.ui.viewmodels.EventViewModel
@@ -51,6 +51,10 @@ class EventsFragment : Fragment(R.layout.fragment_events) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentEventsBinding.bind(view)
+
+        //анимация
+        val upBtnAnim = AnimationUtils.loadAnimation(requireContext(), R.anim.up_btn)
+        val newEventsAnim = AnimationUtils.loadAnimation(requireContext(), R.anim.new_posts_btn)
 
         val mAnimator = binding.eventsList.itemAnimator as SimpleItemAnimator
         mAnimator.supportsChangeAnimations = false
@@ -163,6 +167,14 @@ class EventsFragment : Fragment(R.layout.fragment_events) {
                     Intent.createChooser(intent, getString(R.string.chooser_link))
                 startActivity(shareIntent)
             }
+
+            override fun onUpBtn() {
+                binding.upBtn.apply {
+                    isVisible = true
+                    startAnimation(upBtnAnim)
+                }
+
+            }
         }
         )
 
@@ -180,6 +192,7 @@ class EventsFragment : Fragment(R.layout.fragment_events) {
                 .catch { e:Throwable->
                     e.printStackTrace()
                 }
+                .flowOn(Dispatchers.IO)
                 .collectLatest {
                     adapter.submitData(it)
                 }
@@ -187,7 +200,7 @@ class EventsFragment : Fragment(R.layout.fragment_events) {
 
         lifecycleScope.launch {
             adapter.loadStateFlow.collectLatest {
-                binding.progressBar.isVisible = it.refresh is LoadState.Loading
+                binding.progress.root.isVisible = it.refresh is LoadState.Loading
                         ||it.append is LoadState.Loading
                         ||it.prepend is LoadState.Loading
 
@@ -207,7 +220,7 @@ class EventsFragment : Fragment(R.layout.fragment_events) {
         }
 
         viewModel.state.observe(viewLifecycleOwner){state->
-            binding.progressBar.isVisible = state.loading
+            binding.progress.root.isVisible = state.loading
             if (state.error) {
                 Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
                     .setAction(R.string.retry_loading) {
@@ -215,6 +228,33 @@ class EventsFragment : Fragment(R.layout.fragment_events) {
                     }
                     .show()
             }
+        }
+
+        lifecycleScope.launch{
+            viewModel.newerCount.collectLatest {
+                if (it>0){
+                    val string = "Новое мероприятие ($it)"
+                    binding.newEventsBtn.apply {
+                        text = string
+                        isVisible = true
+                        startAnimation(newEventsAnim)
+                    }
+                }
+            }
+        }
+
+        binding.newEventsBtn.setOnClickListener {
+            it.isVisible = false
+            binding.upBtn.isVisible = false
+            binding.eventsList.smoothScrollToPosition(0)
+            adapter.refresh()
+        }
+
+        binding.upBtn.setOnClickListener {
+            binding.eventsList.smoothScrollToPosition(0)
+            adapter.refresh()
+
+            it.visibility = View.GONE
         }
     }
 

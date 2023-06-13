@@ -22,7 +22,6 @@ import ru.javacat.nework.domain.model.AttachmentType
 import ru.javacat.nework.domain.model.PostModel
 import ru.javacat.nework.domain.repository.PostRepository
 import ru.javacat.nework.error.ApiError
-import ru.javacat.nework.error.AppError
 import ru.javacat.nework.error.NetworkError
 import ru.javacat.nework.error.UnknownError
 import java.io.IOException
@@ -56,10 +55,13 @@ class PostRepositoryImpl @Inject constructor(
             val response = postsApi.getAll()
             val body = response.body() ?: throw ApiError(response.code(), response.message())
             postDao.insert(body.map { it.toEntity() })
+        } catch (e: ApiError) {
+            throw ApiError(e.responseCode, e.message)
         } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
+            throw NetworkError("error_network")
+        }
+        catch (e: Exception) {
+            throw UnknownError("error_unknown")
         }
     }
 
@@ -68,38 +70,21 @@ class PostRepositoryImpl @Inject constructor(
             val response = postsApi.getLatest(count)
             val body = response.body() ?: throw ApiError(response.code(), response.message())
             postDao.insert(body.map { it.toEntity() })
+        }
+        catch (e: ApiError) {
+            throw ApiError(e.responseCode, e.message)
         } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
+            throw NetworkError("error_network")
+        }
+        catch (e: Exception) {
+            throw UnknownError("error_unknown")
         }
     }
 
-//    override suspend fun getPostsByAuthorId(authorId: Long):List<PostModel>? {
-//        val userPosts = postDao.getByAuthorId(authorId)
-//        return userPosts.toDto()
-//    }
-//
-//    override suspend fun updatePostsByAuthorId(authorId: Long):List<PostModel>? {
-//        try {
-//            val response = postsApi.getAll().body()?.filter {
-//                it.authorId == authorId
-//            }
-//            if (response != null) {
-//                postDao.insert(response.map { it.toEntity() })
-//            }
-//            return response?.map { it.toModel() }
-//
-//        } catch (e: IOException) {
-//            throw NetworkError
-//        } catch (e: Exception) {
-//            throw UnknownError
-//        }
-//    }
 
     override fun getNewerCount(id: Long): Flow<Int> = flow {
         while (true) {
-            delay(10_000L)
+            delay(20_000L)
             val response = postsApi.getNewer(id)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
@@ -109,7 +94,7 @@ class PostRepositoryImpl @Inject constructor(
             emit(body.size)
         }
     }
-        .catch { e -> throw AppError.from(e) }
+        .catch { e -> throw UnknownError(e.message) }
         .flowOn(Dispatchers.Default)
 
 
@@ -126,10 +111,13 @@ class PostRepositoryImpl @Inject constructor(
                 post.copy(attachment = type?.name?.let { type -> Attachment(it.url, type) })
             }
             postsApi.save(postWithAttachment ?: post)
+        } catch (e: ApiError) {
+            throw ApiError(e.responseCode, e.message)
         } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
+            throw NetworkError("error_network")
+        }
+        catch (e: Exception) {
+            throw UnknownError("error_unknown")
         }
     }
 
@@ -143,10 +131,13 @@ class PostRepositoryImpl @Inject constructor(
                 throw ApiError(response.code(), response.message())
             }
             return response.body() ?: throw ApiError(response.code(), response.message())
+        } catch (e: ApiError) {
+            throw ApiError(e.responseCode, e.message)
         } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
+            throw NetworkError("error_network")
+        }
+        catch (e: Exception) {
+            throw UnknownError("error_unknown")
         }
     }
 
@@ -154,10 +145,13 @@ class PostRepositoryImpl @Inject constructor(
         try {
             postDao.removeById(id)
             postsApi.removeById(id)
+        } catch (e: ApiError) {
+            throw ApiError(e.responseCode, e.message)
         } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
+            throw NetworkError("error_network")
+        }
+        catch (e: Exception) {
+            throw UnknownError("error_unknown")
         }
     }
 
@@ -175,12 +169,13 @@ class PostRepositoryImpl @Inject constructor(
                 postDao.likeById(id, likeOwnersIdList)
                 postsApi.likeById(id)
             }
+        } catch (e: ApiError) {
+            throw ApiError(e.responseCode, e.message)
         } catch (e: IOException) {
-            //println("worked in repo NETWORKERROR $e")
-            throw NetworkError
-        } catch (e: Exception) {
-            //println("worked in repo UNKNOWNERROR $e")
-            throw UnknownError
+            throw NetworkError("error_network")
+        }
+        catch (e: Exception) {
+            throw UnknownError("error_unknown")
         }
 
     }

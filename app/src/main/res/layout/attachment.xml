@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="280dp"
         android:layout_marginTop="@dimen/dim8dp"
-        android:visibility="visible"
+        android:visibility="gone"
         />
 
     <com.google.android.material.button.MaterialButton
@@ -23,13 +23,13 @@
         android:layout_gravity="center_horizontal"
         android:text="Аудиозапись"
         android:visibility="visible"
-        android:layout_marginBottom="@dimen/dim8dp"
+        android:layout_marginTop="@dimen/dim8dp"
         app:icon="@drawable/baseline_audio_file_24"
          />
 
     <FrameLayout
         android:id="@+id/videoGroup"
-        android:visibility="visible"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -38,6 +38,7 @@
             android:layout_width="match_parent"
             android:layout_height="220dp"
             android:layout_marginTop="@dimen/dim8dp"
+
             />
 
 

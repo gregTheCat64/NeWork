@@ -5,7 +5,12 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -61,11 +66,11 @@ class EventRepositoryImpl @Inject constructor(
 
         } catch (e: IOException) {
             e.printStackTrace()
-            throw NetworkError
+            throw NetworkError("error_network")
 
         } catch (e: Exception) {
             e.printStackTrace()
-            throw UnknownError
+            throw UnknownError("error_unknown")
         }
     }
 
@@ -90,9 +95,24 @@ class EventRepositoryImpl @Inject constructor(
             val body = response.body() ?: throw ApiError(response.code(), response.message())
             eventDao.insert(body.map { it.toEventEntity() })
         } catch (e: IOException) {
-            throw  NetworkError
+            throw  NetworkError("error_network")
         }
     }
+
+    override fun getNewerCount(id: Long): Flow<Int> = flow {
+        while (true) {
+            delay(20_000L)
+            val response = eventsApi.getNewer(id)
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
+            eventDao.insert(body.map { it.toEventEntity() })
+            emit(body.size)
+        }
+    }
+        .catch { e -> throw UnknownError(e.message) }
+        .flowOn(Dispatchers.Default)
 
     override suspend fun getById(id: Long) {
         TODO("Not yet implemented")
@@ -104,10 +124,13 @@ class EventRepositoryImpl @Inject constructor(
         try {
             eventDao.removeById(id)
             eventsApi.removeById(id)
+        } catch (e: ApiError) {
+            throw ApiError(e.responseCode, e.message)
         } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
+            throw NetworkError("error_network")
+        }
+        catch (e: Exception) {
+            throw UnknownError("error_unknown")
         }
     }
 
@@ -125,12 +148,13 @@ class EventRepositoryImpl @Inject constructor(
                 eventDao.likeById(id, likeOwners)
                 eventsApi.likeById(id)
             }
-        }catch (e: IOException) {
-            println("worked in repo NETWORKERROR $e")
-            throw NetworkError
-        } catch (e: Exception) {
-            println("worked in repo UNKNOWNERROR $e")
-            throw UnknownError
+        }catch (e: ApiError) {
+            throw ApiError(e.responseCode, e.message)
+        } catch (e: IOException) {
+            throw NetworkError("error_network")
+        }
+        catch (e: Exception) {
+            throw UnknownError("error_unknown")
         }
 
     }
@@ -143,11 +167,13 @@ class EventRepositoryImpl @Inject constructor(
                 event.copy(attachment = type?.name?.let { type-> Attachment(it.url, type) })
             }
             eventsApi.create(eventWithAttachment?:event)
-        } catch (e:IOException){
-            println("IN REPO ERROR")
-            throw NetworkError
-        }catch (e: Exception) {
-            throw UnknownError
+        } catch (e: ApiError) {
+            throw ApiError(e.responseCode, e.message)
+        } catch (e: IOException) {
+            throw NetworkError("error_network")
+        }
+        catch (e: Exception) {
+            throw UnknownError("error_unknown")
         }
     }
 
@@ -176,10 +202,13 @@ class EventRepositoryImpl @Inject constructor(
                 throw ApiError(response.code(), response.message())
             }
             return response.body() ?: throw ApiError(response.code(), response.message())
+        } catch (e: ApiError) {
+            throw ApiError(e.responseCode, e.message)
         } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
+            throw NetworkError("error_network")
+        }
+        catch (e: Exception) {
+            throw UnknownError("error_unknown")
         }
     }
 }

@@ -5,32 +5,26 @@ import androidx.core.net.toFile
 import androidx.lifecycle.*
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.yandex.mapkit.geometry.Point
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import ru.javacat.nework.data.auth.AppAuth
+import ru.javacat.nework.data.dao.EventRemoteKeyDao
 import ru.javacat.nework.data.dto.MediaUpload
 import ru.javacat.nework.data.mappers.toEventRequest
 import ru.javacat.nework.domain.model.AttachModel
-import ru.javacat.nework.domain.model.AttachmentModel
 import ru.javacat.nework.domain.model.AttachmentType
 import ru.javacat.nework.domain.model.CoordinatesModel
 import ru.javacat.nework.domain.model.EventModel
 import ru.javacat.nework.domain.model.EventType
 import ru.javacat.nework.domain.model.FeedModelState
-import ru.javacat.nework.domain.model.PostModel
-import ru.javacat.nework.domain.model.User
 import ru.javacat.nework.domain.repository.EventRepository
-import ru.javacat.nework.error.NetworkError
 import ru.javacat.nework.util.SingleLiveEvent
-import ru.javacat.nework.util.toFile
 import ru.javacat.nework.util.toLocalDateTimeWhithoutZone
-import java.lang.Error
 import javax.inject.Inject
 
 private val emptyEvent = EventModel(
@@ -46,16 +40,14 @@ private val noPoint = null
 
 @HiltViewModel
 class EventViewModel @Inject constructor(
-    private val repository: EventRepository
+    private val repository: EventRepository,
+    private val eventRemoteKeyDao: EventRemoteKeyDao
 ) : ViewModel() {
 
-    val data: Flow<PagingData<EventModel>> = repository.eventData.cachedIn(viewModelScope)
+    val data: Flow<PagingData<EventModel>> = repository.eventData.cachedIn(viewModelScope).flowOn(Dispatchers.IO)
 
     val count = 5
 
-//    private val _userEvents = MutableLiveData<List<EventModel>>()
-//    val userEvents: LiveData<List<EventModel>>
-//        get() = _userEvents
 
     private val _state = MutableLiveData(FeedModelState(idle = true))
     val state: LiveData<FeedModelState>
@@ -77,22 +69,15 @@ class EventViewModel @Inject constructor(
     val point: LiveData<DoubleArray?>
         get() = _point
 
-
-    init {
-        //loadEvents()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val newerCount: Flow<Int> = data.flatMapLatest {
+        repository.getNewerCount(eventRemoteKeyDao.max() ?: 0L)
+            .catch { e -> e.printStackTrace() }
+            .asLiveData(Dispatchers.Default).asFlow()
     }
 
-    fun loadEvents() {
-        viewModelScope.launch {
-            try {
-                _state.value = FeedModelState(loading = true)
-                //repository.getAll()
-                _state.value = FeedModelState()
-            } catch (e: Exception) {
-                _state.value = FeedModelState(error = true)
-            }
-        }
-    }
+
+
 
     fun refresh() {
         viewModelScope.launch {
@@ -106,9 +91,7 @@ class EventViewModel @Inject constructor(
         }
     }
 
-    suspend fun getUserEvents(id: Long): Flow<PagingData<EventModel>> {
-        return repository.getUserEvents(id).cachedIn(viewModelScope)
-    }
+
 
 
     fun likeById(id: Long) {
@@ -116,7 +99,6 @@ class EventViewModel @Inject constructor(
             try {
                 repository.likeById(id)
             } catch (e: Exception) {
-                println("worked in VM EXCEPTION $e")
                 _state.value = FeedModelState(error = true)
             }
         }
@@ -193,7 +175,11 @@ class EventViewModel @Inject constructor(
 
     fun takePart(event: EventModel) {
         viewModelScope.launch {
-            repository.createParticipant(event)
+            try {
+                repository.createParticipant(event)
+            }catch (e: Exception) {
+                _state.value = FeedModelState(error = true)
+            }
         }
     }
 
@@ -205,7 +191,11 @@ class EventViewModel @Inject constructor(
 
     fun removeById(id: Long) {
         viewModelScope.launch {
-            repository.removeById(id)
+            try {
+                repository.removeById(id)
+            } catch (e: Exception) {
+                _state.value = FeedModelState(error = true)
+            }
         }
     }
 

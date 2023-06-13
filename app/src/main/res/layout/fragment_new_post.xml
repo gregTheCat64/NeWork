@@ -3,11 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-
+    android:background="?attr/colorPrimaryContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.screens.NewPostFragment">
-
 
 
         <com.google.android.material.appbar.AppBarLayout
@@ -27,6 +26,7 @@
         </com.google.android.material.appbar.AppBarLayout>
 
 
+
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -41,6 +41,11 @@
             app:layout_constraintBottom_toTopOf="@+id/buttonPanelLayout"
             app:layout_constraintTop_toTopOf="parent"
             >
+
+            <include
+                android:id="@+id/progress"
+                layout="@layout/progress_bar_horizontal"
+                />
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/locationLayout"
@@ -123,12 +128,7 @@
             </LinearLayout>
 
 
-            <ProgressBar
-                android:id="@+id/progressBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:visibility="visible" />
+
 
             <FrameLayout
                 android:id="@+id/attachmentContainer"
@@ -173,6 +173,8 @@
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
+
+
 
         <LinearLayout
             android:id="@+id/buttonPanelLayout"

@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import ru.javacat.nework.data.entity.ProfileEntity
 import ru.javacat.nework.domain.model.FeedModelState
 import ru.javacat.nework.domain.model.PostModel
+import ru.javacat.nework.domain.model.User
 import ru.javacat.nework.domain.repository.JobRepository
 import ru.javacat.nework.domain.repository.ProfileRepository
 import ru.javacat.nework.domain.repository.UserRepository
@@ -34,18 +35,31 @@ class WallViewModel @Inject constructor(
     val postsSize: LiveData<Int>
         get() = _postsSize
 
+    private val _user = MutableLiveData<User>()
+    val user: LiveData<User>
+        get() = _user
 
 
-    private val _dataState = MutableLiveData<FeedModelState>()
+    private var _dataState = MutableLiveData<FeedModelState>()
     val dataState: LiveData<FeedModelState>
         get() = _dataState
 
+    fun getUserById(id: Long) {
+        viewModelScope.launch {
+            try {
+                _user.postValue(userRepository.getById(id))
+            } catch (e: Exception) {
+                _dataState.value = FeedModelState(error = true)
+            }
+        }
+        //Log.i("mUSER", newUser.name)
+    }
 
     suspend fun getUserPosts(id: Long): Flow<PagingData<PostModel>> {
         return wallRepository.getLatest(id)
     }
 
-    fun refresh(id: Long){
+    fun refresh(id: Long) {
         viewModelScope.launch {
             getUserJob(id)
             getUserPosts(id)
@@ -54,20 +68,20 @@ class WallViewModel @Inject constructor(
 
     }
 
-     fun getUserJob(id: Long) {
-         viewModelScope.launch {
-             try {
+    fun getUserJob(id: Long) {
+        viewModelScope.launch {
+            try {
                 val result = jobRepository.getJobsByUserId(id)
-                 if (!result.isNullOrEmpty()) {
-                     _userJob.postValue(result.last().name)
-                 }
-             } catch (e: Exception) {
-                 e.printStackTrace()
-                 Log.i("GETTING_JOB","error catched in VM")
-                 _dataState.value = FeedModelState(error = true)
-             }
+                if (!result.isNullOrEmpty()) {
+                    _userJob.postValue(result.last().name)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Log.i("GETTING_JOB", "error catched in VM")
+                _dataState.value = FeedModelState(error = true)
+            }
 
-         }
+        }
     }
 
     fun getPostsCount(id: Long) {
@@ -76,27 +90,26 @@ class WallViewModel @Inject constructor(
                 _dataState.value = FeedModelState(loading = true)
                 _postsSize.postValue(wallRepository.getPostsCount(id))
                 _dataState.value = FeedModelState(loading = false)
-            } catch (e: Exception){
+            } catch (e: Exception) {
                 _dataState.value = FeedModelState(error = true)
             }
         }
     }
 
 
-
-    fun addUserToFav(profileId: Long, id: Long){
+    fun addUserToFav(profileId: Long, id: Long) {
         viewModelScope.launch {
             val favs = profileRepository.getFavListIds(profileId)?.favListIds
-            val newList = favs?.plus(id)?: listOf(id)
+            val newList = favs?.plus(id) ?: listOf(id)
             profileRepository.insert(ProfileEntity(profileId, newList))
             userRepository.addToFav(id)
         }
     }
 
-    fun deleteUserFromFav(profileId: Long, id: Long){
+    fun deleteUserFromFav(profileId: Long, id: Long) {
         viewModelScope.launch {
             val favs = profileRepository.getFavListIds(profileId)?.favListIds
-            val newList = favs?.minus(id)?: emptyList()
+            val newList = favs?.minus(id) ?: emptyList()
             profileRepository.insert(ProfileEntity(profileId, newList))
             userRepository.deleteFromFav(id)
         }

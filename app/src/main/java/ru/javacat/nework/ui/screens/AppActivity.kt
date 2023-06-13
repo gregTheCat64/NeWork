@@ -1,5 +1,6 @@
 package ru.javacat.nework.ui.screens
 
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -15,6 +16,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.findNavController
+import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
@@ -52,6 +54,20 @@ class AppActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAppBinding
 
 
+    override fun onStop() {
+        super.onStop()
+        player.pause()
+        binding.audioBar.barPlayBtn.isChecked = true
+    }
+
+    //TODO: доработать взаимодействие с баром после смены экрана
+//    override fun onResume() {
+//        super.onResume()
+//
+//            binding.audioBar.root.isVisible = true
+//            player.play()
+//
+//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,11 +82,18 @@ class AppActivity : AppCompatActivity() {
         val barSeekBar = findViewById<SeekBar>(R.id.barSeekBar)
         val barCloseBtn = findViewById<Button>(R.id.barCloseBtn)
         val avatarImage = findViewById<ImageView>(R.id.appBarImage)
+        val seekBarColor = resources.getColor(R.color.md_theme_light_onPrimary, theme)
+        binding.audioBar.barSeekBar.progressDrawable.setColorFilter(
+            seekBarColor,
+            PorterDuff.Mode.MULTIPLY
+        )
+
+        checkGoogleApiAvailability()
 
 
         avatarImage.setOnClickListener {
             var authorized = viewModel.authorized
-            if (authorized){
+            if (authorized) {
                 showAuthorizedMenu(it)
             } else showMenu(it)
         }
@@ -104,7 +127,6 @@ class AppActivity : AppCompatActivity() {
         })
 
 
-
         //menu:
         viewModel.data.observe(this) {
             val id = appAuth.getId()
@@ -113,20 +135,19 @@ class AppActivity : AppCompatActivity() {
 
         }
 
-        userViewModel.user.observe(this){user->
-                user.avatar.let {
-                    val authorized = viewModel.authorized
-                    if (authorized){
-                        avatarImage.loadAvatar(it.toString())
-                    } else
-                        avatarImage.setImageDrawable(resources.getDrawable(R.drawable.baseline_account_circle_36))
-                }
+        userViewModel.user.observe(this) { user ->
+            user.avatar.let {
+                val authorized = viewModel.authorized
+                if (authorized) {
+                    avatarImage.loadAvatar(it.toString())
+                } else
+                    avatarImage.setImageDrawable(resources.getDrawable(R.drawable.baseline_account_circle_36))
+            }
         }
     }
 
 
     fun playAudio(url: String) {
-
         val mediaItem = MediaItem.fromUri(url)
         player.clearMediaItems()
         player.setMediaItem(mediaItem)
@@ -159,7 +180,7 @@ class AppActivity : AppCompatActivity() {
         })
     }
 
-    fun stopAudio(){
+    fun stopAudio() {
         player.pause()
     }
 
@@ -170,18 +191,21 @@ class AppActivity : AppCompatActivity() {
     private fun showMenu(view: View) {
         val menu = PopupMenu(this, view)
         menu.inflate(R.menu.menu_main)
-        menu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener {item->
-            when (item.itemId){
+        menu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
+            when (item.itemId) {
                 R.id.signIn -> {
                     findNavController(R.id.nav_host_fragment).navigate(R.id.signInFragment)
 
                 }
+
                 R.id.signUp -> {
                     findNavController(R.id.nav_host_fragment).navigate(R.id.registrationFragment)
 
                 }
 
-                else -> {Toast.makeText(this, "lala", Toast.LENGTH_SHORT).show()}
+                else -> {
+                    Toast.makeText(this, "lala", Toast.LENGTH_SHORT).show()
+                }
             }
             true
         })
@@ -191,15 +215,17 @@ class AppActivity : AppCompatActivity() {
     private fun showAuthorizedMenu(view: View) {
         val menu = PopupMenu(this, view)
         menu.inflate(R.menu.menu_by_authorized)
-        menu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener {item->
-            when (item.itemId){
+        menu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
+            when (item.itemId) {
                 R.id.logout -> {
                     showSignOutDialog(appAuth, this)
 
                 }
+
                 R.id.userListBtn -> {
                     findNavController(R.id.nav_host_fragment).navigate(R.id.usersSearchFragment)
                 }
+
                 R.id.profileBtn -> {
                     if (appAuth.getId() != 0L) {
                         val id = appAuth.getId()
@@ -212,13 +238,30 @@ class AppActivity : AppCompatActivity() {
                     } else findNavController(R.id.nav_host_fragment).navigate(R.id.signInFragment)
 
                 }
-                else -> {Toast.makeText(this, "lala", Toast.LENGTH_SHORT).show()}
+
+                else -> {
+                    Toast.makeText(this, "lala", Toast.LENGTH_SHORT).show()
+                }
             }
             true
         })
         menu.show()
     }
 
+    private fun checkGoogleApiAvailability() {
+        with(GoogleApiAvailability.getInstance()) {
+            val code = isGooglePlayServicesAvailable(this@AppActivity)
+            if (code == ConnectionResult.SUCCESS) {
+                return@with
+            }
+            if (isUserResolvableError(code)) {
+                getErrorDialog(this@AppActivity, code, 9000)?.show()
+                return
+            }
+            Toast.makeText(this@AppActivity, R.string.google_play_unavailable, Toast.LENGTH_LONG)
+                .show()
+        }
+    }
 
 }
 

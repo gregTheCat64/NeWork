@@ -47,4 +47,9 @@
     <string name="pass">Password</string>
     <string name="login">Login</string>
     <string name="name">Name</string>
+    <string name="addJob">add a job</string>
+    <string name="toFav">add to favorites</string>
+    <string name="up">up</string>
+    <string name="error_password">Password is wrong</string>
+    <string name="error_unknown">Unknown error</string>
 </resources>
