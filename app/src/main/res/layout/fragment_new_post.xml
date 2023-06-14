@@ -67,7 +67,7 @@
                     android:id="@+id/clearLocationBtn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-
+                    style="@style/Widget.Material3.Button.IconButton"
                     app:icon="@drawable/ic_baseline_close_24"
                     />
 

@@ -3,79 +3,99 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/buttonPanel"
+
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:gravity="bottom"
 
    >
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/pickPhoto"
-        style="@style/Widget.Material3.Button.IconButton"
-        android:layout_width="wrap_content"
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+
+        android:background="?attr/colorOutline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/infoLayout" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:contentDescription="@string/description_select_photo"
-        app:icon="@drawable/ic_baseline_image_24" />
+        android:orientation="horizontal"
+        android:gravity="bottom">
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/pickPhoto"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/description_select_photo"
+            app:icon="@drawable/ic_baseline_image_24" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/audio"
-        style="@style/Widget.Material3.Button.IconButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:contentDescription="@string/description_take_photo"
-        app:icon="@drawable/ic_baseline_audiotrack_24" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/audio"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/description_take_photo"
+            app:icon="@drawable/ic_baseline_audiotrack_24" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/moreIconsBtn"
-        android:layout_width="32dp"
-        android:layout_height="wrap_content"
-        android:visibility="visible"
-        style="@style/Widget.Material3.Button.IconButton"
-        app:icon="@drawable/baseline_arrow_forward_ios_24"
-        />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/moreIconsBtn"
+            android:layout_width="32dp"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            style="@style/Widget.Material3.Button.IconButton"
+            app:icon="@drawable/baseline_arrow_forward_ios_24"
+            />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/takePhoto"
-        style="@style/Widget.Material3.Button.IconButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="invisible"
-        android:contentDescription="@string/description_take_photo"
-        app:icon="@drawable/ic_baseline_camera_alt_24" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/takePhoto"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:contentDescription="@string/description_take_photo"
+            app:icon="@drawable/ic_baseline_camera_alt_24" />
 
 
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/videoBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/Widget.Material3.Button.IconButton"
-        android:visibility="invisible"
-        app:icon="@drawable/baseline_movie_24"
-        />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/videoBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:visibility="invisible"
+            app:icon="@drawable/baseline_movie_24"
+            />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/linkBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/Widget.Material3.Button.IconButton"
-        app:icon="@drawable/baseline_language_24"
-        />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/linkBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Widget.Material3.Button.IconButton"
+            app:icon="@drawable/baseline_language_24"
+            />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/addLocationBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/Widget.Material3.Button.IconButton"
-        app:icon="@drawable/ic_baseline_location_on_24"
-        />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/addLocationBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Widget.Material3.Button.IconButton"
+            app:icon="@drawable/ic_baseline_location_on_24"
+            />
 
-    <Button
-        android:id="@+id/addUsersBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/Widget.Material3.Button.IconButton"
-        app:icon = "@drawable/ic_baseline_alternate_email_24"
-        />
+        <Button
+            android:id="@+id/addUsersBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Widget.Material3.Button.IconButton"
+            app:icon = "@drawable/ic_baseline_alternate_email_24"
+            />
+
+    </LinearLayout>
+
+
 </LinearLayout>
