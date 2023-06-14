@@ -184,13 +184,11 @@ class PostViewModel @Inject constructor(
         _edited.value = edited.value?.copy(mentionIds = list)
     }
 
-    fun getCoordinates(lat: Double, long: Double) {
+    fun setCoordinates(lat: Double, long: Double) {
         _coords.value = CoordinatesModel(lat, long)
-
-
     }
 
-    fun setCoordinates() {
+    fun addCoordinates() {
         try {
             _edited.value = edited.value?.copy(coords = coords.value)
         } catch (e: Exception) {

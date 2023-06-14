@@ -1,8 +1,11 @@
 package ru.javacat.nework.ui.screens
 
+import android.Manifest
 import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -12,6 +15,7 @@ import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -19,6 +23,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.fragment.findNavController
 import com.github.dhaval2404.imagepicker.ImagePicker
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import ru.javacat.nework.R
@@ -150,7 +156,7 @@ class NewPostFragment : Fragment() {
             binding.locationLayout.isVisible = true
             binding.coordsTextView.setText(postViewModel.coords.value.toString())
             snack("Местоположение добавлено")
-            postViewModel.setCoordinates()
+            postViewModel.addCoordinates()
         }
 
         binding.clearLocationBtn.setOnClickListener {
@@ -390,6 +396,7 @@ class NewPostFragment : Fragment() {
             }
         }
     }
+
 }
 
 //    private fun getRealPathFromUri(contentUri: Uri?): String?{

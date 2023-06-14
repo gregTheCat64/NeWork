@@ -18,6 +18,7 @@ import ru.javacat.nework.domain.model.PostModel
 import ru.javacat.nework.util.asString
 import ru.javacat.nework.util.load
 import ru.javacat.nework.util.loadAvatar
+import ru.javacat.nework.util.setDateToPost
 
 
 interface OnInteractionListener {
@@ -52,19 +53,19 @@ class PostsAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val binding = CardPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+
         return PostViewHolder(binding, onInteractionListener)
     }
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         val post = getItem(position) ?: return
 
-        Log.i("POS", position.toString())
+        //Log.i("POS", position.toString())
         if (position == 0) {isScrolledOver = false}
         if (position == 10 && !isScrolledOver) {
             isScrolledOver = true
             onInteractionListener.onUpBtn()
         }
-
 
         holder.bind(post)
     }
@@ -78,7 +79,6 @@ class PostViewHolder(
     private val defaultUserAvatar = AppCompatResources.getDrawable(binding.root.context,
         R.drawable.baseline_account_circle_36
     )
-
 
     fun bind(post: PostModel) {
         if (post.attachment!= null && post.attachment.url.startsWith("http", false)){
@@ -102,7 +102,7 @@ class PostViewHolder(
             }?:avatar.setImageDrawable(defaultUserAvatar)
 
             name.text = post.author
-            published.text = post.published?.asString()
+            published.text = setDateToPost(post.published)
             content.text = post.content
             linkText.text = post.link
             interactionPosts.takePartBtn.isVisible = false

@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
@@ -70,8 +71,7 @@ class PostsFragment : Fragment() {
     ): View {
         val binding = FragmentPostsBinding.inflate(inflater, container, false)
 
-        //init:
-        //userViewModel.loadUsers()
+
         //animation:
         val upBtnAnim = AnimationUtils.loadAnimation(requireContext(), R.anim.up_btn)
         val newPostsAnim = AnimationUtils.loadAnimation(requireContext(), R.anim.new_posts_btn)
@@ -79,11 +79,11 @@ class PostsFragment : Fragment() {
         val mAnimator = binding.postsList.itemAnimator as SimpleItemAnimator
         mAnimator.supportsChangeAnimations = false
 
-        //обнуляем статус нового поста
-        //postViewModel.setNewPostFalse()
+
+
 
         //Доступ к локации:
-        lifecycle.coroutineScope.launchWhenCreated {
+        lifecycle.coroutineScope.launch {
             when {
                 // 1. Проверяем есть ли уже права
                 ContextCompat.checkSelfPermission(
@@ -103,11 +103,10 @@ class PostsFragment : Fragment() {
                         val longitude = location.longitude.toString().take(7).toDouble()
                         if (location != null) {
                             Log.i("MY_LOCATION", latitude.toString())
-                            postViewModel.getCoordinates(
+                            postViewModel.setCoordinates(
                                 latitude, longitude
                             )
                         }
-
                     }
                 }
                 // 2. Должны показать обоснование необходимости прав

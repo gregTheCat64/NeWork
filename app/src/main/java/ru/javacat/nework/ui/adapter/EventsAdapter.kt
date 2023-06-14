@@ -16,6 +16,7 @@ import ru.javacat.nework.domain.model.EventModel
 import ru.javacat.nework.util.asString
 import ru.javacat.nework.util.load
 import ru.javacat.nework.util.loadAvatar
+import ru.javacat.nework.util.setDateToPost
 
 interface OnEventsListener {
     fun onLike(event: EventModel) {}
@@ -64,7 +65,7 @@ class EventViewHolder(
     private val binding: CardEventBinding,
     private val onEventsListener: OnEventsListener
 ): RecyclerView.ViewHolder(binding.root) {
-    val defaultUserAvatar = AppCompatResources.getDrawable(binding.root.context,
+    private val defaultUserAvatar = AppCompatResources.getDrawable(binding.root.context,
         R.drawable.baseline_account_circle_36
     )
     fun bind(event: EventModel){
@@ -90,7 +91,7 @@ class EventViewHolder(
                     avatar.loadAvatar(it)
             }?:avatar.setImageDrawable(defaultUserAvatar)
             name.text = event.author
-            published.text = event.published?.asString()
+            published.text = setDateToPost(event.published)
             content.text = event.content
             dateOfEvent.text = event.datetime?.asString()
             interactionPosts.mentioned.setIconResource(R.drawable.ic_baseline_people_24)
@@ -115,8 +116,6 @@ class EventViewHolder(
             eventHeader.setOnClickListener {
                 onEventsListener.onUser(event)
             }
-
-
 
 
             //likes:
