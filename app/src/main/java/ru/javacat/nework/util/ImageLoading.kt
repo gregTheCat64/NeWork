@@ -11,15 +11,15 @@ fun ImageView.load(url: String, vararg transforms: BitmapTransformation = emptyA
         .load(url)
         .placeholder(R.drawable.ic_baseline_no_photography_24)
         .centerCrop()
-        .timeout(10_000)
+        .timeout(20_000)
         .transform(*transforms)
         .into(this)
 
 fun ImageView.loadFull(url: String, vararg transforms: BitmapTransformation = emptyArray()) =
     Glide.with(this)
         .load(url)
-        .placeholder(R.drawable.ic_baseline_no_photography_24)
-        .timeout(10_000)
+        //.placeholder(R.drawable.ic_baseline_no_photography_24)
+        .timeout(20_000)
         .transform(*transforms)
         .into(this)
 
