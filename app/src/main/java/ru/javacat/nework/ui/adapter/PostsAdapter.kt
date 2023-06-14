@@ -32,19 +32,18 @@ interface OnInteractionListener {
     fun onPlayVideo(url: String) {}
     fun onImage(url: String) {}
     fun onUser(post: PostModel) {}
-    fun onMention(post: PostModel){}
+    fun onMention(post: PostModel) {}
 
-    fun onLiked(post: PostModel){}
-    fun onCoords(post: PostModel){}
+    fun onLiked(post: PostModel) {}
+    fun onCoords(post: PostModel) {}
 
     fun onLink(url: String) {}
 
-    fun onUpBtn() {
+    fun onUpBtn() {}
 
-    }
+    fun clearUpBtn(){}
 
 }
-
 
 
 class PostsAdapter(
@@ -62,11 +61,15 @@ class PostsAdapter(
         val post = getItem(position) ?: return
 
         //Log.i("POS", position.toString())
-        if (position == 0) {isScrolledOver = false}
+        if (position == 0) {
+            isScrolledOver = false
+        }
         if (position == 10 && !isScrolledOver) {
             isScrolledOver = true
             onInteractionListener.onUpBtn()
         }
+
+        if (position<4) onInteractionListener.clearUpBtn()
 
         holder.bind(post)
     }
@@ -77,30 +80,32 @@ class PostViewHolder(
     private val binding: CardPostBinding,
     private val onInteractionListener: OnInteractionListener
 ) : RecyclerView.ViewHolder(binding.root) {
-    private val defaultUserAvatar = AppCompatResources.getDrawable(binding.root.context,
+    private val defaultUserAvatar = AppCompatResources.getDrawable(
+        binding.root.context,
         R.drawable.baseline_account_circle_36
     )
 
     fun bind(post: PostModel) {
-        if (post.attachment!= null && post.attachment.url.startsWith("http", false)){
+        if (post.attachment != null && post.attachment.url.startsWith("http", false)) {
             binding.attachLayout.root.visibility = View.VISIBLE
             when (post.attachment.type) {
                 AttachmentType.IMAGE -> {
                     binding.attachLayout.attachImage.load(post.attachment.url)
                 }
+
                 AttachmentType.VIDEO -> {
                     binding.attachLayout.attachVideo.load(post.attachment.url)
                 }
+
                 AttachmentType.AUDIO -> {
                 }
             }
-        }else binding.attachLayout.root.visibility = View.GONE
+        } else binding.attachLayout.root.visibility = View.GONE
 
         binding.apply {
             post.authorAvatar?.let {
-                if (it.startsWith("http",false))
-                avatar.loadAvatar(it)
-            }?:avatar.setImageDrawable(defaultUserAvatar)
+                if (it.startsWith("http", false)) avatar.loadAvatar(it)
+            } ?: avatar.setImageDrawable(defaultUserAvatar)
 
             name.text = post.author
             published.text = setDateToPost(post.published)
@@ -112,13 +117,15 @@ class PostViewHolder(
             //likes:
             interactionPosts.likeBtn.isChecked = post.likedByMe //???
             interactionPosts.likeBtn.text = "${post.likeOwnerIds?.size ?: ""}"
-            if (post.likeOwnerIds?.size != 0){
+            if (post.likeOwnerIds?.size != 0) {
                 likedList.visibility = View.VISIBLE
 
-                likedList.text = post.likeOwnerIds?.map{
-                    if (post.users[it]?.name != null) {post.users[it]?.name} else
+                likedList.text = post.likeOwnerIds?.map {
+                    if (post.users[it]?.name != null) {
+                        post.users[it]?.name
+                    } else
                         binding.root.resources.getString(R.string.Me)
-                }?.joinToString (", ", binding.root.resources.getString(R.string.Liked)+" ")
+                }?.joinToString(", ", binding.root.resources.getString(R.string.Liked) + " ")
             } else likedList.visibility = View.GONE
 
             //coords:
@@ -138,7 +145,7 @@ class PostViewHolder(
             if (post.mentionIds.isNotEmpty()) {
                 interactionPosts.mentioned.visibility = View.VISIBLE
                 interactionPosts.mentioned.text = post.mentionIds.size.toString()
-            } else  interactionPosts.mentioned.visibility = View.GONE
+            } else interactionPosts.mentioned.visibility = View.GONE
 
             interactionPosts.mentioned.setOnClickListener {
                 onInteractionListener.onMention(post)
@@ -186,6 +193,7 @@ class PostViewHolder(
                                 onInteractionListener.onRemove(post)
                                 true
                             }
+
                             R.id.edit -> {
                                 onInteractionListener.onEdit(post)
                                 true
@@ -217,8 +225,6 @@ class PostViewHolder(
         }
     }
 }
-
-
 
 
 class PostDiffCallback : DiffUtil.ItemCallback<PostModel>() {

@@ -235,6 +235,10 @@ class PostsFragment : Fragment() {
                 binding.upBtn.isVisible = true
                 binding.upBtn.startAnimation(upBtnAnim)
             }
+
+            override fun clearUpBtn() {
+                binding.upBtn.isVisible = false
+            }
         })
 
         binding.postsList.adapter = adapter
