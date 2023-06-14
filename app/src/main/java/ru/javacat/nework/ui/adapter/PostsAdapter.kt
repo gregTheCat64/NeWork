@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isVisible
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -64,12 +65,6 @@ class PostsAdapter(
             onInteractionListener.onUpBtn()
         }
 
-//        if (position<10) {isScrolledOver = false}
-//
-//        if (isScrolledOver && position == 10) {
-//
-//        }
-
 
         holder.bind(post)
     }
@@ -80,26 +75,32 @@ class PostViewHolder(
     private val binding: CardPostBinding,
     private val onInteractionListener: OnInteractionListener
 ) : RecyclerView.ViewHolder(binding.root) {
+    private val defaultUserAvatar = AppCompatResources.getDrawable(binding.root.context,
+        R.drawable.baseline_account_circle_36
+    )
 
-    val  str = binding.root.resources.getString(R.string.Me)
 
     fun bind(post: PostModel) {
-        if (post.attachment != null) {
+        if (post.attachment!= null && post.attachment.url.startsWith("http", false)){
             binding.attachLayout.root.visibility = View.VISIBLE
-            when (post.attachment!!.type) {
+            when (post.attachment.type) {
                 AttachmentType.IMAGE -> {
-                    binding.attachLayout.attachImage.load(post.attachment!!.url)
+                    binding.attachLayout.attachImage.load(post.attachment.url)
                 }
                 AttachmentType.VIDEO -> {
-                    binding.attachLayout.attachVideo.load(post.attachment!!.url)
+                    binding.attachLayout.attachVideo.load(post.attachment.url)
                 }
                 AttachmentType.AUDIO -> {
                 }
             }
-        } else binding.attachLayout.root.visibility = View.GONE
+        }else binding.attachLayout.root.visibility = View.GONE
 
         binding.apply {
-            avatar.loadAvatar(post.authorAvatar.toString())
+            post.authorAvatar?.let {
+                if (it.startsWith("http",false))
+                avatar.loadAvatar(it)
+            }?:avatar.setImageDrawable(defaultUserAvatar)
+
             name.text = post.author
             published.text = post.published?.asString()
             content.text = post.content

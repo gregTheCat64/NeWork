@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isVisible
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -63,8 +64,11 @@ class EventViewHolder(
     private val binding: CardEventBinding,
     private val onEventsListener: OnEventsListener
 ): RecyclerView.ViewHolder(binding.root) {
+    val defaultUserAvatar = AppCompatResources.getDrawable(binding.root.context,
+        R.drawable.baseline_account_circle_36
+    )
     fun bind(event: EventModel){
-        if (event.attachment != null){
+        if (event.attachment != null && event.attachment.url.startsWith("http", false)){
             binding.attachLayout.root.visibility = View.VISIBLE
             when (event.attachment.type) {
                 AttachmentType.IMAGE -> {
@@ -81,7 +85,10 @@ class EventViewHolder(
 
         binding.apply {
             interactionPosts.takePartBtn.isVisible = true
-            avatar.loadAvatar(event.authorAvatar.toString())
+            event.authorAvatar?.let {
+                if (it.startsWith("http", false))
+                    avatar.loadAvatar(it)
+            }?:avatar.setImageDrawable(defaultUserAvatar)
             name.text = event.author
             published.text = event.published?.asString()
             content.text = event.content

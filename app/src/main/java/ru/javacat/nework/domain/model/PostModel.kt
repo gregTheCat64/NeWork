@@ -18,7 +18,7 @@ data class PostModel (
     var mentionIds: List<Long>,
     val mentionMe: Boolean,
     val likedByMe: Boolean,
-    var attachment: AttachmentModel?,
+    val attachment: AttachmentModel?,
     var playBtnPressed: Boolean = false,
     val ownedByMe: Boolean,
     val users: Map<Long, UserPreview>
