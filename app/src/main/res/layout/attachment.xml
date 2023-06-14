@@ -10,7 +10,7 @@
     <ImageView
         android:id="@+id/attachImage"
         android:layout_width="match_parent"
-        android:layout_height="280dp"
+        android:layout_height="400dp"
         android:layout_marginTop="@dimen/dim8dp"
         android:visibility="gone"
         />
