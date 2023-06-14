@@ -39,9 +39,9 @@ interface OnInteractionListener {
 
     fun onLink(url: String) {}
 
-    fun onUpBtn() {}
+    fun clearUpBtn() {}
 
-    fun clearUpBtn(){}
+    fun makeUpBtn(){}
 
 }
 
@@ -61,15 +61,16 @@ class PostsAdapter(
         val post = getItem(position) ?: return
 
         //Log.i("POS", position.toString())
-        if (position == 0) {
-            isScrolledOver = false
-        }
+
         if (position == 10 && !isScrolledOver) {
             isScrolledOver = true
-            onInteractionListener.onUpBtn()
+            onInteractionListener.makeUpBtn()
         }
 
-        if (position<4) onInteractionListener.clearUpBtn()
+        if (position<4) {
+            onInteractionListener.clearUpBtn()
+            isScrolledOver = false
+        }
 
         holder.bind(post)
     }

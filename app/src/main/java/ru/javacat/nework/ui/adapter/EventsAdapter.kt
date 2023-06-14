@@ -38,7 +38,9 @@ interface OnEventsListener {
 
     fun onLink(url: String){}
 
-    fun onUpBtn() {}
+    fun makeUpBtn() {}
+
+    fun clearUpBtn() {}
 }
 class EventsAdapter(
     private val onEventsListener: OnEventsListener
@@ -51,10 +53,14 @@ class EventsAdapter(
 
     override fun onBindViewHolder(holder: EventViewHolder, position: Int) {
         val event = getItem(position) ?: return
-        if (position == 0) {isScrolledOver = false}
         if (position == 10 && !isScrolledOver) {
             isScrolledOver = true
-            onEventsListener.onUpBtn()
+            onEventsListener.makeUpBtn()
+        }
+
+        if (position<4) {
+            onEventsListener.clearUpBtn()
+            isScrolledOver = false
         }
         holder.bind(event)
     }

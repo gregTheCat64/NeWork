@@ -168,12 +168,15 @@ class EventsFragment : Fragment(R.layout.fragment_events) {
                 startActivity(shareIntent)
             }
 
-            override fun onUpBtn() {
+            override fun makeUpBtn() {
                 binding.upBtn.apply {
                     isVisible = true
                     startAnimation(upBtnAnim)
                 }
+            }
 
+            override fun clearUpBtn() {
+                binding.upBtn.isVisible = false
             }
         }
         )

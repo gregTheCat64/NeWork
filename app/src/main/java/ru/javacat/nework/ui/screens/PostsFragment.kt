@@ -231,7 +231,7 @@ class PostsFragment : Fragment() {
                 startActivity(shareIntent)
             }
 
-            override fun onUpBtn() {
+            override fun makeUpBtn() {
                 binding.upBtn.isVisible = true
                 binding.upBtn.startAnimation(upBtnAnim)
             }
