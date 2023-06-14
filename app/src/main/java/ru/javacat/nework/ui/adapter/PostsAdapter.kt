@@ -18,6 +18,7 @@ import ru.javacat.nework.domain.model.PostModel
 import ru.javacat.nework.util.asString
 import ru.javacat.nework.util.load
 import ru.javacat.nework.util.loadAvatar
+import ru.javacat.nework.util.loadFull
 import ru.javacat.nework.util.setDateToPost
 
 

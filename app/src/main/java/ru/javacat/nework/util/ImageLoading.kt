@@ -18,6 +18,7 @@ fun ImageView.load(url: String, vararg transforms: BitmapTransformation = emptyA
 fun ImageView.loadFull(url: String, vararg transforms: BitmapTransformation = emptyArray()) =
     Glide.with(this)
         .load(url)
+        .placeholder(R.drawable.ic_baseline_no_photography_24)
         .timeout(10_000)
         .transform(*transforms)
         .into(this)
