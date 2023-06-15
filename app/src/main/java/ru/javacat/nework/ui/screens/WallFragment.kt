@@ -259,6 +259,10 @@ class WallFragment : Fragment() {
                     Intent.createChooser(intent, getString(R.string.chooser_link))
                 startActivity(shareIntent)
             }
+
+            override fun clearUpBtn() {
+                super.clearUpBtn()
+            }
         })
 
         binding.postsList.adapter = adapter
