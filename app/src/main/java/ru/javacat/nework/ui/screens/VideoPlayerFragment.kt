@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
+import androidx.media3.exoplayer.ExoPlaybackException
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
@@ -38,21 +39,20 @@ class VideoPlayerFragment : Fragment() {
         val args = arguments
         val url = args?.getString("URL") ?: ""
 
-        play(player, url)
+        viewModel.play(player, url)
+
+
 
         viewModel.state.observe(viewLifecycleOwner){
             binding.progressBar.isVisible = it.loading
             if (it == FeedModelState(error = true)){
                 Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
                     .setAction(R.string.retry_loading) {
-                        play(player, url)
+                        viewModel.play(player, url)
                     }
                     .show()
             }
         }
-
-
-
 
 
         binding.closeBtn.setOnClickListener {
@@ -84,22 +84,7 @@ class VideoPlayerFragment : Fragment() {
         (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
     }
 
-    private fun play(player: ExoPlayer, url: String){
-        try {
-            viewModel.setLoadingState()
-            // Build the media item.
-            val mediaItem = MediaItem.fromUri(url.toUri().toString())
-// Set the media item to be played.
-            player.setMediaItem(mediaItem)
-// Prepare the player.
-            player.prepare()
-// Start the playback.
-            viewModel.setIdleState()
-            player.play()
-        } catch (e: PlaybackException) {
-            viewModel.setErrorState()
-        }
-    }
+
 
     //    override fun onCreateDialog(
 //        savedInstanceState: Bundle?

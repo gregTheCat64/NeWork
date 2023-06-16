@@ -13,6 +13,7 @@ import retrofit2.create
 import ru.javacat.nework.BuildConfig
 import ru.javacat.nework.data.api.*
 import ru.javacat.nework.data.auth.AppAuth
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -47,6 +48,7 @@ class ApiModule {
     }
     chain.proceed(chain.request())
         }
+        .connectTimeout(10, TimeUnit.SECONDS)
         .build()
 
     @Provides

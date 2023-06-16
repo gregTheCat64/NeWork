@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -83,6 +84,7 @@ class AppActivity : AppCompatActivity() {
         val barCloseBtn = findViewById<Button>(R.id.barCloseBtn)
         val avatarImage = findViewById<ImageView>(R.id.appBarImage)
         val seekBarColor = resources.getColor(R.color.md_theme_light_onPrimary, theme)
+        val defaultAvatar = ResourcesCompat.getDrawable(resources,R.drawable.baseline_account_circle_36,theme)
         binding.audioBar.barSeekBar.progressDrawable.setColorFilter(
             seekBarColor,
             PorterDuff.Mode.MULTIPLY
@@ -141,7 +143,7 @@ class AppActivity : AppCompatActivity() {
                 if (authorized) {
                     avatarImage.loadAvatar(it.toString())
                 } else
-                    avatarImage.setImageDrawable(resources.getDrawable(R.drawable.baseline_account_circle_36))
+                    avatarImage.setImageDrawable(defaultAvatar)
             }
         }
     }
