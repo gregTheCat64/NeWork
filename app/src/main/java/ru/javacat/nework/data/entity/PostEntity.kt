@@ -35,8 +35,6 @@ data class PostEntity(
     val ownedByMe: Boolean,
     val users: Map<Long, UserPreview>,
     ) {
-
-
     fun toDto() = PostModel(
         id, authorId, author, authorAvatar, authorJob, content, published?.toLocalDateTime(),
         coords = coords?.toDto(),

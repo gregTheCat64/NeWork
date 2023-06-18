@@ -16,7 +16,7 @@ import ru.javacat.nework.util.Converters
     UserEntity::class,
     JobEntity::class,
     ProfileEntity::class
-                     ], version = 1)
+                     ], version = 1, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDb : RoomDatabase() {
     abstract fun postDao(): PostDao

@@ -31,7 +31,7 @@ class VideoPlayerFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentVideoPlayerBinding.inflate(layoutInflater)
 
         player = ExoPlayer.Builder(requireContext()).build()
@@ -40,7 +40,6 @@ class VideoPlayerFragment : Fragment() {
         val url = args?.getString("URL") ?: ""
 
         viewModel.play(player, url)
-
 
 
         viewModel.state.observe(viewLifecycleOwner){

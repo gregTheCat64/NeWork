@@ -45,7 +45,6 @@ interface OnInteractionListener {
 
 }
 
-
 class PostsAdapter(
     private val onInteractionListener: OnInteractionListener,
 ) : PagingDataAdapter<PostModel, PostViewHolder>(PostDiffCallback()) {
@@ -67,7 +66,7 @@ class PostsAdapter(
             onInteractionListener.makeUpBtn()
         }
 
-        if (position<4) {
+        if (position<6) {
             onInteractionListener.clearUpBtn()
             isScrolledOver = false
         }

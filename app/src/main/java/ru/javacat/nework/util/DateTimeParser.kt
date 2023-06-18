@@ -6,7 +6,7 @@ import androidx.annotation.RequiresApi
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-val currentDateTime = LocalDateTime.now()
+val currentDateTime: LocalDateTime = LocalDateTime.now()
 
 fun String.toLocalDateTime(): LocalDateTime =
     try {

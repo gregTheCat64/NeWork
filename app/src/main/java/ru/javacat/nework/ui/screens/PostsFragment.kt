@@ -50,8 +50,6 @@ class PostsFragment : Fragment() {
     //private val eventsViewModel: EventViewModel by viewModels()
 
 
-
-
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
