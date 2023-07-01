@@ -38,7 +38,7 @@ class SignInFragment : Fragment() {
     ): View {
         val binding = FragmentSignInBinding.inflate(inflater, container, false)
 
-        (activity as AppCompatActivity).findViewById<View>(R.id.wallAppBar)!!.visibility = View.GONE
+
 
         binding.loginBtn.setOnClickListener {
             val login = binding.loginEditText.text.toString().trim()
