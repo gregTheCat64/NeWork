@@ -18,6 +18,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.fragment.findNavController
 import com.github.dhaval2404.imagepicker.ImagePicker
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import ru.javacat.nework.R
@@ -46,21 +47,6 @@ class NewEventFragment : Fragment() {
     private val eventViewModel: EventViewModel by activityViewModels()
     private val userViewModel: UserViewModel by activityViewModels()
 
-    override fun onStart() {
-        super.onStart()
-        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
-    }
-
-    override fun onStop() {
-        super.onStop()
-        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.VISIBLE
-    }
-
-    override fun onResume() {
-        super.onResume()
-        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
-    }
-//    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -215,12 +201,12 @@ class NewEventFragment : Fragment() {
         }
 
         //Навигация
-        binding.topAppBar.setNavigationOnClickListener {
+        binding.newEventAppBar.setNavigationOnClickListener {
             eventViewModel.clearEdit()
             AndroidUtils.hideKeyboard(requireView())
             findNavController().navigateUp()
         }
-        binding.topAppBar.setOnMenuItemClickListener { menuItem ->
+        binding.newEventAppBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.create -> {
                     val content = binding.eventEditText.text.toString()

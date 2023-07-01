@@ -12,7 +12,6 @@
             style="@style/Widget.AppTheme.LikeCheckBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
             android:checkable="true"
             android:text="33"
             app:icon="@drawable/ic_like_selector" />
@@ -22,8 +21,9 @@
             style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/dim16dp"
+            android:layout_marginStart="@dimen/dim8dp"
             android:text="2"
+            android:textAlignment="viewEnd"
             app:icon="@drawable/ic_baseline_people_24"
             app:tint="#7C7C7C" />
 
@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:checkable="true"
         android:text="in"
-        android:layout_marginStart="@dimen/dim16dp"
+        android:layout_marginStart="@dimen/dim8dp"
         app:icon="@drawable/be_participate_btn_selector"
         />
 
@@ -43,7 +43,7 @@
             style="@style/Widget.Material3.Button.IconButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/dim8dp"
+            android:layout_marginStart="@dimen/dim4dp"
             app:icon="@drawable/ic_baseline_share_24"
             />
 

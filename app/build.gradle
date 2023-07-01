@@ -39,9 +39,7 @@ android {
             buildConfigField "String", "BASE_URL", '"https://netomedia.ru"'
         }
         debug {
-            manifestPlaceholders.usesCleartextTraffic = false
-            //buildConfigField "String", "BASE_URL", '"http://10.0.2.2:9999"'
-            //buildConfigField "String", "BASE_URL", '"http://192.168.0.103:9999"'
+            manifestPlaceholders.usesCleartextTraffic = true
             buildConfigField "String", "BASE_URL", '"https://netomedia.ru"'
         }
     }

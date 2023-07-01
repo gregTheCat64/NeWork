@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -24,6 +25,7 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.catch
@@ -44,6 +46,8 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class PostsFragment : Fragment() {
+
+
 
 
     private val postViewModel: PostViewModel by activityViewModels()
@@ -151,13 +155,17 @@ class PostsFragment : Fragment() {
                     val attach = post.attachment?.url ?: ""
                     val link = post.link ?: ""
                     val published = post.published?.asString()
+                    val downloadLink = "https://disk.yandex.ru/d/CMfR6397IROBqw"
 
-                    val msg = "$author пишет:\n" +
+
+                    val msg = "$published\n"  +
+                            "$author пишет:\n" +
                             "$content \n" +
                             "$attach \n" +
                             "$link\n" +
-                            "$published" +
-                            "отправлено из NeWork App.\n"
+                            "отправлено из NeWork App.\n"+
+                            "чтобы скачать приложение пройдите по ссылке: \n"+
+                            downloadLink
 
                     putExtra(Intent.EXTRA_TEXT, msg)
                     type = "text/plain"

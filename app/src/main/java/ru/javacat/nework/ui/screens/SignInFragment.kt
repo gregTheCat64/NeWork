@@ -22,21 +22,7 @@ import javax.inject.Inject
 
 class SignInFragment : Fragment() {
 
-    override fun onStart() {
-        super.onStart()
-        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
-    }
 
-    override fun onStop() {
-        super.onStop()
-        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility =
-            View.VISIBLE
-    }
-
-    override fun onResume() {
-        super.onResume()
-        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
-    }
 
 
     private val viewModel: SignInViewModel by activityViewModels()
@@ -51,6 +37,8 @@ class SignInFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentSignInBinding.inflate(inflater, container, false)
+
+        (activity as AppCompatActivity).findViewById<View>(R.id.wallAppBar)!!.visibility = View.GONE
 
         binding.loginBtn.setOnClickListener {
             val login = binding.loginEditText.text.toString().trim()

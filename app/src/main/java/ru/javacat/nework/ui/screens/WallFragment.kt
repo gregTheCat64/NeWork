@@ -16,6 +16,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.SimpleItemAnimator
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -42,22 +43,12 @@ class WallFragment : Fragment() {
 
     var currentUser: User = User(0L, "", "", "", false, false)
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        println("onCreate")
 
-    override fun onStart() {
-        super.onStart()
-        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
     }
 
-    override fun onStop() {
-        super.onStop()
-        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility =
-            View.VISIBLE
-    }
-
-    override fun onResume() {
-        super.onResume()
-        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
-    }
 
 
     @Inject
@@ -68,6 +59,7 @@ class WallFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        println("onCreateView")
         val binding = FragmentWallBinding.inflate(inflater, container, false)
 
         val mAnimator = binding.postsList.itemAnimator as SimpleItemAnimator
@@ -296,7 +288,14 @@ class WallFragment : Fragment() {
         return binding.root
 
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        println("onViewCreated")
+        //(activity as AppCompatActivity).findViewById<AppBarLayout>(R.id.topAppBar)!!.visibility = View.GONE
+    }
 }
+
 
 
 fun getPostSizeText(size: Int): String {

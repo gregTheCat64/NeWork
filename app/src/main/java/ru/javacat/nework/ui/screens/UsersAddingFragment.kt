@@ -1,30 +1,23 @@
 package ru.javacat.nework.ui.screens
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.cardview.widget.CardView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
-import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.appbar.AppBarLayout
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.*
 import ru.javacat.nework.R
 import ru.javacat.nework.databinding.FragmentUsersAddingBinding
 import ru.javacat.nework.domain.model.User
-import ru.javacat.nework.domain.model.UsersType
 import ru.javacat.nework.ui.adapter.OnUserListener
 import ru.javacat.nework.ui.adapter.UsersAdapter
-import ru.javacat.nework.ui.viewmodels.EventViewModel
-import ru.javacat.nework.ui.viewmodels.PostViewModel
 import ru.javacat.nework.ui.viewmodels.UserViewModel
 
 @AndroidEntryPoint
@@ -32,20 +25,7 @@ class UsersAddingFragment : Fragment() {
 
     private val userViewModel: UserViewModel by activityViewModels()
 
-    override fun onStart() {
-        super.onStart()
-        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
-    }
 
-    override fun onStop() {
-        super.onStop()
-        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.VISIBLE
-    }
-
-    override fun onResume() {
-        super.onResume()
-        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -98,12 +78,12 @@ class UsersAddingFragment : Fragment() {
 
 
         //navigation:
-        binding.topAppBar.setNavigationOnClickListener {
+        binding.usersAppBar.setNavigationOnClickListener {
               usersIds.clear()
             findNavController().navigateUp()
         }
 
-        binding.topAppBar.setOnMenuItemClickListener {menuItem->
+        binding.usersAppBar.setOnMenuItemClickListener {menuItem->
             when (menuItem.itemId){
                 R.id.create -> {
                     val users = usersIds.toLongArray()

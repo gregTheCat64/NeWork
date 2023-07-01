@@ -25,6 +25,7 @@ import androidx.navigation.fragment.findNavController
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import ru.javacat.nework.R
@@ -52,20 +53,7 @@ class NewPostFragment : Fragment() {
     private val postViewModel: PostViewModel by activityViewModels()
     private val userViewModel: UserViewModel by activityViewModels()
 
-    override fun onStart() {
-        super.onStart()
-        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
-    }
 
-    override fun onStop() {
-        super.onStop()
-        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.VISIBLE
-    }
-
-    override fun onResume() {
-        super.onResume()
-        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
-    }
 
 
     override fun onCreateView(
@@ -268,12 +256,12 @@ class NewPostFragment : Fragment() {
         }
 
         //navigation
-        binding.topAppBar.setNavigationOnClickListener {
+        binding.newPostAppBar.setNavigationOnClickListener {
             postViewModel.clearEdit()
             findNavController().navigateUp()
         }
 
-        binding.topAppBar.setOnMenuItemClickListener { menuItem ->
+        binding.newPostAppBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.create -> {
 

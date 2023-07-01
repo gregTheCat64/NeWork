@@ -19,6 +19,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.findNavController
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.material.appbar.AppBarLayout
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -37,8 +38,8 @@ import javax.inject.Inject
 class AppActivity : AppCompatActivity() {
 
 
-    @Inject
-    lateinit var appAuth: AppAuth
+//    @Inject
+//    lateinit var appAuth: AppAuth
 
     @Inject
     lateinit var firebaseMessaging: FirebaseMessaging
@@ -49,7 +50,7 @@ class AppActivity : AppCompatActivity() {
     var duration = 0L
 
     val viewModel: AuthViewModel by viewModels()
-    val userViewModel: UserViewModel by viewModels()
+
 
     private lateinit var player: ExoPlayer
     private lateinit var binding: ActivityAppBinding
@@ -82,9 +83,7 @@ class AppActivity : AppCompatActivity() {
         val barPlayBtn = findViewById<Button>(R.id.barPlayBtn)
         val barSeekBar = findViewById<SeekBar>(R.id.barSeekBar)
         val barCloseBtn = findViewById<Button>(R.id.barCloseBtn)
-        val avatarImage = findViewById<ImageView>(R.id.appBarImage)
         val seekBarColor = resources.getColor(R.color.md_theme_light_onPrimary, theme)
-        val defaultAvatar = ResourcesCompat.getDrawable(resources,R.drawable.baseline_account_circle_36,theme)
         binding.audioBar.barSeekBar.progressDrawable.setColorFilter(
             seekBarColor,
             PorterDuff.Mode.MULTIPLY
@@ -93,12 +92,6 @@ class AppActivity : AppCompatActivity() {
         checkGoogleApiAvailability()
 
 
-        avatarImage.setOnClickListener {
-            var authorized = viewModel.authorized
-            if (authorized) {
-                showAuthorizedMenu(it)
-            } else showMenu(it)
-        }
 
         barPlayBtn.setOnClickListener {
             if (player.isPlaying) {
@@ -129,23 +122,6 @@ class AppActivity : AppCompatActivity() {
         })
 
 
-        //menu:
-        viewModel.data.observe(this) {
-            val id = appAuth.getId()
-            userViewModel.getUserById(id)
-            userViewModel.updateFavUserList(id)
-
-        }
-
-        userViewModel.user.observe(this) { user ->
-            user.avatar.let {
-                val authorized = viewModel.authorized
-                if (authorized) {
-                    avatarImage.loadAvatar(it.toString())
-                } else
-                    avatarImage.setImageDrawable(defaultAvatar)
-            }
-        }
     }
 
 
@@ -190,65 +166,7 @@ class AppActivity : AppCompatActivity() {
         return ((position.toDouble() / duration.toDouble()) * 100).toInt()
     }
 
-    private fun showMenu(view: View) {
-        val menu = PopupMenu(this, view)
-        menu.inflate(R.menu.menu_main)
-        menu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.signIn -> {
-                    findNavController(R.id.nav_host_fragment).navigate(R.id.signInFragment)
 
-                }
-
-                R.id.signUp -> {
-                    findNavController(R.id.nav_host_fragment).navigate(R.id.registrationFragment)
-
-                }
-
-                else -> {
-                    Toast.makeText(this, "lala", Toast.LENGTH_SHORT).show()
-                }
-            }
-            true
-        })
-        menu.show()
-    }
-
-    private fun showAuthorizedMenu(view: View) {
-        val menu = PopupMenu(this, view)
-        menu.inflate(R.menu.menu_by_authorized)
-        menu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.logout -> {
-                    showSignOutDialog(appAuth, this)
-
-                }
-
-                R.id.userListBtn -> {
-                    findNavController(R.id.nav_host_fragment).navigate(R.id.usersSearchFragment)
-                }
-
-                R.id.profileBtn -> {
-                    if (appAuth.getId() != 0L) {
-                        val id = appAuth.getId()
-                        val bundle = Bundle()
-                        bundle.putLong("userID", id)
-                        findNavController(R.id.nav_host_fragment).navigate(
-                            R.id.wallFragment,
-                            bundle
-                        )
-                    } else findNavController(R.id.nav_host_fragment).navigate(R.id.signInFragment)
-
-                }
-
-                else -> {
-                    Toast.makeText(this, "lala", Toast.LENGTH_SHORT).show()
-                }
-            }
-            true
-        })
-        menu.show()
-    }
 
     private fun checkGoogleApiAvailability() {
         with(GoogleApiAvailability.getInstance()) {

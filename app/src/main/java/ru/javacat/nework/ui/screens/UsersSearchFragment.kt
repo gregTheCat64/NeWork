@@ -4,9 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.appbar.AppBarLayout
 import dagger.hilt.android.AndroidEntryPoint
 import ru.javacat.nework.R
 import ru.javacat.nework.databinding.FragmentUsersSearchBinding
@@ -17,6 +19,9 @@ import ru.javacat.nework.ui.viewmodels.UserViewModel
 
 @AndroidEntryPoint
 class UsersSearchFragment: Fragment() {
+
+
+
     private val userViewModel: UserViewModel by viewModels()
 
     override fun onCreateView(
@@ -43,7 +48,7 @@ class UsersSearchFragment: Fragment() {
             adapter.submitList(userList)
         }
 
-        binding.topAppBar.setNavigationOnClickListener {
+        binding.usersSearchAppBar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
 

@@ -9,6 +9,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import ru.javacat.nework.R
@@ -22,21 +23,7 @@ import ru.javacat.nework.util.toLocalDateTimeWhithoutZone
 @AndroidEntryPoint
 class NewJobFragment : Fragment() {
 
-    override fun onStart() {
-        super.onStart()
-        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
-    }
 
-    override fun onStop() {
-        super.onStop()
-        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility =
-            View.VISIBLE
-    }
-
-    override fun onResume() {
-        super.onResume()
-        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
-    }
 
     private val viewModel: JobsViewModel by viewModels()
 
@@ -47,12 +34,12 @@ class NewJobFragment : Fragment() {
         val binding = FragmentNewJobBinding.inflate(inflater)
 
         //AppBar:
-        binding.topAppBar.setNavigationOnClickListener {
+        binding.newJobAppBar.setNavigationOnClickListener {
             AndroidUtils.hideKeyboard(requireView())
             findNavController().navigateUp()
         }
 
-        binding.topAppBar.setOnMenuItemClickListener { menuItem ->
+        binding.newJobAppBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.create -> {
                     if (binding.jobEditText.text.isNotEmpty() &&

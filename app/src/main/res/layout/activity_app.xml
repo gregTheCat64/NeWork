@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -9,28 +9,33 @@
     tools:context=".ui.screens.AppActivity">
 
 
-            <include
-                android:id="@+id/topAppBar"
-                layout="@layout/app_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
 
-            <include
-                android:id="@+id/audioBar"
-                layout="@layout/audio_bar"
-                android:visibility="gone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                />
+        android:orientation="vertical">
+        <include
+            android:id="@+id/audioBar"
+            layout="@layout/audio_bar"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
 
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/nav_host_fragment"
-                android:name="androidx.navigation.fragment.NavHostFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:defaultNavHost="true"
-                app:navGraph="@navigation/nav_main" />
+            />
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/nav_host_fragment"
+            android:name="androidx.navigation.fragment.NavHostFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:defaultNavHost="true"
+            app:navGraph="@navigation/nav_main"
+           />
+    </LinearLayout>
+
+
+
+
 
 
 
@@ -52,4 +57,4 @@
 <!--                />-->
 <!--        </com.google.android.material.appbar.AppBarLayout>-->
 
-</androidx.appcompat.widget.LinearLayoutCompat>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

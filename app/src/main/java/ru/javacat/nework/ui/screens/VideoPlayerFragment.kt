@@ -5,13 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.media3.common.MediaItem
-import androidx.media3.common.PlaybackException
-import androidx.media3.exoplayer.ExoPlaybackException
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
@@ -64,7 +60,7 @@ class VideoPlayerFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
+
 //        dialog!!.window?.setLayout(
 //            ViewGroup.LayoutParams.MATCH_PARENT,
 //            ViewGroup.LayoutParams.WRAP_CONTENT
@@ -73,14 +69,13 @@ class VideoPlayerFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-        player.stop()
-        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility =
-            View.VISIBLE
+        player.pause()
+
     }
 
     override fun onResume() {
         super.onResume()
-        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
+
     }
 
 

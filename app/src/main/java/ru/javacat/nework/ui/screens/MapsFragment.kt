@@ -70,7 +70,7 @@ class MapsFragment : Fragment(R.layout.fragment_maps), InputListener {
             Toast.makeText(requireContext(), "Выберите место", Toast.LENGTH_SHORT).show()
         }
 
-        binding.topAppBar.setNavigationOnClickListener {
+        binding.mapAppBar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
     }
@@ -96,18 +96,18 @@ class MapsFragment : Fragment(R.layout.fragment_maps), InputListener {
     override fun onStart() {
         MapKitFactory.getInstance().onStart()
         super.onStart()
-        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
+
     }
 
     override fun onStop() {
         binding.mapview.onStop()
         MapKitFactory.getInstance().onStop()
         super.onStop()
-        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.VISIBLE
+
     }
 
     override fun onResume() {
         super.onResume()
-        (activity as AppCompatActivity).findViewById<View>(R.id.topAppBar)!!.visibility = View.GONE
+
     }
 }

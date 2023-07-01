@@ -97,15 +97,17 @@ class EventsFragment : Fragment(R.layout.fragment_events) {
                     val date = event.datetime?.asString()
                     val link = event.link?:""
                     val format = event.type.name
-
+                    val downloadLink = "https://disk.yandex.ru/d/CMfR6397IROBqw"
                     val msg =
                         "$author делится мероприятием:\n" +
-                                "$content \n" +
-                                "начало в $date \n"+
-                                "формат мероприятия: $format"+
-                                "$attach \n"+
-                                "$link\n"+
-                                "отправлено из NeWork App.\n"
+                                "$content \n." +
+                                "Начало $date \n"+
+                                "Формат мероприятия: $format\n"+
+                                "вложение: $attach \n"+
+                                "сайт: $link\n"+
+                                "отправлено из NeWork App.\n"+
+                                "чтобы скачать приложение пройдите по ссылке: \n"+
+                                downloadLink
 
                     putExtra(Intent.EXTRA_TEXT, msg)
                     type = "text/plain"
