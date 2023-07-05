@@ -1,6 +1,8 @@
 package ru.javacat.nework.ui.screens
 
+import android.content.Context
 import android.os.Bundle
+import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,12 +12,15 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
@@ -178,5 +183,58 @@ class ViewPagerFragment: Fragment() {
             true
         })
         menu.show()
+    }
+
+    class NestedFabBehavior(context: Context?, attrs: AttributeSet?) :
+        FloatingActionButton.Behavior(context, attrs) {
+
+        override fun onStartNestedScroll(
+            coordinatorLayout: CoordinatorLayout,
+            child: FloatingActionButton,
+            directTargetChild: View,
+            target: View,
+            axes: Int,
+            type: Int
+        ): Boolean {
+            return axes == ViewCompat.SCROLL_AXIS_VERTICAL ||
+                    super.onStartNestedScroll(
+                        coordinatorLayout,
+                        child,
+                        directTargetChild,
+                        target,
+                        axes,
+                        type
+                    )
+        }
+        override fun onNestedScroll(
+            coordinatorLayout: CoordinatorLayout,
+            child: FloatingActionButton,
+            target: View,
+            dxConsumed: Int,
+            dyConsumed: Int,
+            dxUnconsumed: Int,
+            dyUnconsumed: Int,
+            type: Int,
+            consumed: IntArray
+        ) {
+            super.onNestedScroll(
+                coordinatorLayout,
+                child,
+                target,
+                dxConsumed,
+                dyConsumed,
+                dxUnconsumed,
+                dyUnconsumed,
+                type,
+                consumed
+            )
+            if (dyConsumed > 0 && child.visibility == View.VISIBLE){
+                child.hide()
+            } else if (dyConsumed < 0 && child.visibility != View.VISIBLE){
+                child.show()
+            }
+        }
+
+
     }
 }
